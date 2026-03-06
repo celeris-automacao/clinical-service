@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  clinical-service:
+    build: .
+    container_name: healthgame_api_dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+    command: npm run start:dev # Hot-reload ativo em dev

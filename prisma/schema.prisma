@@ -1,0 +1,166 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["access", "clinical", "game", "social"]
+}
+
+model ClinicalRecord {
+  id                    String   @id @default(uuid()) @db.Uuid
+  tenantId              String   @map("tenant_id") @db.Uuid
+  patientId             String   @map("patient_id") @db.Uuid
+  recordedAt            DateTime @default(now()) @map("recorded_at")
+  weight                Decimal  @db.Decimal(5, 2)
+  skeletalMuscleMass    Decimal? @map("skeletal_muscle_mass") @db.Decimal(5, 2)
+  bodyFatMass           Decimal? @map("body_fat_mass") @db.Decimal(5, 2)
+
+  // RELAÇÃO CORRIGIDA
+  patient               Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("clinical_records")
+  @@schema("clinical")
+}
+
+model BossBattle {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  name      String   
+  maxHp     Decimal  @map("max_hp") @db.Decimal(12, 2)
+  currentHp Decimal  @map("current_hp") @db.Decimal(12, 2)
+  isActive  Boolean  @default(true) @map("is_active")
+  defeatedAt  DateTime?
+
+  @@map("boss_battles")
+  @@schema("game")
+}
+
+model DailyTask {
+  id          String    @id @default(uuid()) @db.Uuid
+  tenantId    String    @map("tenant_id") @db.Uuid
+  patientId   String    @map("patient_id") @db.Uuid
+  title       String
+  description String?
+  taskType    String    @map("task_type")
+  xpReward    Int       @default(50) @map("xp_reward")
+  dueDate     DateTime  @default(now()) @map("due_date") @db.Date
+  isCompleted Boolean   @default(false) @map("is_completed")
+  isActive    Boolean   @default(true) @map("is_active")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // ADICIONE ESTA LINHA: Campo oposto da relação com TaskCompletion
+  completions TaskCompletion[] 
+
+  @@map("daily_tasks")
+  @@schema("clinical")
+}
+
+model TaskCompletion {
+  id        String   @id @default(uuid()) @db.Uuid
+  taskId    String   @map("task_id") @db.Uuid
+  patientId String   @map("patient_id") @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  completedAt DateTime @default(now()) @map("completed_at")
+
+  task      DailyTask @relation(fields: [taskId], references: [id])
+  
+  // RELAÇÃO CORRIGIDA
+  patient   Patient   @relation(fields: [patientId], references: [id])
+
+  @@map("task_completions")
+  @@schema("game")
+}
+
+model Reward {
+  id              String   @id @default(uuid()) @db.Uuid
+  tenantId        String   @map("tenant_id") @db.Uuid
+  title           String   
+  description     String?
+  requiredDamage  Int      @map("required_damage")
+  goldCost       Int           @default(0) // Custo em moedas para resgatar 
+  badgeIcon       String?  @map("badge_icon")      
+  isActive        Boolean  @default(true) @map("is_active")
+
+  claims          RewardClaim[]
+
+  @@unique([title, tenantId])
+  @@map("rewards")
+  @@schema("game")
+}
+
+model RewardClaim {
+  id          String   @id @default(uuid()) @db.Uuid
+  rewardId    String   @map("reward_id") @db.Uuid
+  patientId   String   @map("patient_id") @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
+  claimedAt   DateTime @default(now()) @map("claimed_at")
+
+  reward      Reward   @relation(fields: [rewardId], references: [id])
+  
+  // RELAÇÃO CORRIGIDA
+  patient     Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("reward_claims")
+  @@schema("game")
+}
+
+model Patient {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  name      String   
+
+  clinicalRecords ClinicalRecord[]
+  completions     TaskCompletion[]
+  rewardClaims    RewardClaim[]
+  socialPosts SocialPost[]
+  playerStats     PlayerStats?
+
+  @@map("patients")
+  @@schema("clinical")
+}
+
+model PlayerStats {
+  patientId      String   @id @map("patient_id") @db.Uuid
+  tenantId       String   @map("tenant_id") @db.Uuid
+  currentLevel   Int      @default(1) @map("current_level")
+  currentXp      Int      @default(0) @map("current_xp")
+  currentGold Int @default(0)
+  currentStreak  Int      @default(0) @map("current_streak")
+  lastActivityAt DateTime @default(now()) @map("last_activity_at")
+  totalDamageDealt  Decimal  @default(0) @map("total_damage_dealt") @db.Decimal(10, 2)
+  patient           Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("player_stats")
+  @@schema("game")
+}
+
+model SocialPost {
+  id        String   @id @default(uuid()) @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  patientId String   @map("patient_id") @db.Uuid
+  content   String   // Ex: "Guerreiro de Saúde derrotou o Boss!"
+  type      String   // Ex: "achievement", "boss_defeat", "milestone"
+  createdAt DateTime @default(now()) @map("created_at")
+
+  patient   Patient  @relation(fields: [patientId], references: [id])
+
+  @@map("social_posts")
+  @@schema("social")
+}
+
+model Staff {
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String   @map("tenant_id") @db.Uuid
+  userId        String   @unique @map("user_id") @db.Uuid // Ligação com o Auth do Supabase
+  name          String
+  document      String   // CRM, CRN, etc.
+  specialty     String   // Endocrinologia, Nutrição...
+  role          String   @default("doctor") // doctor, admin, health_coach
+
+  @@map("staff")
+  @@schema("clinical")
+}

@@ -1,0 +1,60 @@
+clinical-service
+Ôö£ÔöÇÔöÇ prisma
+Ôöé   Ôö£ÔöÇÔöÇ migrations
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ 20260203202328_init_db
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ migration.sql
+Ôöé   Ôöé   ÔööÔöÇÔöÇ migration_lock.toml
+Ôöé   Ôö£ÔöÇÔöÇ schema.prisma
+Ôöé   ÔööÔöÇÔöÇ seed.ts
+Ôö£ÔöÇÔöÇ src
+Ôöé   Ôö£ÔöÇÔöÇ auth
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ guards
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ supabase.guard.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ strategies
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ supabase.strategy.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ auth.module.ts
+Ôöé   Ôö£ÔöÇÔöÇ common
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ decorators
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ get-user.decorator.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ guards
+Ôöé   Ôöé       ÔööÔöÇÔöÇ legacy-auth.guard.ts
+Ôöé   Ôö£ÔöÇÔöÇ dashboard
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ dashboard.controller.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ dashboard.module.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ dashboard.service.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ notifications.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ game
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ achievements.service.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ game.module.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ player.controller.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ player.service.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ rewards.controller.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ rewards.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ prisma
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ prisma-rls.extension.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ prisma.module.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ prisma.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ records
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ dto
+Ôöé   Ôöé   Ôöé   Ôö£ÔöÇÔöÇ create-record.dto.ts
+Ôöé   Ôöé   Ôöé   ÔööÔöÇÔöÇ evolution.dto.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ records.controller.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ records.module.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ records.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ social
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ social.controller.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ social.listener.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ social.model.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ social.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ tasks
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ tasks.controller.ts
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ tasks.module.ts
+Ôöé   Ôöé   ÔööÔöÇÔöÇ tasks.service.ts
+Ôöé   Ôö£ÔöÇÔöÇ app.module.ts
+Ôöé   ÔööÔöÇÔöÇ main.ts
+Ôö£ÔöÇÔöÇ estrutura_projeto.txt
+Ôö£ÔöÇÔöÇ generate-token.js
+Ôö£ÔöÇÔöÇ nest-cli.json
+Ôö£ÔöÇÔöÇ package-lock.json
+Ôö£ÔöÇÔöÇ package.json
+ÔööÔöÇÔöÇ tsconfig.json
