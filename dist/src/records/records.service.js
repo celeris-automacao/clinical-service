@@ -14,101 +14,68 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecordsService = void 0;
 const common_1 = require("@nestjs/common");
+const achievements_service_1 = require("../achievements/achievements.service");
 const prisma_service_1 = require("../prisma/prisma.service");
-const client_1 = require("@prisma/client");
-const achievements_service_1 = require("../game/achievements.service");
-const prisma_rls_extension_1 = require("../prisma/prisma-rls.extension");
 let RecordsService = class RecordsService {
-    constructor(prisma, achievementsService) {
+    constructor(repository, prisma, achievementsService) {
+        this.repository = repository;
         this.prisma = prisma;
         this.achievementsService = achievementsService;
     }
-    async create(dto, user) {
-        const record = await this.prisma.clinicalRecord.create({
-            data: {
-                patientId: user.userId,
-                tenantId: user.tenantId,
-                weight: new client_1.Prisma.Decimal(dto.weight),
-                skeletalMuscleMass: dto.skeletal_muscle_mass ? new client_1.Prisma.Decimal(dto.skeletal_muscle_mass) : null,
-                bodyFatMass: dto.body_fat_mass ? new client_1.Prisma.Decimal(dto.body_fat_mass) : null,
-            },
-        });
+    async createRecord(dto, user) {
+        const newRecord = await this.repository.create(dto, user.userId, user.tenantId);
         const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId, dto);
         await this.prisma.playerStats.update({
             where: { patientId: user.userId },
             data: {
                 totalDamageDealt: { increment: damageDealt },
-                currentGold: { increment: damageDealt }, // O suor (músculo) vira ouro!
+                currentGold: { increment: damageDealt },
             }
         });
+        const stats = await this.getStats(user);
+        await this.achievementsService.checkLevelAchievements(user.userId, user.tenantId, stats.currentLevel);
         return {
-            id: record.id,
+            ...newRecord,
+            damage: damageDealt,
             message: damageDealt > 0
                 ? `🔥 ATAQUE CRÍTICO! Você causou ${damageDealt.toLocaleString()} de dano no Boss!`
-                : "Registro salvo. Continue focado na missão!",
-            damage: damageDealt
+                : "Registro salvo. Continue focado na sua evolução!",
         };
     }
-    async calculateAndApplyDamage(userId: string, tenantId: string, dto: CreateRecordDto): Promise<number> {
-        // Busca os dois últimos registros para comparação
+    async calculateAndApplyDamage(userId, tenantId, dto) {
         const records = await this.repository.findLastTwo(userId);
-        if (records.length < 2) return 0;
-
-        const current = records[0]; // O registro que acabamos de criar
-        const previous = records[1]; // O registro imediatamente anterior
-
-        // 1. Cálculo de Perda de Peso (Base: 1kg = 7700 pts)
+        if (records.length < 2)
+            return 0;
+        const current = records[0];
+        const previous = records[1];
         const weightDiff = Number(previous.weight) - Number(current.weight);
         const weightDamage = weightDiff > 0 ? weightDiff * 7700 : 0;
-
-        // 2. Ganho de Massa Muscular (Bônus Crítico: 1kg = 10.000 pts)
         const muscleDiff = Number(current.skeletalMuscleMass) - Number(previous.skeletalMuscleMass);
         const muscleDamage = muscleDiff > 0 ? muscleDiff * 10000 : 0;
-
-        // 3. Redução de Massa de Gordura (Bônus de Agilidade: 1kg = 5.000 pts)
         const fatDiff = Number(previous.bodyFatMass) - Number(current.bodyFatMass);
         const fatDamage = fatDiff > 0 ? fatDiff * 5000 : 0;
-
         const totalDamage = Math.round(weightDamage + muscleDamage + fatDamage);
-
         if (totalDamage > 0) {
-            // Atualiza o Boss ativo com o dano total acumulado
-            await this.prisma.bossBattle.updateMany({
-                where: { tenantId, isActive: true },
-                data: { currentHp: { decrement: totalDamage } }
+            const boss = await this.prisma.bossBattle.findFirst({
+                where: { tenantId, isActive: true }
             });
+            if (boss) {
+                const newHp = Number(boss.currentHp) - totalDamage;
+                if (newHp <= 0) {
+                    await this.handleBossVictory(boss.id, tenantId);
+                }
+                else {
+                    await this.prisma.bossBattle.update({
+                        where: { id: boss.id },
+                        data: { currentHp: newHp }
+                    });
+                }
+            }
         }
-
         return totalDamage;
     }
-
-    async getEvolution(user) {
-        const records = await this.prisma.clinicalRecord.findMany({
-            where: {
-                patientId: user.userId,
-                tenantId: user.tenantId,
-            },
-            orderBy: {
-                recordedAt: 'asc',
-            },
-        });
-        return records.map(r => ({
-            recordedAt: r.recordedAt,
-            weight: Number(r.weight),
-            skeletalMuscleMass: r.skeletalMuscleMass ? Number(r.skeletalMuscleMass) : null,
-            bodyFatMass: r.bodyFatMass ? Number(r.bodyFatMass) : null,
-        }));
-    }
     async getStats(user) {
-        const records = await this.prisma.clinicalRecord.findMany({
-            where: {
-                patientId: user.userId,
-                tenantId: user.tenantId,
-            },
-            orderBy: {
-                recordedAt: 'asc',
-            },
-        });
+        const records = await this.repository.findAllByPatient(user.userId, user.tenantId);
         let totalDamage = 0;
         let totalWeightLoss = 0;
         for (let i = 1; i < records.length; i++) {
@@ -128,6 +95,15 @@ let RecordsService = class RecordsService {
             rank: this.calculateRank(totalDamage),
         };
     }
+    async getEvolution(user) {
+        const records = await this.repository.findAllByPatient(user.userId, user.tenantId);
+        return records.map(r => ({
+            recordedAt: r.recordedAt,
+            weight: Number(r.weight),
+            skeletalMuscleMass: r.skeletalMuscleMass ? Number(r.skeletalMuscleMass) : null,
+            bodyFatMass: r.bodyFatMass ? Number(r.bodyFatMass) : null,
+        }));
+    }
     calculateRank(damage) {
         if (damage > 50000)
             return 'Guerreiro de Elite';
@@ -136,8 +112,7 @@ let RecordsService = class RecordsService {
         return 'Recruta';
     }
     calculateLevel(totalDamage) {
-        const level = Math.floor(Math.sqrt(totalDamage / 500)) + 1;
-        return level;
+        return Math.floor(Math.sqrt(totalDamage / 500)) + 1;
     }
     calculateProgressToNextLevel(totalDamage) {
         const currentLevel = this.calculateLevel(totalDamage);
@@ -151,35 +126,49 @@ let RecordsService = class RecordsService {
             nextLevelThreshold: Math.round(nextLevelThreshold)
         };
     }
-    async createRecord(dto: CreateRecordDto, user: UserContext) {
-        const record = await this.repository.create(dto, user.userId, user.tenantId);
-
-        // Calcula o dano clínico avançado usando o DTO completo
-        const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId, dto);
-
-        // Atualiza as estatísticas do jogador: suor vira ouro!
-        await this.prisma.playerStats.update({
-            where: { patientId: user.userId },
-            data: {
-                totalDamageDealt: { increment: damageDealt },
-                currentGold: { increment: damageDealt }, // O dano clínico vira moeda de troca
-            }
+    async handleBossVictory(bossId, tenantId) {
+        return await this.prisma.$transaction(async (tx) => {
+            const oldBoss = await tx.bossBattle.findUnique({ where: { id: bossId } });
+            if (!oldBoss)
+                return;
+            await tx.bossBattle.update({
+                where: { id: bossId },
+                data: { isActive: false, currentHp: 0, defeatedAt: new Date() }
+            });
+            await tx.playerStats.updateMany({
+                where: { tenantId },
+                data: { currentGold: { increment: 5000 } }
+            });
+            const nextName = this.generateClinicalBossName();
+            const nextMaxHp = Math.round(Number(oldBoss.maxHp) * 1.15);
+            await tx.bossBattle.create({
+                data: {
+                    name: nextName,
+                    maxHp: nextMaxHp,
+                    currentHp: nextMaxHp,
+                    tenantId,
+                    isActive: true,
+                }
+            });
+            this.achievementsService.emitGlobalVictory(tenantId, `🏆 VITÓRIA! O "${nextName}" surgiu!`);
         });
-
-        return {
-            id: record.id,
-            damage: damageDealt,
-            message: damageDealt > 0
-                ? `🔥 ATAQUE CRÍTICO! Você causou ${damageDealt.toLocaleString()} de dano no Boss!`
-                : "Registro salvo. Continue focado na missão!"
-        };
+    }
+    generateClinicalBossName() {
+        const titulos = ['Lorde da', 'Colosso do', 'Espectro da', 'Sombra da', 'Tirano da', 'Vulto do'];
+        const inimigos = ['Gordura Visceral', 'Sedentarismo Estagnado', 'Acomodação Crônica', 'Desidratação Celular', 'Inflamação Sistêmica', 'Sarcopenia Latente'];
+        const adjetivos = ['Persistente', 'Tóxico(a)', 'Invisível', 'Debilitante', 'Stubborn (Teimoso)', 'Inflamatório(a)'];
+        const t = titulos[Math.floor(Math.random() * titulos.length)];
+        const i = inimigos[Math.floor(Math.random() * inimigos.length)];
+        const s = adjetivos[Math.floor(Math.random() * adjetivos.length)];
+        return `${t} ${i} ${s}`;
     }
 };
 exports.RecordsService = RecordsService;
 exports.RecordsService = RecordsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => achievements_service_1.AchievementsService))),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-    achievements_service_1.AchievementsService])
+    __param(0, (0, common_1.Inject)('IRecordsRepository')),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => achievements_service_1.AchievementsService))),
+    __metadata("design:paramtypes", [Object, prisma_service_1.PrismaService,
+        achievements_service_1.AchievementsService])
 ], RecordsService);
 //# sourceMappingURL=records.service.js.map

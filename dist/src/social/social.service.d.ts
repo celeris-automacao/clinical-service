@@ -1,25 +1,21 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { ISocialRepository } from './repositories/interfaces/social.repository.interface';
 export declare class SocialService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    getFeed(tenantId: string): Promise<({
-        patient: {
-            name: string;
-        };
-    } & {
+    private readonly repository;
+    constructor(repository: ISocialRepository);
+    getFeed(tenantId: string): Promise<{
         id: string;
         tenantId: string;
         type: string;
         patientId: string;
-        createdAt: Date;
         content: string;
-    })[]>;
+        createdAt: Date;
+    }[]>;
     createPost(patientId: string, tenantId: string, content: string, type: string): Promise<{
         id: string;
         tenantId: string;
         type: string;
         patientId: string;
-        createdAt: Date;
         content: string;
+        createdAt: Date;
     }>;
 }

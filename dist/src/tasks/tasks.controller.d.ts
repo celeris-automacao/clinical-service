@@ -24,20 +24,20 @@ export declare class TasksController {
         current_xp: number;
         current_level: number;
         level_up: boolean;
-        message: string;
+        boss_damage: number;
     }>;
     getRanking(user: UserContext): Promise<{
         position: number;
-        name: string;
-        level: number;
-        xp: number;
+        name: any;
+        level: any;
+        xp: any;
         damage: number;
     }[]>;
     getDetailedRanking(user: UserContext): Promise<{
-        name: string;
-        missionRank: number;
+        name: any;
+        missionRank: any;
         clinicalRank: number;
-        totalDamage: number;
+        totalDamage: any;
         level: number;
     }[]>;
     getTasksToday(user: UserContext): Promise<{

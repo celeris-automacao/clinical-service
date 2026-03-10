@@ -15,7 +15,7 @@ const dashboard_module_1 = require("./dashboard/dashboard.module");
 const game_module_1 = require("./game/game.module");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const auth_module_1 = require("./auth/auth.module");
-const social_model_1 = require("./social/social.model");
+const social_module_1 = require("./social/social.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,7 +29,7 @@ exports.AppModule = AppModule = __decorate([
             tasks_module_1.TasksModule,
             dashboard_module_1.DashboardModule,
             game_module_1.GameModule,
-            social_model_1.SocialModule
+            social_module_1.SocialModule
         ],
         controllers: [],
         providers: [],

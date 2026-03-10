@@ -8,14 +8,14 @@ export declare class DashboardController {
     getOverview(user: UserContext): Promise<{
         activeToday: number;
         recentAchievements: {
-            patient: string;
-            content: string;
-            date: Date;
+            patient: any;
+            content: any;
+            date: any;
         }[];
         ranking: {
-            name: string;
+            name: any;
             damage: number;
-            level: number;
+            level: any;
         }[];
     }>;
     getInactive(user: UserContext): Promise<{
@@ -31,6 +31,7 @@ export declare class DashboardController {
             description: string | null;
             title: string;
             requiredDamage: number;
+            goldCost: number;
             badgeIcon: string | null;
         };
     } & {

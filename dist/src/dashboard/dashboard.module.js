@@ -10,14 +10,28 @@ exports.DashboardModule = void 0;
 const common_1 = require("@nestjs/common");
 const dashboard_service_1 = require("./dashboard.service");
 const dashboard_controller_1 = require("./dashboard.controller");
+const dashboard_repository_1 = require("./repositories/dashboard.repository");
 const notifications_service_1 = require("./notifications.service");
+const notifications_repository_1 = require("./repositories/notifications.repository");
 let DashboardModule = class DashboardModule {
 };
 exports.DashboardModule = DashboardModule;
 exports.DashboardModule = DashboardModule = __decorate([
     (0, common_1.Module)({
         controllers: [dashboard_controller_1.DashboardController],
-        providers: [dashboard_service_1.DashboardService, notifications_service_1.NotificationsService],
+        providers: [
+            dashboard_service_1.DashboardService,
+            notifications_service_1.NotificationsService,
+            {
+                provide: 'IDashboardRepository',
+                useClass: dashboard_repository_1.DashboardRepository,
+            },
+            {
+                provide: 'INotificationsRepository',
+                useClass: notifications_repository_1.NotificationsRepository,
+            },
+        ],
+        exports: [dashboard_service_1.DashboardService, 'IDashboardRepository'],
     })
 ], DashboardModule);
 //# sourceMappingURL=dashboard.module.js.map

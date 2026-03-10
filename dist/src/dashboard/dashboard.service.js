@@ -8,45 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
 let DashboardService = class DashboardService {
-    constructor(prisma) {
-        this.prisma = prisma;
+    constructor(repository) {
+        this.repository = repository;
     }
     async getClinicOverview(tenantId) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const activeToday = await this.prisma.playerStats.count({
-            where: {
-                tenantId,
-                lastActivityAt: { gte: today }
-            }
-        });
-        const recentAchievements = await this.prisma.socialPost.findMany({
-            where: {
-                tenantId,
-                type: 'achievement'
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            include: {
-                patient: { select: { name: true } }
-            }
-        });
-        const ranking = await this.prisma.playerStats.findMany({
-            where: { tenantId },
-            orderBy: { totalDamageDealt: 'desc' },
-            take: 3,
-            include: {
-                patient: { select: { name: true } }
-            }
-        });
+        const [activeCount, achievements, ranking] = await Promise.all([
+            this.repository.countActivePlayers(tenantId, today),
+            this.repository.findRecentAchievements(tenantId, 5),
+            this.repository.findTopPlayers(tenantId, 3)
+        ]);
         return {
-            activeToday,
-            recentAchievements: recentAchievements.map(a => ({
+            activeToday: activeCount,
+            recentAchievements: achievements.map(a => ({
                 patient: a.patient.name,
                 content: a.content,
                 date: a.createdAt
@@ -61,37 +43,26 @@ let DashboardService = class DashboardService {
     async getMissingPatients(tenantId, daysInactive = 3) {
         const thresholdDate = new Date();
         thresholdDate.setDate(thresholdDate.getDate() - daysInactive);
-        const activity = await this.prisma.taskCompletion.findMany({
-            where: {
-                tenantId: tenantId,
-            },
-            select: {
-                patientId: true,
-                completedAt: true,
-            },
-            orderBy: {
-                completedAt: 'desc',
-            },
-        });
+        const activity = await this.repository.getTaskCompletionsHistory(tenantId);
         const lastActivities = new Map();
         activity.forEach(record => {
             if (!lastActivities.has(record.patientId)) {
                 lastActivities.set(record.patientId, record.completedAt);
             }
         });
-        const inactivePatients = Array.from(lastActivities.entries())
+        return Array.from(lastActivities.entries())
             .filter(([_, lastDate]) => lastDate < thresholdDate)
             .map(([patientId, lastDate]) => ({
             patientId,
             lastActivity: lastDate,
             status: 'Inativo'
         }));
-        return inactivePatients;
     }
 };
 exports.DashboardService = DashboardService;
 exports.DashboardService = DashboardService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)('IDashboardRepository')),
+    __metadata("design:paramtypes", [Object])
 ], DashboardService);
 //# sourceMappingURL=dashboard.service.js.map

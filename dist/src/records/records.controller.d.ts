@@ -5,6 +5,8 @@ export declare class RecordsController {
     private readonly recordsService;
     constructor(recordsService: RecordsService);
     createRecord(createRecordDto: CreateRecordDto, user: UserContext): Promise<{
+        damage: number;
+        message: string;
         id: string;
         tenantId: string;
         weight: import("@prisma/client/runtime/library").Decimal;

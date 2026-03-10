@@ -8,23 +8,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameModule = void 0;
 const common_1 = require("@nestjs/common");
-const rewards_service_1 = require("./rewards.service");
-const rewards_controller_1 = require("./rewards.controller");
+const game_controller_1 = require("./game.controller");
+const game_service_1 = require("./game.service");
+const game_repository_1 = require("./repositories/game.repository");
 const records_module_1 = require("../records/records.module");
-const achievements_service_1 = require("./achievements.service");
-const player_controller_1 = require("./player.controller");
-const player_service_1 = require("./player.service");
+const prisma_module_1 = require("../prisma/prisma.module");
 let GameModule = class GameModule {
 };
 exports.GameModule = GameModule;
 exports.GameModule = GameModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            prisma_module_1.PrismaModule,
             (0, common_1.forwardRef)(() => records_module_1.RecordsModule),
         ],
-        controllers: [rewards_controller_1.RewardsController, player_controller_1.PlayerController],
-        providers: [rewards_service_1.RewardsService, achievements_service_1.AchievementsService, player_service_1.PlayerService],
-        exports: [rewards_service_1.RewardsService, achievements_service_1.AchievementsService, player_service_1.PlayerService],
+        controllers: [game_controller_1.GameController],
+        providers: [
+            game_service_1.GameService,
+            {
+                provide: 'IGameRepository',
+                useClass: game_repository_1.GameRepository,
+            },
+        ],
+        exports: [game_service_1.GameService, 'IGameRepository'],
     })
 ], GameModule);
 //# sourceMappingURL=game.module.js.map

@@ -1,18 +1,18 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { IDashboardRepository } from './repositories/interfaces/dashboard.repository.interface';
 export declare class DashboardService {
-    private prisma;
-    constructor(prisma: PrismaService);
+    private readonly repository;
+    constructor(repository: IDashboardRepository);
     getClinicOverview(tenantId: string): Promise<{
         activeToday: number;
         recentAchievements: {
-            patient: string;
-            content: string;
-            date: Date;
+            patient: any;
+            content: any;
+            date: any;
         }[];
         ranking: {
-            name: string;
+            name: any;
             damage: number;
-            level: number;
+            level: any;
         }[];
     }>;
     getMissingPatients(tenantId: string, daysInactive?: number): Promise<{

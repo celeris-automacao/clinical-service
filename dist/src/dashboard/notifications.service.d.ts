@@ -1,4 +1,7 @@
+import { NotificationsRepository } from './repositories/notifications.repository';
 export declare class NotificationsService {
-    handleAchievement(payload: any): void;
-    handleBossDefeated(payload: any): void;
+    private readonly repository;
+    constructor(repository: NotificationsRepository);
+    handleAchievement(payload: any): Promise<void>;
+    handleBossDefeated(payload: any): Promise<void>;
 }

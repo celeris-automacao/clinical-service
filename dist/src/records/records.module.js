@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecordsModule = void 0;
 const common_1 = require("@nestjs/common");
 const records_controller_1 = require("./records.controller");
+const records_repository_1 = require("./repositories/records.repository");
 const records_service_1 = require("./records.service");
 const game_module_1 = require("../game/game.module");
 let RecordsModule = class RecordsModule {
@@ -20,8 +21,14 @@ exports.RecordsModule = RecordsModule = __decorate([
             (0, common_1.forwardRef)(() => game_module_1.GameModule),
         ],
         controllers: [records_controller_1.RecordsController],
-        providers: [records_service_1.RecordsService],
-        exports: [records_service_1.RecordsService],
+        providers: [
+            records_service_1.RecordsService,
+            {
+                provide: 'IRecordsRepository',
+                useClass: records_repository_1.RecordsRepository,
+            },
+        ],
+        exports: [records_service_1.RecordsService, 'IRecordsRepository'],
     })
 ], RecordsModule);
 //# sourceMappingURL=records.module.js.map

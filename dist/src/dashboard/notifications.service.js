@@ -12,17 +12,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsService = void 0;
 const common_1 = require("@nestjs/common");
 const event_emitter_1 = require("@nestjs/event-emitter");
+const notifications_repository_1 = require("./repositories/notifications.repository");
 let NotificationsService = class NotificationsService {
-    handleAchievement(payload) {
-        console.log(`🏆 CONQUISTA NA CLÍNICA: Paciente ${payload.patientId} desbloqueou "${payload.achievement}"`);
+    constructor(repository) {
+        this.repository = repository;
     }
-    handleBossDefeated(payload) {
-        console.log('\n\n' + '='.repeat(40));
-        console.log('📢 ALERTA DE VITÓRIA NA CLÍNICA!');
-        console.log(`🏥 Clínica (Tenant): ${payload.tenantId}`);
-        console.log(`🐉 O Boss "${payload.bossName}" foi derrotado!`);
-        console.log(`⚔️ Golpe final desferido pelo paciente: ${payload.killerId}`);
-        console.log('='.repeat(40) + '\n\n');
+    async handleAchievement(payload) {
+        const title = '🏆 NOVA CONQUISTA!';
+        const message = `Paciente ${payload.patientId} desbloqueou "${payload.achievement}"`;
+        await this.repository.createNotification({
+            tenantId: payload.tenantId,
+            userId: payload.patientId,
+            title,
+            message,
+            type: 'achievement'
+        });
+        console.log(`[Notification System] ${title}: ${message}`);
+    }
+    async handleBossDefeated(payload) {
+        const title = '📢 VITÓRIA ÉPICA!';
+        const message = `O Boss "${payload.bossName}" foi derrotado pelo paciente ${payload.killerId}!`;
+        await this.repository.createNotification({
+            tenantId: payload.tenantId,
+            userId: payload.killerId,
+            title,
+            message,
+            type: 'boss_defeat'
+        });
+        console.log('\n' + '='.repeat(40));
+        console.log(title);
+        console.log(`🏥 Clínica: ${payload.tenantId}`);
+        console.log(`⚔️ ${message}`);
+        console.log('='.repeat(40) + '\n');
     }
 };
 exports.NotificationsService = NotificationsService;
@@ -30,15 +51,16 @@ __decorate([
     (0, event_emitter_1.OnEvent)('achievement.unlocked'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], NotificationsService.prototype, "handleAchievement", null);
 __decorate([
     (0, event_emitter_1.OnEvent)('boss.defeated'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], NotificationsService.prototype, "handleBossDefeated", null);
 exports.NotificationsService = NotificationsService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [notifications_repository_1.NotificationsRepository])
 ], NotificationsService);
 //# sourceMappingURL=notifications.service.js.map

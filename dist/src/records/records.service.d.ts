@@ -1,24 +1,25 @@
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UserContext } from '../common/decorators/get-user.decorator';
-import { Prisma } from '@prisma/client';
-import { AchievementsService } from '../game/achievements.service';
+import { AchievementsService } from '../achievements/achievements.service';
+import { IRecordsRepository } from './repositories/interfaces/records.repository.interface';
+import { PrismaService } from '../prisma/prisma.service';
 export declare class RecordsService {
-    private prisma;
+    private readonly repository;
+    private readonly prisma;
     private readonly achievementsService;
-    constructor(prisma: PrismaService, achievementsService: AchievementsService);
-    create(dto: CreateRecordDto, user: UserContext): Promise<{
-        id: string;
-        message: string;
+    constructor(repository: IRecordsRepository, prisma: PrismaService, achievementsService: AchievementsService);
+    createRecord(dto: CreateRecordDto, user: UserContext): Promise<{
         damage: number;
+        message: string;
+        id: string;
+        tenantId: string;
+        weight: import("@prisma/client/runtime/library").Decimal;
+        patientId: string;
+        recordedAt: Date;
+        skeletalMuscleMass: import("@prisma/client/runtime/library").Decimal | null;
+        bodyFatMass: import("@prisma/client/runtime/library").Decimal | null;
     }>;
     private calculateAndApplyDamage;
-    getEvolution(user: UserContext): Promise<{
-        recordedAt: Date;
-        weight: number;
-        skeletalMuscleMass: number;
-        bodyFatMass: number;
-    }[]>;
     getStats(user: UserContext): Promise<{
         recordsCount: number;
         rank: string;
@@ -29,20 +30,15 @@ export declare class RecordsService {
         totalDamage: number;
         totalWeightLoss: number;
     }>;
-    private calculateRank;
-    calculateLevel(totalDamage: number): number;
-    calculateProgressToNextLevel(totalDamage: number): {
-        currentLevel: number;
-        progressPercentage: number;
-        nextLevelThreshold: number;
-    };
-    createRecord(data: CreateRecordDto, user: UserContext): Promise<{
-        id: string;
-        tenantId: string;
-        weight: Prisma.Decimal;
-        patientId: string;
+    getEvolution(user: UserContext): Promise<{
         recordedAt: Date;
-        skeletalMuscleMass: Prisma.Decimal | null;
-        bodyFatMass: Prisma.Decimal | null;
-    }>;
+        weight: number;
+        skeletalMuscleMass: number;
+        bodyFatMass: number;
+    }[]>;
+    private calculateRank;
+    private calculateLevel;
+    private calculateProgressToNextLevel;
+    handleBossVictory(bossId: string, tenantId: string): Promise<void>;
+    private generateClinicalBossName;
 }
