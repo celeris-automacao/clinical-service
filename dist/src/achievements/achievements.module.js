@@ -10,11 +10,16 @@ exports.AchievementsModule = void 0;
 const common_1 = require("@nestjs/common");
 const achievements_service_1 = require("./achievements.service");
 const achievements_repository_1 = require("./repositories/achievements.repository");
+const common_2 = require("@nestjs/common");
+const records_module_1 = require("../records/records.module");
 let AchievementsModule = class AchievementsModule {
 };
 exports.AchievementsModule = AchievementsModule;
 exports.AchievementsModule = AchievementsModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            (0, common_2.forwardRef)(() => records_module_1.RecordsModule),
+        ],
         providers: [
             achievements_service_1.AchievementsService,
             {

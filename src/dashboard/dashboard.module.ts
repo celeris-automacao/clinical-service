@@ -20,6 +20,6 @@ import { NotificationsRepository } from './repositories/notifications.repository
       useClass: NotificationsRepository,
     },
   ],
-  exports: [DashboardService, 'IDashboardRepository'],
+  exports: [DashboardService, 'IDashboardRepository', NotificationsService, 'INotificationsRepository'], // Exportamos os serviços e repositórios para uso em outros módulos
 })
 export class DashboardModule {}

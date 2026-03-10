@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsService = void 0;
 const common_1 = require("@nestjs/common");
@@ -61,6 +64,7 @@ __decorate([
 ], NotificationsService.prototype, "handleBossDefeated", null);
 exports.NotificationsService = NotificationsService = __decorate([
     (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('INotificationsRepository')),
     __metadata("design:paramtypes", [notifications_repository_1.NotificationsRepository])
 ], NotificationsService);
 //# sourceMappingURL=notifications.service.js.map

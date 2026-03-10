@@ -1,11 +1,14 @@
 // src/dashboard/notifications.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NotificationsRepository } from './repositories/notifications.repository';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly repository: NotificationsRepository) {}
+  constructor(
+    @Inject('INotificationsRepository') // <--- ADICIONE ESTA LINHA
+    private readonly repository: NotificationsRepository
+  ) { }
 
   @OnEvent('achievement.unlocked')
   async handleAchievement(payload: any) {
@@ -21,7 +24,7 @@ export class NotificationsService {
       type: 'achievement'
     });
 
-    console.log(`[Notification System] ${title}: ${message}`); 
+    console.log(`[Notification System] ${title}: ${message}`);
   }
 
   @OnEvent('boss.defeated')
@@ -41,6 +44,6 @@ export class NotificationsService {
     console.log(title);
     console.log(`🏥 Clínica: ${payload.tenantId}`);
     console.log(`⚔️ ${message}`);
-    console.log('='.repeat(40) + '\n'); 
+    console.log('='.repeat(40) + '\n');
   }
 }

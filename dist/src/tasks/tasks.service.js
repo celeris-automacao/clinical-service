@@ -155,6 +155,8 @@ exports.TasksService = TasksService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('ITasksRepository')),
     __param(1, (0, common_1.Inject)('IRecordsRepository')),
+    __param(4, (0, common_1.Inject)((0, common_1.forwardRef)(() => achievements_service_1.AchievementsService))),
+    __param(5, (0, common_1.Inject)((0, common_1.forwardRef)(() => records_service_1.RecordsService))),
     __metadata("design:paramtypes", [Object, Object, prisma_service_1.PrismaService,
         event_emitter_1.EventEmitter2,
         achievements_service_1.AchievementsService,

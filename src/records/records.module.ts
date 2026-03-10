@@ -4,10 +4,12 @@ import { RecordsController } from './records.controller';
 import { RecordsRepository } from './repositories/records.repository';  
 import { RecordsService } from './records.service';
 import { GameModule } from '../game/game.module';
+import { AchievementsModule } from '../achievements/achievements.module'; // <--- IMPORTAÇÃO DO MÓDULO DE CONQUISTAS
 
 @Module({
   imports: [
     forwardRef(() => GameModule),
+    forwardRef(() => AchievementsModule), // <--- ADICIONE ESTA LINHA
   ],
   controllers: [RecordsController],
   providers: [

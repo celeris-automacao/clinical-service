@@ -31,7 +31,7 @@ exports.DashboardModule = DashboardModule = __decorate([
                 useClass: notifications_repository_1.NotificationsRepository,
             },
         ],
-        exports: [dashboard_service_1.DashboardService, 'IDashboardRepository'],
+        exports: [dashboard_service_1.DashboardService, 'IDashboardRepository', notifications_service_1.NotificationsService, 'INotificationsRepository'],
     })
 ], DashboardModule);
 //# sourceMappingURL=dashboard.module.js.map

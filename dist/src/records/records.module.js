@@ -12,6 +12,7 @@ const records_controller_1 = require("./records.controller");
 const records_repository_1 = require("./repositories/records.repository");
 const records_service_1 = require("./records.service");
 const game_module_1 = require("../game/game.module");
+const achievements_module_1 = require("../achievements/achievements.module");
 let RecordsModule = class RecordsModule {
 };
 exports.RecordsModule = RecordsModule;
@@ -19,6 +20,7 @@ exports.RecordsModule = RecordsModule = __decorate([
     (0, common_1.Module)({
         imports: [
             (0, common_1.forwardRef)(() => game_module_1.GameModule),
+            (0, common_1.forwardRef)(() => achievements_module_1.AchievementsModule),
         ],
         controllers: [records_controller_1.RecordsController],
         providers: [

@@ -13,12 +13,17 @@ const tasks_controller_1 = require("./tasks.controller");
 const game_module_1 = require("../game/game.module");
 const tasks_repository_1 = require("./repositories/tasks.repository");
 const records_module_1 = require("../records/records.module");
+const achievements_module_1 = require("../achievements/achievements.module");
 let TasksModule = class TasksModule {
 };
 exports.TasksModule = TasksModule;
 exports.TasksModule = TasksModule = __decorate([
     (0, common_1.Module)({
-        imports: [game_module_1.GameModule, records_module_1.RecordsModule],
+        imports: [
+            game_module_1.GameModule,
+            records_module_1.RecordsModule,
+            achievements_module_1.AchievementsModule
+        ],
         controllers: [tasks_controller_1.TasksController],
         providers: [
             tasks_service_1.TasksService,

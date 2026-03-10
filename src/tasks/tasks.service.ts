@@ -1,5 +1,5 @@
 // src/tasks/tasks.service.ts
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject,forwardRef, BadRequestException } from '@nestjs/common';
 import { ITasksRepository } from './repositories/interfaces/tasks.repository.interface';
 import { IRecordsRepository } from '../records/repositories/interfaces/records.repository.interface'; // Nova importação
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,10 +12,12 @@ import { RecordsService } from '../records/records.service';
 export class TasksService {
   constructor(
     @Inject('ITasksRepository') private readonly repository: ITasksRepository,
-    @Inject('IRecordsRepository') private readonly recordsRepository: IRecordsRepository, // Nova dependência
+    @Inject('IRecordsRepository') private readonly recordsRepository: IRecordsRepository,
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
+    @Inject(forwardRef(() => AchievementsService)) // <--- Use forwardRef
     private readonly achievementsService: AchievementsService,
+    @Inject(forwardRef(() => RecordsService)) // <--- Use forwardRef
     private readonly recordsService: RecordsService,
   ) { }
 
