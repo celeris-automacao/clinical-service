@@ -17,7 +17,7 @@ const payload = {
   sub: "f47ac10b-58cc-4372-a567-0e02b2c3d479", // ID do Paciente do seu SQL
   email: "paciente@teste.com",
   user_metadata: {
-    tenant_id: "c56a4180-65aa-42ec-a945-5fd21dec0538", // ID da Clínica
+    tenant_id: "519da169-5c88-4984-aaf1-935c3b1ea416", // ID da Clínica
     role: "doctor" // Role do seu schema access : doctot ou patient
   }
 };

@@ -6,17 +6,17 @@ export declare class TasksController {
     getDailyTasks(user: UserContext): Promise<{
         completed: boolean;
         id: string;
+        createdAt: Date;
         tenantId: string;
-        title: string;
-        description: string | null;
         isActive: boolean;
+        description: string | null;
         patientId: string;
+        title: string;
         taskType: string;
         xpReward: number;
         dueDate: Date;
         isCompleted: boolean;
         completedAt: Date | null;
-        createdAt: Date;
     }[]>;
     completeTask(taskId: string, user: UserContext): Promise<{
         success: boolean;
@@ -42,16 +42,16 @@ export declare class TasksController {
     }[]>;
     getTasksToday(user: UserContext): Promise<{
         id: string;
+        createdAt: Date;
         tenantId: string;
-        title: string;
-        description: string | null;
         isActive: boolean;
+        description: string | null;
         patientId: string;
+        title: string;
         taskType: string;
         xpReward: number;
         dueDate: Date;
         isCompleted: boolean;
         completedAt: Date | null;
-        createdAt: Date;
     }[]>;
 }

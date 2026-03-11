@@ -4,7 +4,7 @@ import { TasksService } from './tasks.service';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
 
-@Controller('v1/tasks')
+@Controller('tasks')
 @UseGuards(SupabaseGuard)
 export class TasksController {
   constructor(private readonly tasksService: TasksService) { }

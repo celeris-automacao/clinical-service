@@ -16,15 +16,15 @@ export declare class AchievementsRepository implements IAchievementsRepository {
     findClaim(patientId: string, rewardId: string): Promise<{
         id: string;
         tenantId: string;
-        rewardId: string;
         patientId: string;
+        rewardId: string;
         claimedAt: Date;
     }>;
     createClaim(patientId: string, tenantId: string, rewardId: string): Promise<{
         id: string;
         tenantId: string;
-        rewardId: string;
         patientId: string;
+        rewardId: string;
         claimedAt: Date;
     }>;
 }

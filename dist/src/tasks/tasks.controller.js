@@ -78,7 +78,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], TasksController.prototype, "getTasksToday", null);
 exports.TasksController = TasksController = __decorate([
-    (0, common_1.Controller)('v1/tasks'),
+    (0, common_1.Controller)('tasks'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [tasks_service_1.TasksService])
 ], TasksController);

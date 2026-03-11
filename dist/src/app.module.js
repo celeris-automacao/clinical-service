@@ -16,6 +16,8 @@ const game_module_1 = require("./game/game.module");
 const event_emitter_1 = require("@nestjs/event-emitter");
 const auth_module_1 = require("./auth/auth.module");
 const social_module_1 = require("./social/social.module");
+const tenants_module_1 = require("./tenants/tenants.module");
+const patients_module_1 = require("./patients/patients.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -29,7 +31,9 @@ exports.AppModule = AppModule = __decorate([
             tasks_module_1.TasksModule,
             dashboard_module_1.DashboardModule,
             game_module_1.GameModule,
-            social_module_1.SocialModule
+            social_module_1.SocialModule,
+            tenants_module_1.TenantsModule,
+            patients_module_1.PatientsModule
         ],
         controllers: [],
         providers: [],

@@ -7,7 +7,7 @@ import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { EvolutionDto } from './dto/evolution.dto';
 
-@Controller('v1/records')
+@Controller('records')
 @UseGuards(SupabaseGuard) // Protege todas as rotas deste controller [cite: 222]
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) {}

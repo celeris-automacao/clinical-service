@@ -77,7 +77,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getRecentClaims", null);
 exports.DashboardController = DashboardController = __decorate([
-    (0, common_1.Controller)('v1/dashboard'),
+    (0, common_1.Controller)('dashboard'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
         dashboard_service_1.DashboardService])

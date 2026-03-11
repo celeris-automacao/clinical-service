@@ -9,18 +9,22 @@ import { GameModule } from './game/game.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './auth/auth.module';
 import { SocialModule } from './social/social.module';
+// NOVOS IMPORTES
+import { TenantsModule } from './tenants/tenants.module';
+import { PatientsModule } from './patients/patients.module';
 
 @Module({
   imports: [
     AuthModule,
     EventEmitterModule.forRoot(),
-    PrismaModule, 
-    RecordsModule, 
+    PrismaModule,
+    RecordsModule,
     TasksModule,
     DashboardModule,
     GameModule,
-    SocialModule
-
+    SocialModule,
+    TenantsModule,
+    PatientsModule
   ],
   controllers: [],
   providers: [],

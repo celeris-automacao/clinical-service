@@ -15,8 +15,8 @@ export declare class GameRepository implements IGameRepository {
     }>;
     findActiveBoss(tenantId: string): Promise<{
         id: string;
-        tenantId: string;
         name: string;
+        tenantId: string;
         maxHp: import("@prisma/client/runtime/library").Decimal;
         currentHp: import("@prisma/client/runtime/library").Decimal;
         isActive: boolean;

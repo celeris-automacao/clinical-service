@@ -7,7 +7,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 
-@Controller('v1/dashboard')
+@Controller('dashboard')
 @UseGuards(SupabaseGuard)
 export class DashboardController {
   constructor(
