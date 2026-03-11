@@ -1,6 +1,7 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { IPatientsRepository } from './repositories/interfaces/patients-repository.interface';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { UpdatePatientProfileDto } from './dto/update-patient-profile.dto';
 
 @Injectable()
 export class PatientsService {
@@ -18,4 +19,12 @@ export class PatientsService {
     if (!patient) throw new NotFoundException('Paciente não encontrado.');
     return patient;
   }
+
+  async updateProfile(id: string, updateProfileDto: UpdatePatientProfileDto) {
+  // Primeiro, verificamos se o paciente existe
+  await this.findOne(id); 
+  
+  // Chamamos o repositório para salvar os dados clínicos
+  return this.patientsRepository.updateProfile(id, updateProfileDto);
+}
 }

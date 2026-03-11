@@ -27,6 +27,10 @@ let PatientsService = class PatientsService {
             throw new common_1.NotFoundException('Paciente não encontrado.');
         return patient;
     }
+    async updateProfile(id, updateProfileDto) {
+        await this.findOne(id);
+        return this.patientsRepository.updateProfile(id, updateProfileDto);
+    }
 };
 exports.PatientsService = PatientsService;
 exports.PatientsService = PatientsService = __decorate([

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IPatientsRepository } from './interfaces/patients-repository.interface';
 import { CreatePatientDto } from '../dto/create-patient.dto';
+import { UpdatePatientProfileDto } from '../dto/update-patient-profile.dto';
 
 @Injectable()
 export class PatientsRepository implements IPatientsRepository {
@@ -39,4 +40,15 @@ export class PatientsRepository implements IPatientsRepository {
   async findById(id: string) {
     return this.prisma.patient.findUnique({ where: { id } });
   }
+
+  async updateProfile(patientId: string, data: UpdatePatientProfileDto) {
+  return this.prisma.patientProfile.upsert({
+    where: { patientId },
+    update: data,
+    create: {
+      patientId,
+      ...data,
+    },
+  });
+}
 }

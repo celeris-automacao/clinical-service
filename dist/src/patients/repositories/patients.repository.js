@@ -43,6 +43,16 @@ let PatientsRepository = class PatientsRepository {
     async findById(id) {
         return this.prisma.patient.findUnique({ where: { id } });
     }
+    async updateProfile(patientId, data) {
+        return this.prisma.patientProfile.upsert({
+            where: { patientId },
+            update: data,
+            create: {
+                patientId,
+                ...data,
+            },
+        });
+    }
 };
 exports.PatientsRepository = PatientsRepository;
 exports.PatientsRepository = PatientsRepository = __decorate([
