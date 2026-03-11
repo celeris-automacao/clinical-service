@@ -15,6 +15,7 @@ export class AchievementsService {
     const rewardsConfig = {
       2: { title: 'Medalha de Nível 2', icon: 'award' },
       5: { title: 'Guerreiro de Elite', icon: 'shield-star' },
+      7: { title: 'Desbravador Clínico', icon: 'map' },
       10: { title: 'Guerreiro de Prata', icon: 'silver-blade' },
       20: { title: 'Mestre de Ouro', icon: 'gold-crown' }
     };

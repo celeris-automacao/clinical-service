@@ -20,8 +20,8 @@ let RecordsRepository = class RecordsRepository {
         return this.prisma.clinicalRecord.create({
             data: {
                 weight: data.weight,
-                skeletalMuscleMass: data.skeletal_muscle_mass,
-                bodyFatMass: data.body_fat_mass,
+                skeletalMuscleMass: data.skeletalMuscleMass,
+                bodyFatMass: data.bodyFatMass,
                 patientId: userId,
                 tenantId: tenantId,
             },

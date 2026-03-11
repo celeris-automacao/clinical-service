@@ -13,9 +13,9 @@ export declare class RecordsService {
         message: string;
         id: string;
         tenantId: string;
-        weight: import("@prisma/client/runtime/library").Decimal;
         patientId: string;
         recordedAt: Date;
+        weight: import("@prisma/client/runtime/library").Decimal;
         skeletalMuscleMass: import("@prisma/client/runtime/library").Decimal | null;
         bodyFatMass: import("@prisma/client/runtime/library").Decimal | null;
     }>;

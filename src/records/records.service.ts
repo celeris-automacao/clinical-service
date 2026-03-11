@@ -27,11 +27,19 @@ export class RecordsService {
     const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId, dto);
 
     // 3. Atualiza as estatísticas do jogador (O dano vira Gold spendável)
-    await this.prisma.playerStats.update({
+    await this.prisma.playerStats.upsert({
       where: { patientId: user.userId },
-      data: {
+      update: {
         totalDamageDealt: { increment: damageDealt },
         currentGold: { increment: damageDealt },
+      },
+      create: {
+        patientId: user.userId,
+        tenantId: user.tenantId,
+        totalDamageDealt: damageDealt,
+        currentGold: damageDealt,
+        currentLevel: 1,
+        currentXp: 0
       }
     });
 

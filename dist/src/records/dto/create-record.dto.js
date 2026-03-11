@@ -27,29 +27,29 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, swagger_1.ApiPropertyOptional)({ example: 32.1, description: 'Massa muscular esquelética' }),
     __metadata("design:type", Number)
-], CreateRecordDto.prototype, "skeletal_muscle_mass", void 0);
+], CreateRecordDto.prototype, "skeletalMuscleMass", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     (0, swagger_1.ApiPropertyOptional)({ example: 18.5, description: 'Massa de gordura corporal' }),
     __metadata("design:type", Number)
-], CreateRecordDto.prototype, "body_fat_mass", void 0);
+], CreateRecordDto.prototype, "bodyFatMass", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     (0, swagger_1.ApiPropertyOptional)({ example: 22.5, description: 'Percentual de gordura corporal' }),
     __metadata("design:type", Number)
-], CreateRecordDto.prototype, "percent_body_fat", void 0);
+], CreateRecordDto.prototype, "percentBodyFat", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     (0, swagger_1.ApiPropertyOptional)({ example: 9, description: 'Nível de gordura visceral' }),
     __metadata("design:type", Number)
-], CreateRecordDto.prototype, "visceral_fat_level", void 0);
+], CreateRecordDto.prototype, "visceralFatLevel", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     (0, swagger_1.ApiPropertyOptional)({ example: 1850, description: 'Taxa metabólica basal (kcal)' }),
     __metadata("design:type", Number)
-], CreateRecordDto.prototype, "basal_metabolic_rate", void 0);
+], CreateRecordDto.prototype, "basalMetabolicRate", void 0);
 //# sourceMappingURL=create-record.dto.js.map

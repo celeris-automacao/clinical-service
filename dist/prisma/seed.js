@@ -121,6 +121,19 @@ async function main() {
         ],
         skipDuplicates: true,
     });
+    console.log('📊 Inicializando estatísticas do herói...');
+    await prisma.playerStats.upsert({
+        where: { patientId: patientId },
+        update: {},
+        create: {
+            patientId: patientId,
+            tenantId: tenantId,
+            currentXp: 0,
+            currentLevel: 1,
+            totalDamageDealt: 0,
+            currentGold: 0
+        },
+    });
 }
 main()
     .catch((e) => {

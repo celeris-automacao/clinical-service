@@ -17,12 +17,12 @@ export declare class RewardsService {
         progress: number;
         id: string;
         tenantId: string;
-        isActive: boolean;
-        description: string | null;
         title: string;
+        description: string | null;
         requiredDamage: number;
         goldCost: number;
         badgeIcon: string | null;
+        isActive: boolean;
     }[]>;
     claimReward(rewardId: string, user: UserContext): Promise<{
         success: boolean;

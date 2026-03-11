@@ -25,11 +25,19 @@ let RecordsService = class RecordsService {
     async createRecord(dto, user) {
         const newRecord = await this.repository.create(dto, user.userId, user.tenantId);
         const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId, dto);
-        await this.prisma.playerStats.update({
+        await this.prisma.playerStats.upsert({
             where: { patientId: user.userId },
-            data: {
+            update: {
                 totalDamageDealt: { increment: damageDealt },
                 currentGold: { increment: damageDealt },
+            },
+            create: {
+                patientId: user.userId,
+                tenantId: user.tenantId,
+                totalDamageDealt: damageDealt,
+                currentGold: damageDealt,
+                currentLevel: 1,
+                currentXp: 0
             }
         });
         const stats = await this.getStats(user);

@@ -18,7 +18,7 @@ const payload = {
   email: "paciente@teste.com",
   user_metadata: {
     tenant_id: "c56a4180-65aa-42ec-a945-5fd21dec0538", // ID da Clínica
-    role: "patient" // Role do seu schema access
+    role: "doctor" // Role do seu schema access
   }
 };
 

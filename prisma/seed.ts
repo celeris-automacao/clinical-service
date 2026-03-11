@@ -114,27 +114,41 @@ async function main() {
   });
 
   await prisma.dailyTask.createMany({
-  data: [
-    {
-      tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-      patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-      title: 'Beber 2L de Água',
-      xpReward: 200,
-      taskType: 'water',
-      dueDate: today, // Garante que apareça no "today"
+    data: [
+      {
+        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
+        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        title: 'Beber 2L de Água',
+        xpReward: 200,
+        taskType: 'water',
+        dueDate: today, // Garante que apareça no "today"
+      },
+      {
+        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
+        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        title: '30min de Caminhada',
+        xpReward: 250,
+        taskType: 'workout',
+        dueDate: today,
+      },
+      // ... adicione para as outras tarefas
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log('📊 Inicializando estatísticas do herói...');
+  await prisma.playerStats.upsert({
+    where: { patientId: patientId },
+    update: {},
+    create: {
+      patientId: patientId,
+      tenantId: tenantId,
+      currentXp: 0,
+      currentLevel: 1,
+      totalDamageDealt: 0,
+      currentGold: 0
     },
-    {
-      tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-      patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-      title: '30min de Caminhada',
-      xpReward: 250,
-      taskType: 'workout',
-      dueDate: today,
-    },
-    // ... adicione para as outras tarefas
-  ],
-  skipDuplicates: true,
-});
+  });
 
 
 }

@@ -12,25 +12,25 @@ export class CreateRecordDto {
   @IsNumber()
   @IsOptional()
   @ApiPropertyOptional({ example: 32.1, description: 'Massa muscular esquelética' })
-  skeletal_muscle_mass?: number;
+  skeletalMuscleMass?: number; // Mudou de skeletal_muscle_mass para camelCase
 
   @IsNumber()
   @IsOptional()
   @ApiPropertyOptional({ example: 18.5, description: 'Massa de gordura corporal' })
-  body_fat_mass?: number;
+  bodyFatMass?: number; // Mudou de body_fat_mass para camelCase
 
   @IsNumber()
   @IsOptional()
   @ApiPropertyOptional({ example: 22.5, description: 'Percentual de gordura corporal' })
-  percent_body_fat?: number;
+  percentBodyFat?: number; // Padronizando o restante
 
   @IsNumber()
   @IsOptional()
   @ApiPropertyOptional({ example: 9, description: 'Nível de gordura visceral' })
-  visceral_fat_level?: number;
+  visceralFatLevel?: number;
 
   @IsNumber()
   @IsOptional()
   @ApiPropertyOptional({ example: 1850, description: 'Taxa metabólica basal (kcal)' })
-  basal_metabolic_rate?: number;
+  basalMetabolicRate?: number;
 }
