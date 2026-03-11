@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SocialController.prototype, "getFeed", null);
 exports.SocialController = SocialController = __decorate([
-    (0, common_1.Controller)('v1/social'),
+    (0, common_1.Controller)('social'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [social_service_1.SocialService])
 ], SocialController);

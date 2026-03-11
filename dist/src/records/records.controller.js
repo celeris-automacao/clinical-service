@@ -62,7 +62,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], RecordsController.prototype, "getStats", null);
 exports.RecordsController = RecordsController = __decorate([
-    (0, common_1.Controller)('v1/records'),
+    (0, common_1.Controller)('records'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [records_service_1.RecordsService])
 ], RecordsController);

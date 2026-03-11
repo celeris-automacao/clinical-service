@@ -14,10 +14,10 @@ export declare class RecordsService {
         id: string;
         tenantId: string;
         patientId: string;
-        recordedAt: Date;
         weight: import("@prisma/client/runtime/library").Decimal;
         skeletalMuscleMass: import("@prisma/client/runtime/library").Decimal | null;
         bodyFatMass: import("@prisma/client/runtime/library").Decimal | null;
+        recordedAt: Date;
     }>;
     private calculateAndApplyDamage;
     getStats(user: UserContext): Promise<{

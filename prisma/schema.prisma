@@ -9,33 +9,59 @@ datasource db {
   schemas  = ["access", "clinical", "game", "social"]
 }
 
-model ClinicalRecord {
-  id                    String   @id @default(uuid()) @db.Uuid
-  tenantId              String   @map("tenant_id") @db.Uuid
-  patientId             String   @map("patient_id") @db.Uuid
-  recordedAt            DateTime @default(now()) @map("recorded_at")
-  weight                Decimal  @db.Decimal(5, 2)
-  skeletalMuscleMass    Decimal? @map("skeletal_muscle_mass") @db.Decimal(5, 2)
-  bodyFatMass           Decimal? @map("body_fat_mass") @db.Decimal(5, 2)
+// ==========================================
+// ACESSO E MULTI-TENANCY
+// ==========================================
 
-  // RELAÇÃO CORRIGIDA
-  patient               Patient  @relation(fields: [patientId], references: [id])
+model Tenant {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  @@map("clinical_records")
+  // Relações Reais 
+  patients        Patient[]
+  bossBattles     BossBattle[]
+  dailyTasks      DailyTask[]
+  records         ClinicalRecord[]
+  rewards         Reward[]
+  playerStats     PlayerStats[]
+  taskCompletions TaskCompletion[]
+  rewardClaims    RewardClaim[]
+  socialPosts     SocialPost[]
+  staff           Staff[]
+
+  @@map("tenants")
+  @@schema("access")
+}
+
+// ==========================================
+// MÓDULO CLÍNICO
+// ==========================================
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+
   @@schema("clinical")
 }
 
-model BossBattle {
-  id        String   @id @default(uuid()) @db.Uuid
-  tenantId  String   @map("tenant_id") @db.Uuid
-  name      String   
-  maxHp     Decimal  @map("max_hp") @db.Decimal(12, 2)
-  currentHp Decimal  @map("current_hp") @db.Decimal(12, 2)
-  isActive  Boolean  @default(true) @map("is_active")
-  defeatedAt  DateTime?
+model ClinicalRecord {
+  id                 String   @id @default(uuid()) @db.Uuid
+  tenantId           String   @map("tenant_id") @db.Uuid
+  patientId          String   @map("patient_id") @db.Uuid
+  recordedAt         DateTime @default(now()) @map("recorded_at")
+  weight             Decimal  @db.Decimal(5, 2)
+  skeletalMuscleMass Decimal? @map("skeletal_muscle_mass") @db.Decimal(5, 2)
+  bodyFatMass        Decimal? @map("body_fat_mass") @db.Decimal(5, 2)
 
-  @@map("boss_battles")
-  @@schema("game")
+  // Relações
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@map("clinical_records")
+  @@schema("clinical")
 }
 
 model DailyTask {
@@ -52,40 +78,112 @@ model DailyTask {
   completedAt DateTime? @map("completed_at")
   createdAt   DateTime  @default(now()) @map("created_at")
 
-  // ADICIONE ESTA LINHA: Campo oposto da relação com TaskCompletion
-  completions TaskCompletion[] 
+  // Relações
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
+  completions TaskCompletion[]
 
   @@map("daily_tasks")
   @@schema("clinical")
 }
 
+model Patient {
+  id        String    @id @default(uuid()) @db.Uuid
+  tenantId  String    @map("tenant_id") @db.Uuid
+  name      String
+  gender    Gender?
+  birthDate DateTime? @map("birth_date") @db.Date
+
+  // Relações Clínicas
+  tenant          Tenant           @relation(fields: [tenantId], references: [id])
+  clinicalRecords ClinicalRecord[]
+  profile         PatientProfile? // 1:1 com o perfil de intake 
+
+  // Relações de Jogo (O que estava faltando e causou o erro) [cite: 16]
+  completions  TaskCompletion[] // Corrigindo erro na linha 161 [cite: 16]
+  rewardClaims RewardClaim[] // Corrigindo erro na linha 194 [cite: 16]
+  playerStats  PlayerStats?
+
+  // Relação Social [cite: 16]
+  socialPosts SocialPost[] // Corrigindo erro na linha 230 [cite: 16]
+
+  @@map("patients")
+  @@schema("clinical")
+}
+
+model PatientProfile {
+  patientId    String  @id @map("patient_id") @db.Uuid
+  initialGoals String? @map("initial_goals") @db.Text
+  symptoms     String? @db.Text
+  pathologies  String? @db.Text
+  medicalNotes String? @map("medical_notes") @db.Text
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@map("patient_profiles")
+  @@schema("clinical")
+}
+
+model Staff {
+  id        String @id @default(uuid()) @db.Uuid
+  tenantId  String @map("tenant_id") @db.Uuid
+  userId    String @unique @map("user_id") @db.Uuid
+  name      String
+  document  String
+  specialty String
+  role      String @default("doctor")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("staff")
+  @@schema("clinical")
+}
+
+// ==========================================
+// MÓDULO GAME (GAMIFICAÇÃO)
+// ==========================================
+
+model BossBattle {
+  id         String    @id @default(uuid()) @db.Uuid
+  tenantId   String    @map("tenant_id") @db.Uuid
+  name       String
+  maxHp      Decimal   @map("max_hp") @db.Decimal(12, 2)
+  currentHp  Decimal   @map("current_hp") @db.Decimal(12, 2)
+  isActive   Boolean   @default(true) @map("is_active")
+  defeatedAt DateTime? @map("defeated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("boss_battles")
+  @@schema("game")
+}
+
 model TaskCompletion {
-  id        String   @id @default(uuid()) @db.Uuid
-  taskId    String   @map("task_id") @db.Uuid
-  patientId String   @map("patient_id") @db.Uuid
-  tenantId  String   @map("tenant_id") @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
+  taskId      String   @map("task_id") @db.Uuid
+  patientId   String   @map("patient_id") @db.Uuid
+  tenantId    String   @map("tenant_id") @db.Uuid
   completedAt DateTime @default(now()) @map("completed_at")
 
-  task      DailyTask @relation(fields: [taskId], references: [id])
-  
-  // RELAÇÃO CORRIGIDA
-  patient   Patient   @relation(fields: [patientId], references: [id])
+  task    DailyTask @relation(fields: [taskId], references: [id])
+  patient Patient   @relation(fields: [patientId], references: [id])
+  tenant  Tenant    @relation(fields: [tenantId], references: [id])
 
   @@map("task_completions")
   @@schema("game")
 }
 
 model Reward {
-  id              String   @id @default(uuid()) @db.Uuid
-  tenantId        String   @map("tenant_id") @db.Uuid
-  title           String   
-  description     String?
-  requiredDamage  Int      @map("required_damage")
-  goldCost       Int           @default(0) // Custo em moedas para resgatar 
-  badgeIcon       String?  @map("badge_icon")      
-  isActive        Boolean  @default(true) @map("is_active")
+  id             String  @id @default(uuid()) @db.Uuid
+  tenantId       String  @map("tenant_id") @db.Uuid
+  title          String
+  description    String?
+  requiredDamage Int     @map("required_damage")
+  goldCost       Int     @default(0)
+  badgeIcon      String? @map("badge_icon")
+  isActive       Boolean @default(true) @map("is_active")
 
-  claims          RewardClaim[]
+  tenant Tenant        @relation(fields: [tenantId], references: [id])
+  claims RewardClaim[]
 
   @@unique([title, tenantId])
   @@map("rewards")
@@ -93,74 +191,52 @@ model Reward {
 }
 
 model RewardClaim {
-  id          String   @id @default(uuid()) @db.Uuid
-  rewardId    String   @map("reward_id") @db.Uuid
-  patientId   String   @map("patient_id") @db.Uuid
-  tenantId    String   @map("tenant_id") @db.Uuid
-  claimedAt   DateTime @default(now()) @map("claimed_at")
+  id        String   @id @default(uuid()) @db.Uuid
+  rewardId  String   @map("reward_id") @db.Uuid
+  patientId String   @map("patient_id") @db.Uuid
+  tenantId  String   @map("tenant_id") @db.Uuid
+  claimedAt DateTime @default(now()) @map("claimed_at")
 
-  reward      Reward   @relation(fields: [rewardId], references: [id])
-  
-  // RELAÇÃO CORRIGIDA
-  patient     Patient  @relation(fields: [patientId], references: [id])
+  reward  Reward  @relation(fields: [rewardId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
 
   @@map("reward_claims")
   @@schema("game")
 }
 
-model Patient {
-  id        String   @id @default(uuid()) @db.Uuid
-  tenantId  String   @map("tenant_id") @db.Uuid
-  name      String   
-
-  clinicalRecords ClinicalRecord[]
-  completions     TaskCompletion[]
-  rewardClaims    RewardClaim[]
-  socialPosts SocialPost[]
-  playerStats     PlayerStats?
-
-  @@map("patients")
-  @@schema("clinical")
-}
-
 model PlayerStats {
-  patientId      String   @id @map("patient_id") @db.Uuid
-  tenantId       String   @map("tenant_id") @db.Uuid
-  currentLevel   Int      @default(1) @map("current_level")
-  currentXp      Int      @default(0) @map("current_xp")
-  currentGold Int @default(0)
-  currentStreak  Int      @default(0) @map("current_streak")
-  lastActivityAt DateTime @default(now()) @map("last_activity_at")
-  totalDamageDealt  Decimal  @default(0) @map("total_damage_dealt") @db.Decimal(10, 2)
-  patient           Patient  @relation(fields: [patientId], references: [id])
+  patientId        String   @id @map("patient_id") @db.Uuid
+  tenantId         String   @map("tenant_id") @db.Uuid
+  currentLevel     Int      @default(1) @map("current_level")
+  currentXp        Int      @default(0) @map("current_xp")
+  currentGold      Int      @default(0) @map("current_gold")
+  currentStreak    Int      @default(0) @map("current_streak")
+  lastActivityAt   DateTime @default(now()) @map("last_activity_at")
+  totalDamageDealt Decimal  @default(0) @map("total_damage_dealt") @db.Decimal(10, 2)
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
 
   @@map("player_stats")
   @@schema("game")
 }
 
+// ==========================================
+// MÓDULO SOCIAL
+// ==========================================
+
 model SocialPost {
   id        String   @id @default(uuid()) @db.Uuid
   tenantId  String   @map("tenant_id") @db.Uuid
   patientId String   @map("patient_id") @db.Uuid
-  content   String   // Ex: "Guerreiro de Saúde derrotou o Boss!"
-  type      String   // Ex: "achievement", "boss_defeat", "milestone"
+  content   String
+  type      String
   createdAt DateTime @default(now()) @map("created_at")
 
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+  tenant  Tenant  @relation(fields: [tenantId], references: [id])
 
   @@map("social_posts")
   @@schema("social")
-}
-
-model Staff {
-  id            String   @id @default(uuid()) @db.Uuid
-  tenantId      String   @map("tenant_id") @db.Uuid
-  userId        String   @unique @map("user_id") @db.Uuid // Ligação com o Auth do Supabase
-  name          String
-  document      String   // CRM, CRN, etc.
-  specialty     String   // Endocrinologia, Nutrição...
-  role          String   @default("doctor") // doctor, admin, health_coach
-
-  @@map("staff")
-  @@schema("clinical")
 }

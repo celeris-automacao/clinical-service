@@ -37,8 +37,8 @@ export declare class DashboardController {
     } & {
         id: string;
         tenantId: string;
-        rewardId: string;
         patientId: string;
+        rewardId: string;
         claimedAt: Date;
     })[]>;
     checkDoctorRole(user: UserContext): void;

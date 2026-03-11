@@ -4,18 +4,18 @@ export declare class SocialService {
     constructor(repository: ISocialRepository);
     getFeed(tenantId: string): Promise<{
         id: string;
-        tenantId: string;
-        type: string;
-        patientId: string;
-        content: string;
         createdAt: Date;
+        tenantId: string;
+        patientId: string;
+        type: string;
+        content: string;
     }[]>;
     createPost(patientId: string, tenantId: string, content: string, type: string): Promise<{
         id: string;
-        tenantId: string;
-        type: string;
-        patientId: string;
-        content: string;
         createdAt: Date;
+        tenantId: string;
+        patientId: string;
+        type: string;
+        content: string;
     }>;
 }

@@ -3,7 +3,7 @@ import { GameService } from './game.service'; // Nome corrigido
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
 
-@Controller('v1/player')
+@Controller('player')
 @UseGuards(SupabaseGuard)
 export class GameController {
   constructor(private readonly gameService: GameService) {} // Injeção atualizada

@@ -45,7 +45,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], RewardsController.prototype, "claim", null);
 exports.RewardsController = RewardsController = __decorate([
-    (0, common_1.Controller)('v1/rewards'),
+    (0, common_1.Controller)('rewards'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [rewards_service_1.RewardsService])
 ], RewardsController);

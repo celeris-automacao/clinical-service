@@ -4,7 +4,7 @@ import { RewardsService } from './rewards.service';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
 
-@Controller('v1/rewards')
+@Controller('rewards')
 @UseGuards(SupabaseGuard)
 export class RewardsController {
   constructor(private readonly rewardsService: RewardsService) {}

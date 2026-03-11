@@ -5,10 +5,10 @@ export declare class SocialController {
     constructor(socialService: SocialService);
     getFeed(user: UserContext): Promise<{
         id: string;
-        tenantId: string;
-        type: string;
-        patientId: string;
-        content: string;
         createdAt: Date;
+        tenantId: string;
+        patientId: string;
+        type: string;
+        content: string;
     }[]>;
 }

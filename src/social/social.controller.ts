@@ -4,7 +4,7 @@ import { SocialService } from './social.service';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
 
-@Controller('v1/social')
+@Controller('social')
 @UseGuards(SupabaseGuard)
 export class SocialController {
   constructor(private readonly socialService: SocialService) {}

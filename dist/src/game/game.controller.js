@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], GameController.prototype, "getStats", null);
 exports.GameController = GameController = __decorate([
-    (0, common_1.Controller)('v1/player'),
+    (0, common_1.Controller)('player'),
     (0, common_1.UseGuards)(supabase_guard_1.SupabaseGuard),
     __metadata("design:paramtypes", [game_service_1.GameService])
 ], GameController);

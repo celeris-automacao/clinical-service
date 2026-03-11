@@ -3,137 +3,108 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 async function main() {
-    const tenantId = 'c56a4180-65aa-42ec-a945-5fd21dec0538';
-    const patientId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    console.log('👤 Criando o Paciente/Herói...');
-    await prisma.patient.upsert({
-        where: { id: patientId },
-        update: { name: 'Guerreiro de Saúde' },
+    console.log('🏢 Criando a Clínica (Tenant)...');
+    const tenant = await prisma.tenant.upsert({
+        where: { id: 'c56a4180-65aa-42ec-a945-5fd21dec0538' },
+        update: {},
         create: {
-            id: patientId,
-            tenantId: tenantId,
-            name: 'Guerreiro de Saúde',
+            id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
+            name: 'Clínica HealthQuest Central',
         },
     });
-    console.log('✅ Seed finalizado com sucesso!');
+    console.log('👤 Criando o Paciente/Herói...');
+    const patient = await prisma.patient.upsert({
+        where: { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
+        update: {},
+        create: {
+            id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+            name: 'Guerreiro de Saúde',
+            tenantId: tenant.id,
+        },
+    });
     console.log('⚔️  Gerando o Boss da Semana...');
     const boss = await prisma.bossBattle.upsert({
         where: { id: '00000000-0000-0000-0000-000000000001' },
         update: {
-            currentHp: 1,
+            currentHp: 10,
             isActive: true,
         },
         create: {
             id: '00000000-0000-0000-0000-000000000001',
-            tenantId: tenantId,
+            tenantId: tenant.id,
             name: 'Sedentarismo Voraz',
             maxHp: 100000,
             currentHp: 10,
             isActive: true,
         },
     });
-    console.log(`✅ Boss ${boss.name} pronto para a batalha! HP: ${boss.currentHp}`);
+    console.log(`✅ Boss ${boss.name} pronto! HP: ${boss.currentHp}`);
+    console.log('📅 Criando tarefas diárias...');
     await prisma.dailyTask.createMany({
         data: [
             {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-                title: 'Beber 2L de Água',
-                xpReward: 200,
-                taskType: 'diet'
-            },
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-                title: '30min de Caminhada',
-                xpReward: 200,
-                taskType: 'diet'
-            },
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-                title: 'Registrar Refeição Saudável',
-                xpReward: 200,
-                taskType: 'diet'
-            },
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-                title: 'Meditação ou Respiração',
-                description: 'Realizar 5 min de respiração guiada',
-                xpReward: 150,
-                taskType: 'education'
-            },
-        ],
-        skipDuplicates: true,
-    });
-    console.log('✅ Tarefas diárias iniciais criadas.');
-    await prisma.reward.createMany({
-        data: [
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                title: 'Medalha de Recruta',
-                requiredDamage: 1000,
-                badgeIcon: 'shield'
-            },
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                title: 'Cupom 15% Suplementos',
-                requiredDamage: 5000,
-                badgeIcon: 'ticket'
-            },
-        ],
-        skipDuplicates: true,
-    });
-    console.log('✅ Recompensas iniciais criadas.');
-    await prisma.reward.upsert({
-        where: { id: '00000000-0000-0000-0000-000000000002' },
-        update: {},
-        create: {
-            id: '00000000-0000-0000-0000-000000000002',
-            tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-            title: 'Medalha de Teste Unitário',
-            description: 'Parabéns por validar o sistema de Loot!',
-            requiredDamage: 1,
-            badgeIcon: 'test-tube',
-        },
-    });
-    await prisma.dailyTask.createMany({
-        data: [
-            {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+                tenantId: tenant.id,
+                patientId: patient.id,
                 title: 'Beber 2L de Água',
                 xpReward: 200,
                 taskType: 'water',
                 dueDate: today,
             },
             {
-                tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-                patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+                tenantId: tenant.id,
+                patientId: patient.id,
                 title: '30min de Caminhada',
                 xpReward: 250,
                 taskType: 'workout',
                 dueDate: today,
+            },
+            {
+                tenantId: tenant.id,
+                patientId: patient.id,
+                title: 'Registrar Refeição Saudável',
+                xpReward: 200,
+                taskType: 'diet',
+                dueDate: today,
+            },
+        ],
+        skipDuplicates: true,
+    });
+    console.log('🎁 Criando recompensas...');
+    await prisma.reward.createMany({
+        data: [
+            {
+                id: '00000000-0000-0000-0000-000000000002',
+                tenantId: tenant.id,
+                title: 'Medalha de Teste Unitário',
+                description: 'Parabéns por validar o sistema de Loot!',
+                requiredDamage: 1,
+                badgeIcon: 'test-tube',
+            },
+            {
+                tenantId: tenant.id,
+                title: 'Cupom 15% Suplementos',
+                requiredDamage: 5000,
+                badgeIcon: 'ticket',
             },
         ],
         skipDuplicates: true,
     });
     console.log('📊 Inicializando estatísticas do herói...');
     await prisma.playerStats.upsert({
-        where: { patientId: patientId },
+        where: { patientId: patient.id },
         update: {},
         create: {
-            patientId: patientId,
-            tenantId: tenantId,
+            patientId: patient.id,
+            tenantId: tenant.id,
             currentXp: 0,
             currentLevel: 1,
             totalDamageDealt: 0,
             currentGold: 0
         },
     });
+    console.log('✅ Seed finalizado com sucesso!');
 }
 main()
     .catch((e) => {

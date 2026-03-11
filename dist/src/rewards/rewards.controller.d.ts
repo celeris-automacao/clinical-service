@@ -9,12 +9,12 @@ export declare class RewardsController {
         progress: number;
         id: string;
         tenantId: string;
-        title: string;
+        isActive: boolean;
         description: string | null;
+        title: string;
         requiredDamage: number;
         goldCost: number;
         badgeIcon: string | null;
-        isActive: boolean;
     }[]>;
     claim(rewardId: string, user: UserContext): Promise<{
         success: boolean;

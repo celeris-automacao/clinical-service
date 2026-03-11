@@ -10,10 +10,10 @@ export declare class RecordsController {
         id: string;
         tenantId: string;
         patientId: string;
-        recordedAt: Date;
         weight: import("@prisma/client/runtime/library").Decimal;
         skeletalMuscleMass: import("@prisma/client/runtime/library").Decimal | null;
         bodyFatMass: import("@prisma/client/runtime/library").Decimal | null;
+        recordedAt: Date;
     }>;
     getEvolution(user: UserContext): Promise<{
         recordedAt: Date;
