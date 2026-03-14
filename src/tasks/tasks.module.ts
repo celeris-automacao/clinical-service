@@ -10,7 +10,7 @@ import { GetTasksTodayUseCase } from './application/use-cases/get-tasks-today.us
 import { TasksAchievementsAdapter } from './infrastructure/adapters/tasks-achievements.adapter';
 import { PrismaTaskCompletionTransactionAdapter } from './infrastructure/persistence/prisma-task-completion-transaction.adapter';
 import { TasksController } from './presentation/http/tasks.controller';
-import { TasksRepository } from './infrastructure/persistence/prisma-tasks.repository';
+import { PrismaTasksRepository } from './infrastructure/persistence/prisma-tasks.repository';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,
@@ -28,7 +28,7 @@ import {
     GetTasksTodayUseCase,
     {
       provide: TASKS_REPOSITORY,
-      useClass: TasksRepository,
+      useClass: PrismaTasksRepository,
     },
     {
       provide: TASK_COMPLETION_TRANSACTION_PORT,

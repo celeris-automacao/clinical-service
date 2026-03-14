@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { DashboardRepository } from './infrastructure/persistence/prisma-dashboard.repository';
-import { NotificationsRepository } from './infrastructure/persistence/prisma-notifications.repository';
+import { PrismaDashboardRepository } from './infrastructure/persistence/prisma-dashboard.repository';
+import { PrismaNotificationsRepository } from './infrastructure/persistence/prisma-notifications.repository';
 import { GetClinicOverviewUseCase } from './application/use-cases/get-clinic-overview.use-case';
 import { GetMissingPatientsUseCase } from './application/use-cases/get-missing-patients.use-case';
 import { GetRecentClaimsUseCase } from './application/use-cases/get-recent-claims.use-case';
@@ -17,11 +17,11 @@ import { DASHBOARD_REPOSITORY, NOTIFICATIONS_REPOSITORY } from './dashboard.toke
     NotificationsService,
     {
       provide: DASHBOARD_REPOSITORY,
-      useClass: DashboardRepository,
+      useClass: PrismaDashboardRepository,
     },
     {
       provide: NOTIFICATIONS_REPOSITORY,
-      useClass: NotificationsRepository,
+      useClass: PrismaNotificationsRepository,
     },
   ],
   exports: [

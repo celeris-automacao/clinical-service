@@ -1,16 +1,16 @@
 // src/tests/rewards/rewards.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { RewardsRepository } from '../../rewards/infrastructure/persistence/prisma-rewards.repository';
+import { PrismaRewardsRepository } from '../../rewards/infrastructure/persistence/prisma-rewards.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('RewardsRepository - Cobertura Total', () => {
-  let repository: RewardsRepository;
+describe('PrismaRewardsRepository - Cobertura Total', () => {
+  let repository: PrismaRewardsRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RewardsRepository,
+        PrismaRewardsRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -21,7 +21,7 @@ describe('RewardsRepository - Cobertura Total', () => {
       ],
     }).compile();
 
-    repository = module.get<RewardsRepository>(RewardsRepository);
+    repository = module.get<PrismaRewardsRepository>(PrismaRewardsRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

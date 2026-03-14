@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AchievementsRepository } from '../../achievements/infrastructure/persistence/prisma-achievements.repository';
+import { PrismaAchievementsRepository } from '../../achievements/infrastructure/persistence/prisma-achievements.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('AchievementsRepository', () => {
-  let repository: AchievementsRepository;
+describe('PrismaAchievementsRepository', () => {
+  let repository: PrismaAchievementsRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AchievementsRepository,
+        PrismaAchievementsRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -20,7 +20,7 @@ describe('AchievementsRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<AchievementsRepository>(AchievementsRepository);
+    repository = module.get<PrismaAchievementsRepository>(PrismaAchievementsRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

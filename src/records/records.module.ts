@@ -9,7 +9,7 @@ import { RecordsAchievementsAdapter } from './infrastructure/adapters/records-ac
 import { PrismaBossBattleAdapter } from './infrastructure/persistence/prisma-boss-battle.adapter';
 import { PrismaPlayerProgressionAdapter } from './infrastructure/persistence/prisma-player-progression.adapter';
 import { RecordsController } from './presentation/http/records.controller';
-import { RecordsRepository } from './infrastructure/persistence/prisma-records.repository';
+import { PrismaRecordsRepository } from './infrastructure/persistence/prisma-records.repository';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,
@@ -28,7 +28,7 @@ import {
     ClinicalProgressCalculator,
     {
       provide: RECORDS_REPOSITORY,
-      useClass: RecordsRepository,
+      useClass: PrismaRecordsRepository,
     },
     {
       provide: PLAYER_PROGRESSION_PORT,

@@ -3,7 +3,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CreatePatientDto } from '../../presentation/http/dto/create-patient.dto';
 
 @Injectable()
-export class PatientsRepository {
+export class PrismaTenantPatientsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createWithStats(data: CreatePatientDto, tenantId: string) {

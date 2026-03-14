@@ -4,7 +4,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { IAchievementsRepository } from '../../repositories/interfaces/achievements.repository.interface';
 
 @Injectable()
-export class AchievementsRepository implements IAchievementsRepository {
+export class PrismaAchievementsRepository implements IAchievementsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getOrCreateBadge(tenantId: string, title: string, icon: string) {

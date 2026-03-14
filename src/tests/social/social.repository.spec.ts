@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SocialRepository } from '../../social/infrastructure/persistence/prisma-social.repository';
+import { PrismaSocialRepository } from '../../social/infrastructure/persistence/prisma-social.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('SocialRepository', () => {
-  let repository: SocialRepository;
+describe('PrismaSocialRepository', () => {
+  let repository: PrismaSocialRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        SocialRepository,
+        PrismaSocialRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -22,7 +22,7 @@ describe('SocialRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<SocialRepository>(SocialRepository);
+    repository = module.get<PrismaSocialRepository>(PrismaSocialRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

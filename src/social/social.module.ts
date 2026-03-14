@@ -4,7 +4,7 @@ import { CreateSocialPostUseCase } from './application/use-cases/create-social-p
 import { GetFeedUseCase } from './application/use-cases/get-feed.use-case';
 import { SocialController } from './presentation/http/social.controller';
 import { SocialListener } from './presentation/listeners/social.listener';
-import { SocialRepository } from './infrastructure/persistence/prisma-social.repository';
+import { PrismaSocialRepository } from './infrastructure/persistence/prisma-social.repository';
 import { SOCIAL_REPOSITORY } from './social.tokens';
 
 @Module({
@@ -16,7 +16,7 @@ import { SOCIAL_REPOSITORY } from './social.tokens';
     SocialListener,
     {
       provide: SOCIAL_REPOSITORY,
-      useClass: SocialRepository,
+      useClass: PrismaSocialRepository,
     },
   ],
   exports: [GetFeedUseCase, CreateSocialPostUseCase, SOCIAL_REPOSITORY],

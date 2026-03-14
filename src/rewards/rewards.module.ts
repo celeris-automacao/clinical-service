@@ -7,7 +7,7 @@ import { RecordsRewardsStatsAdapter } from './infrastructure/adapters/records-re
 import { RewardsEventsAdapter } from './infrastructure/adapters/rewards-events.adapter';
 import { PrismaRewardClaimTransactionAdapter } from './infrastructure/persistence/prisma-reward-claim-transaction.adapter';
 import { RewardsController } from './presentation/http/rewards.controller';
-import { RewardsRepository } from './infrastructure/persistence/prisma-rewards.repository';
+import { PrismaRewardsRepository } from './infrastructure/persistence/prisma-rewards.repository';
 import {
   REWARD_CLAIM_TRANSACTION_PORT,
   REWARDS_EVENTS_PORT,
@@ -22,7 +22,7 @@ import {
     ClaimRewardUseCase,
     {
       provide: REWARDS_REPOSITORY,
-      useClass: RewardsRepository,
+      useClass: PrismaRewardsRepository,
     },
     {
       provide: REWARDS_STATS_PORT,

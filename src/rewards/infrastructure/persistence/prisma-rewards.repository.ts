@@ -5,7 +5,7 @@ import { IRewardsRepository } from '../../repositories/interfaces/rewards.reposi
 import { Reward, RewardClaim } from '@prisma/client';
 
 @Injectable()
-export class RewardsRepository implements IRewardsRepository {
+export class PrismaRewardsRepository implements IRewardsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAllActiveByTenant(tenantId: string): Promise<Reward[]> {

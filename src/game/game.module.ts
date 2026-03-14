@@ -4,7 +4,7 @@ import { RecordsModule } from '../records/records.module';
 import { GetPlayerStatsUseCase } from './application/use-cases/get-player-stats.use-case';
 import { RecordsPlayerClinicalStatsAdapter } from './infrastructure/adapters/records-player-clinical-stats.adapter';
 import { GameController } from './presentation/http/game.controller';
-import { GameRepository } from './infrastructure/persistence/prisma-game.repository';
+import { PrismaGameRepository } from './infrastructure/persistence/prisma-game.repository';
 import { GAME_REPOSITORY, PLAYER_CLINICAL_STATS_PORT } from './game.tokens';
 
 @Module({
@@ -14,7 +14,7 @@ import { GAME_REPOSITORY, PLAYER_CLINICAL_STATS_PORT } from './game.tokens';
     GetPlayerStatsUseCase,
     {
       provide: GAME_REPOSITORY,
-      useClass: GameRepository,
+      useClass: PrismaGameRepository,
     },
     {
       provide: PLAYER_CLINICAL_STATS_PORT,

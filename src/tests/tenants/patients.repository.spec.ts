@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePatientDto } from '../../tenants/presentation/http/dto/create-patient.dto';
-import { PatientsRepository } from '../../tenants/infrastructure/persistence/prisma-tenant-patients.repository';
+import { PrismaTenantPatientsRepository } from '../../tenants/infrastructure/persistence/prisma-tenant-patients.repository';
 
-describe('PatientsRepository', () => {
-  let repository: PatientsRepository;
+describe('PrismaTenantPatientsRepository', () => {
+  let repository: PrismaTenantPatientsRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        PatientsRepository,
+        PrismaTenantPatientsRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -23,7 +23,7 @@ describe('PatientsRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<PatientsRepository>(PatientsRepository);
+    repository = module.get<PrismaTenantPatientsRepository>(PrismaTenantPatientsRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

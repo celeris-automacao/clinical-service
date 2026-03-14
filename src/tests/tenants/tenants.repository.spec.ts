@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTenantDto } from '../../tenants/presentation/http/dto/create-tenant.dto';
-import { TenantsRepository } from '../../tenants/infrastructure/persistence/prisma-tenants.repository';
+import { PrismaTenantsRepository } from '../../tenants/infrastructure/persistence/prisma-tenants.repository';
 
-describe('TenantsRepository', () => {
-  let repository: TenantsRepository;
+describe('PrismaTenantsRepository', () => {
+  let repository: PrismaTenantsRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TenantsRepository,
+        PrismaTenantsRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -24,7 +24,7 @@ describe('TenantsRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<TenantsRepository>(TenantsRepository);
+    repository = module.get<PrismaTenantsRepository>(PrismaTenantsRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

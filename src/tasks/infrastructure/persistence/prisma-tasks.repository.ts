@@ -5,7 +5,7 @@ import { ITasksRepository } from '../../repositories/interfaces/tasks.repository
 import { DailyTask, TaskCompletion } from '@prisma/client';
 
 @Injectable()
-export class TasksRepository implements ITasksRepository {
+export class PrismaTasksRepository implements ITasksRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findTasksByTenant(tenantId: string): Promise<DailyTask[]> {

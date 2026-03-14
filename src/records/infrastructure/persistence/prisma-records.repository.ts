@@ -6,7 +6,7 @@ import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalRecord } from '@prisma/client';
 
 @Injectable()
-export class RecordsRepository implements IRecordsRepository { // Adicionado 'implements'
+export class PrismaRecordsRepository implements IRecordsRepository {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(data: CreateRecordDto, userId: string, tenantId: string): Promise<ClinicalRecord> {

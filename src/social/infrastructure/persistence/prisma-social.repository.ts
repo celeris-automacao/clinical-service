@@ -5,7 +5,7 @@ import { SocialPost } from '@prisma/client';
 import { SocialRepositoryPort } from '../../application/ports/social-repository.port';
 
 @Injectable()
-export class SocialRepository implements SocialRepositoryPort {
+export class PrismaSocialRepository implements SocialRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async findFeedByTenant(tenantId: string, limit: number = 20): Promise<SocialPost[]> {

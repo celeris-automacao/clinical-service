@@ -4,7 +4,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { GameRepositoryPort } from '../../application/ports/game-repository.port';
 
 @Injectable()
-export class GameRepository implements GameRepositoryPort {
+export class PrismaGameRepository implements GameRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async findPlayerProgress(patientId: string) {

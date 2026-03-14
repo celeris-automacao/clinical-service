@@ -1,16 +1,16 @@
 // src/tests/game/game.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameRepository } from '../../game/infrastructure/persistence/prisma-game.repository';
+import { PrismaGameRepository } from '../../game/infrastructure/persistence/prisma-game.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('GameRepository', () => {
-  let repository: GameRepository;
+describe('PrismaGameRepository', () => {
+  let repository: PrismaGameRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        GameRepository,
+        PrismaGameRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -21,7 +21,7 @@ describe('GameRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<GameRepository>(GameRepository);
+    repository = module.get<PrismaGameRepository>(PrismaGameRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

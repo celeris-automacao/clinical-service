@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DashboardRepository } from '../../dashboard/infrastructure/persistence/prisma-dashboard.repository';
+import { PrismaDashboardRepository } from '../../dashboard/infrastructure/persistence/prisma-dashboard.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
-describe('DashboardRepository', () => {
-  let repository: DashboardRepository;
+describe('PrismaDashboardRepository', () => {
+  let repository: PrismaDashboardRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DashboardRepository,
+        PrismaDashboardRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -31,7 +31,7 @@ describe('DashboardRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<DashboardRepository>(DashboardRepository);
+    repository = module.get<PrismaDashboardRepository>(PrismaDashboardRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

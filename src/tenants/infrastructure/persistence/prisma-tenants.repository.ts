@@ -4,7 +4,7 @@ import { CreateTenantDto } from '../../presentation/http/dto/create-tenant.dto';
 import { TenantsRepositoryPort } from '../../application/ports/tenants-repository.port';
 
 @Injectable()
-export class TenantsRepository implements TenantsRepositoryPort {
+export class PrismaTenantsRepository implements TenantsRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTenantDto) {

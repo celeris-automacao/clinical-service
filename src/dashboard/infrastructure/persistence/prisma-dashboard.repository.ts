@@ -4,7 +4,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { IDashboardRepository } from '../../repositories/interfaces/dashboard.repository.interface';
 
 @Injectable()
-export class DashboardRepository implements IDashboardRepository {
+export class PrismaDashboardRepository implements IDashboardRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async countActivePlayers(tenantId: string, since: Date): Promise<number> {

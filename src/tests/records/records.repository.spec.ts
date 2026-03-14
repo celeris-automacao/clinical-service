@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecordsRepository } from '../../records/infrastructure/persistence/prisma-records.repository';
+import { PrismaRecordsRepository } from '../../records/infrastructure/persistence/prisma-records.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 
-describe('RecordsRepository', () => {
-  let repository: RecordsRepository;
+describe('PrismaRecordsRepository', () => {
+  let repository: PrismaRecordsRepository;
   let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RecordsRepository,
+        PrismaRecordsRepository,
         {
           provide: PrismaService,
           useValue: {
@@ -23,7 +23,7 @@ describe('RecordsRepository', () => {
       ],
     }).compile();
 
-    repository = module.get<RecordsRepository>(RecordsRepository);
+    repository = module.get<PrismaRecordsRepository>(PrismaRecordsRepository);
     prisma = module.get<PrismaService>(PrismaService);
   });
 

@@ -5,7 +5,7 @@ import { UpdatePatientProfileDto } from '../../presentation/http/dto/update-pati
 import { PatientsRepositoryPort } from '../../application/ports/patients-repository.port';
 
 @Injectable()
-export class PatientsRepository implements PatientsRepositoryPort {
+export class PrismaPatientsRepository implements PatientsRepositoryPort {
   constructor(private readonly prisma: PrismaService) { }
 
   async createWithStats(data: CreatePatientDto, tenantId: string) {
