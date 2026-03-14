@@ -1,4 +1,4 @@
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 
 export interface RewardsStatsPort {
   getStats(user: UserContext): Promise<{

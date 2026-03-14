@@ -1,5 +1,5 @@
 import { Inject, Injectable, BadRequestException } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import {
   REWARD_CLAIM_TRANSACTION_PORT,
   REWARDS_EVENTS_PORT,

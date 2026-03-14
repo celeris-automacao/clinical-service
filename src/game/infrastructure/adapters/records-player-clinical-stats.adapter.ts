@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { GetPatientStatsUseCase } from '../../../records/application/use-cases/get-patient-stats.use-case';
 import { PlayerClinicalStatsPort } from '../../application/ports/player-clinical-stats.port';
 

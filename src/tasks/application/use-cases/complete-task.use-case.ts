@@ -1,6 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
+import { ApplicationEventBusPort } from '../../../shared/application/ports/application-event-bus.port';
+import { APPLICATION_EVENT_BUS } from '../../../shared/shared.tokens';
 import { HandleBossVictoryUseCase } from '../../../records/application/use-cases/handle-boss-victory.use-case';
 import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import {
@@ -18,7 +19,8 @@ export class CompleteTaskUseCase {
     private readonly repository: TasksRepositoryPort,
     @Inject(TASK_COMPLETION_TRANSACTION_PORT)
     private readonly taskCompletionTransactionPort: TaskCompletionTransactionPort,
-    private readonly eventEmitter: EventEmitter2,
+    @Inject(APPLICATION_EVENT_BUS)
+    private readonly eventBus: ApplicationEventBusPort,
     @Inject(TASKS_ACHIEVEMENTS_PORT)
     private readonly tasksAchievementsPort: TasksAchievementsPort,
     private readonly handleBossVictoryUseCase: HandleBossVictoryUseCase,
@@ -65,7 +67,7 @@ export class CompleteTaskUseCase {
       });
     }
 
-    this.eventEmitter.emit('task.completed', { taskId, userId: user.userId, xp: task.xpReward });
+    this.eventBus.emit('task.completed', { taskId, userId: user.userId, xp: task.xpReward });
 
     return {
       success: true,

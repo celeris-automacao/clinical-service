@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 import { HandleBossVictoryUseCase } from '../../records/application/use-cases/handle-boss-victory.use-case';
+import { APPLICATION_EVENT_BUS } from '../../shared/shared.tokens';
 import { CompleteTaskUseCase } from '../../tasks/application/use-cases/complete-task.use-case';
 import { TaskCompletionTransactionPort } from '../../tasks/application/ports/task-completion-transaction.port';
 import { TasksAchievementsPort } from '../../tasks/application/ports/tasks-achievements.port';
@@ -38,7 +38,7 @@ describe('CompleteTaskUseCase', () => {
             execute: jest.fn(),
           },
         },
-        { provide: EventEmitter2, useValue: { emit: jest.fn() } },
+        { provide: APPLICATION_EVENT_BUS, useValue: { emit: jest.fn() } },
         {
           provide: TASKS_ACHIEVEMENTS_PORT,
           useValue: {

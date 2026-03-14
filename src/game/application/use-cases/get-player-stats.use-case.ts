@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { GameRepositoryPort } from '../ports/game-repository.port';
 import { PlayerClinicalStatsPort } from '../ports/player-clinical-stats.port';
 import { GAME_REPOSITORY, PLAYER_CLINICAL_STATS_PORT } from '../../game.tokens';

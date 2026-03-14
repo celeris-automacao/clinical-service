@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AchievementsModule } from '../achievements/achievements.module';
-import { GameModule } from '../game/game.module';
 import { RecordsModule } from '../records/records.module';
 import { CompleteTaskUseCase } from './application/use-cases/complete-task.use-case';
 import { GetCategorizedRankingUseCase } from './application/use-cases/get-categorized-ranking.use-case';
@@ -18,7 +17,7 @@ import {
 } from './tasks.tokens';
 
 @Module({
-  imports: [GameModule, RecordsModule, AchievementsModule],
+  imports: [RecordsModule, AchievementsModule],
   controllers: [TasksController],
   providers: [
     CompleteTaskUseCase,

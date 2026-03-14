@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
 import { RecordsModule } from '../records/records.module';
 import { ClaimRewardUseCase } from './application/use-cases/claim-reward.use-case';
 import { GetAvailableRewardsUseCase } from './application/use-cases/get-available-rewards.use-case';
@@ -16,7 +15,7 @@ import {
 } from './rewards.tokens';
 
 @Module({
-  imports: [PrismaModule, RecordsModule],
+  imports: [RecordsModule],
   providers: [
     GetAvailableRewardsUseCase,
     ClaimRewardUseCase,
@@ -38,6 +37,5 @@ import {
     },
   ],
   controllers: [RewardsController],
-  exports: [GetAvailableRewardsUseCase, ClaimRewardUseCase, REWARDS_REPOSITORY],
 })
 export class RewardsModule {}

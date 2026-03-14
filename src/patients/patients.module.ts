@@ -17,6 +17,5 @@ import { PATIENTS_REPOSITORY } from './patients.tokens';
       useClass: PrismaPatientsRepository,
     },
   ],
-  exports: [CreatePatientUseCase, GetPatientByIdUseCase, UpdatePatientProfileUseCase, PATIENTS_REPOSITORY],
 })
 export class PatientsModule {}

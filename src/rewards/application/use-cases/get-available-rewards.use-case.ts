@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { REWARDS_REPOSITORY, REWARDS_STATS_PORT } from '../../rewards.tokens';
 import { RewardsRepositoryPort } from '../ports/rewards-repository.port';
 import { RewardsStatsPort } from '../ports/rewards-stats.port';

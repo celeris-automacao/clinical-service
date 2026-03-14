@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CheckLevelAchievementsUseCase } from '../../achievements/application/use-cases/check-level-achievements.use-case';
 import { EmitGlobalVictoryUseCase } from '../../achievements/application/use-cases/emit-global-victory.use-case';
 import { AchievementsEventsPort } from '../../achievements/application/ports/achievements-events.port';

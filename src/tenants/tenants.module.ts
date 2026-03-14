@@ -17,6 +17,5 @@ import { TENANTS_REPOSITORY } from './tenants.tokens';
       useClass: PrismaTenantsRepository,
     },
   ],
-  exports: [CreateTenantUseCase, GetTenantsUseCase, GetTenantByIdUseCase, TENANTS_REPOSITORY],
 })
 export class TenantsModule {}

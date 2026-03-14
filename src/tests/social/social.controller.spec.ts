@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { UserContext } from '../../shared/auth/user-context';
 import { SocialController } from '../../social/presentation/http/social.controller';
 import { GetFeedUseCase } from '../../social/application/use-cases/get-feed.use-case';
 

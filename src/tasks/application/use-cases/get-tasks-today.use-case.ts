@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import { TASKS_REPOSITORY } from '../../tasks.tokens';
 

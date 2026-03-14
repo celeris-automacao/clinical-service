@@ -16,6 +16,5 @@ import { SupabaseStrategy } from './strategies/supabase.strategy';
     },
     SupabaseStrategy,
   ],
-  exports: [PassportModule, MapSupabaseUserUseCase, AUTH_CONFIG_PORT, SupabaseStrategy],
 })
 export class AuthModule {}

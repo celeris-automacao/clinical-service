@@ -1,0 +1,1 @@
+export const APPLICATION_EVENT_BUS = Symbol('APPLICATION_EVENT_BUS');

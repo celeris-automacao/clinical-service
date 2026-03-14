@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SupabaseGuard } from '../../../auth/guards/supabase.guard';
-import { GetUser, UserContext } from '../../../common/decorators/get-user.decorator';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { CompleteTaskUseCase } from '../../application/use-cases/complete-task.use-case';
 import { GetCategorizedRankingUseCase } from '../../application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from '../../application/use-cases/get-daily-tasks.use-case';

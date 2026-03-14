@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
 import { RecordsRepositoryPort } from '../ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../records.tokens';

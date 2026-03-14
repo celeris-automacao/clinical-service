@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SupabaseGuard } from '../../../auth/guards/supabase.guard';
-import { GetUser, UserContext } from '../../../common/decorators/get-user.decorator';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { UserContext } from '../../../shared/auth/user-context';
 import { ClaimRewardUseCase } from '../../application/use-cases/claim-reward.use-case';
 import { GetAvailableRewardsUseCase } from '../../application/use-cases/get-available-rewards.use-case';
 

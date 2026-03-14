@@ -24,13 +24,5 @@ import { DASHBOARD_REPOSITORY, NOTIFICATIONS_REPOSITORY } from './dashboard.toke
       useClass: PrismaNotificationsRepository,
     },
   ],
-  exports: [
-    GetClinicOverviewUseCase,
-    GetMissingPatientsUseCase,
-    GetRecentClaimsUseCase,
-    DASHBOARD_REPOSITORY,
-    NotificationsService,
-    NOTIFICATIONS_REPOSITORY,
-  ],
 })
 export class DashboardModule {}

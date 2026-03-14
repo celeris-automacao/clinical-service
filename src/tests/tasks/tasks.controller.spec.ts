@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { UserContext } from '../../shared/auth/user-context';
 import { CompleteTaskUseCase } from '../../tasks/application/use-cases/complete-task.use-case';
 import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';

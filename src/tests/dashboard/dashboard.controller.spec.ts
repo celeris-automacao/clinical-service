@@ -5,7 +5,7 @@ import { GetClinicOverviewUseCase } from '../../dashboard/application/use-cases/
 import { GetMissingPatientsUseCase } from '../../dashboard/application/use-cases/get-missing-patients.use-case';
 import { GetRecentClaimsUseCase } from '../../dashboard/application/use-cases/get-recent-claims.use-case';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { UserContext } from '../../shared/auth/user-context';
 
 describe('DashboardController', () => {
   let controller: DashboardController;

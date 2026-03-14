@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { UserContext } from '../../shared/auth/user-context';
 import { ClaimRewardUseCase } from '../../rewards/application/use-cases/claim-reward.use-case';
 import { RewardClaimTransactionPort } from '../../rewards/application/ports/reward-claim-transaction.port';
 import { RewardsEventsPort } from '../../rewards/application/ports/rewards-events.port';
