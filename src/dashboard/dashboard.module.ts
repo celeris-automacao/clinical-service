@@ -1,25 +1,36 @@
-// src/dashboard/dashboard.module.ts
 import { Module } from '@nestjs/common';
-import { DashboardService } from './dashboard.service';
 import { DashboardController } from './dashboard.controller';
-import { DashboardRepository } from './repositories/dashboard.repository';
 import { NotificationsService } from './notifications.service';
+import { DashboardRepository } from './repositories/dashboard.repository';
 import { NotificationsRepository } from './repositories/notifications.repository';
+import { GetClinicOverviewUseCase } from './application/use-cases/get-clinic-overview.use-case';
+import { GetMissingPatientsUseCase } from './application/use-cases/get-missing-patients.use-case';
+import { GetRecentClaimsUseCase } from './application/use-cases/get-recent-claims.use-case';
+import { DASHBOARD_REPOSITORY, NOTIFICATIONS_REPOSITORY } from './dashboard.tokens';
 
 @Module({
   controllers: [DashboardController],
   providers: [
-    DashboardService,
+    GetClinicOverviewUseCase,
+    GetMissingPatientsUseCase,
+    GetRecentClaimsUseCase,
     NotificationsService,
     {
-      provide: 'IDashboardRepository', // Token de Injeção
+      provide: DASHBOARD_REPOSITORY,
       useClass: DashboardRepository,
     },
     {
-      provide: 'INotificationsRepository',
+      provide: NOTIFICATIONS_REPOSITORY,
       useClass: NotificationsRepository,
     },
   ],
-  exports: [DashboardService, 'IDashboardRepository', NotificationsService, 'INotificationsRepository'], // Exportamos os serviços e repositórios para uso em outros módulos
+  exports: [
+    GetClinicOverviewUseCase,
+    GetMissingPatientsUseCase,
+    GetRecentClaimsUseCase,
+    DASHBOARD_REPOSITORY,
+    NotificationsService,
+    NOTIFICATIONS_REPOSITORY,
+  ],
 })
 export class DashboardModule {}

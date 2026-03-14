@@ -53,4 +53,13 @@ export class DashboardRepository implements IDashboardRepository {
       },
     });
   }
+
+  async findRecentClaims(tenantId: string, limit: number): Promise<any[]> {
+    return this.prisma.rewardClaim.findMany({
+      where: { tenantId },
+      include: { reward: true },
+      orderBy: { claimedAt: 'desc' },
+      take: limit,
+    });
+  }
 }

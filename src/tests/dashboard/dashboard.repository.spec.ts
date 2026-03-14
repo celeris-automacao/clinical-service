@@ -20,6 +20,9 @@ describe('DashboardRepository', () => {
             socialPost: {
               findMany: jest.fn(),
             },
+            rewardClaim: {
+              findMany: jest.fn(),
+            },
             taskCompletion: {
               findMany: jest.fn(),
             },
@@ -101,6 +104,21 @@ describe('DashboardRepository', () => {
         orderBy: {
           completedAt: 'desc',
         },
+      });
+    });
+  });
+
+  describe('findRecentClaims', () => {
+    it('deve buscar os resgates recentes por tenant com reward incluído', async () => {
+      const tenantId = 'tenant-abc';
+
+      await repository.findRecentClaims(tenantId, 10);
+
+      expect(prisma.rewardClaim.findMany).toHaveBeenCalledWith({
+        where: { tenantId },
+        include: { reward: true },
+        orderBy: { claimedAt: 'desc' },
+        take: 10,
       });
     });
   });

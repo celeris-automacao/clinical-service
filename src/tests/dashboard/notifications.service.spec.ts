@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../../dashboard/notifications.service';
 import { INotificationsRepository } from '../../dashboard/repositories/interfaces/notifications.repository.interface';
+import { NOTIFICATIONS_REPOSITORY } from '../../dashboard/dashboard.tokens';
 
 describe('NotificationsService - Event Reactions', () => {
   let service: NotificationsService;
@@ -11,7 +12,7 @@ describe('NotificationsService - Event Reactions', () => {
       providers: [
         NotificationsService,
         {
-          provide: 'INotificationsRepository',
+          provide: NOTIFICATIONS_REPOSITORY,
           useValue: {
             createNotification: jest.fn().mockResolvedValue({ id: 'notif-123' }),
           },
@@ -20,7 +21,7 @@ describe('NotificationsService - Event Reactions', () => {
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
-    repository = module.get<INotificationsRepository>('INotificationsRepository');
+    repository = module.get<INotificationsRepository>(NOTIFICATIONS_REPOSITORY);
   });
 
   describe('handleAchievement', () => {

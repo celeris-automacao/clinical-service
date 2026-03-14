@@ -1,27 +1,26 @@
-// src/dashboard/notifications.service.ts
 import { Injectable, Inject } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { NotificationsRepository } from './repositories/notifications.repository';
+import { INotificationsRepository } from './repositories/interfaces/notifications.repository.interface';
+import { NOTIFICATIONS_REPOSITORY } from './dashboard.tokens';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    @Inject('INotificationsRepository') // <--- ADICIONE ESTA LINHA
-    private readonly repository: NotificationsRepository
-  ) { }
+    @Inject(NOTIFICATIONS_REPOSITORY)
+    private readonly repository: INotificationsRepository,
+  ) {}
 
   @OnEvent('achievement.unlocked')
   async handleAchievement(payload: any) {
     const title = '🏆 NOVA CONQUISTA!';
     const message = `Paciente ${payload.patientId} desbloqueou "${payload.achievement}"`;
 
-    // Delegamos a persistência ao repositório
     await this.repository.createNotification({
       tenantId: payload.tenantId,
       userId: payload.patientId,
       title,
       message,
-      type: 'achievement'
+      type: 'achievement',
     });
 
     console.log(`[Notification System] ${title}: ${message}`);
@@ -37,7 +36,7 @@ export class NotificationsService {
       userId: payload.killerId,
       title,
       message,
-      type: 'boss_defeat'
+      type: 'boss_defeat',
     });
 
     console.log('\n' + '='.repeat(40));
