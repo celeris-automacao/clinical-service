@@ -1,17 +1,43 @@
-// src/rewards/rewards.module.ts
 import { Module } from '@nestjs/common';
-import { RewardsController } from './rewards.controller';
-import { RewardsService } from './rewards.service';
-import { RewardsRepository } from './repositories/rewards.repository';
-import { RecordsModule } from '../records/records.module';
 import { PrismaModule } from '../prisma/prisma.module';
+import { RecordsModule } from '../records/records.module';
+import { RewardsController } from './rewards.controller';
+import { ClaimRewardUseCase } from './application/use-cases/claim-reward.use-case';
+import { GetAvailableRewardsUseCase } from './application/use-cases/get-available-rewards.use-case';
+import { RecordsRewardsStatsAdapter } from './infrastructure/adapters/records-rewards-stats.adapter';
+import { RewardsEventsAdapter } from './infrastructure/adapters/rewards-events.adapter';
+import { PrismaRewardClaimTransactionAdapter } from './infrastructure/persistence/prisma-reward-claim-transaction.adapter';
+import { RewardsRepository } from './repositories/rewards.repository';
+import {
+  REWARD_CLAIM_TRANSACTION_PORT,
+  REWARDS_EVENTS_PORT,
+  REWARDS_REPOSITORY,
+  REWARDS_STATS_PORT,
+} from './rewards.tokens';
 
 @Module({
-  imports: [PrismaModule, RecordsModule], // Certifique-se de que o PrismaModule está aqui
+  imports: [PrismaModule, RecordsModule],
   providers: [
-    RewardsService,
-    { provide: 'IRewardsRepository', useClass: RewardsRepository }
+    GetAvailableRewardsUseCase,
+    ClaimRewardUseCase,
+    {
+      provide: REWARDS_REPOSITORY,
+      useClass: RewardsRepository,
+    },
+    {
+      provide: REWARDS_STATS_PORT,
+      useClass: RecordsRewardsStatsAdapter,
+    },
+    {
+      provide: REWARD_CLAIM_TRANSACTION_PORT,
+      useClass: PrismaRewardClaimTransactionAdapter,
+    },
+    {
+      provide: REWARDS_EVENTS_PORT,
+      useClass: RewardsEventsAdapter,
+    },
   ],
   controllers: [RewardsController],
+  exports: [GetAvailableRewardsUseCase, ClaimRewardUseCase, REWARDS_REPOSITORY],
 })
 export class RewardsModule {}

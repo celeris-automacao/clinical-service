@@ -39,6 +39,6 @@ import { RecordsService } from './records.service';
       useClass: RecordsAchievementsAdapter,
     },
   ],
-  exports: [RecordsService, HandleBossVictoryUseCase, 'IRecordsRepository'],
+  exports: [RecordsService, HandleBossVictoryUseCase, GetPatientStatsUseCase, 'IRecordsRepository'],
 })
 export class RecordsModule {}
