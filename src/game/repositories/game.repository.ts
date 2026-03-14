@@ -1,10 +1,10 @@
 // src/game/repositories/game.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { IGameRepository } from './interfaces/game.repository.interface';
+import { GameRepositoryPort } from '../application/ports/game-repository.port';
 
 @Injectable()
-export class GameRepository implements IGameRepository {
+export class GameRepository implements GameRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async findPlayerProgress(patientId: string) {
