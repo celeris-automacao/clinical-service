@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ACHIEVEMENTS_EVENTS_PORT, ACHIEVEMENTS_REPOSITORY } from '../../achievements.tokens';
-import { IAchievementsRepository } from '../../repositories/interfaces/achievements.repository.interface';
+import { IAchievementsRepository } from '../ports/achievements-repository.port';
 import { AchievementsEventsPort } from '../ports/achievements-events.port';
 
 @Injectable()

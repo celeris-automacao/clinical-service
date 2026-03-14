@@ -1,7 +1,7 @@
 // src/rewards/infrastructure/persistence/prisma-rewards.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IRewardsRepository } from '../../repositories/interfaces/rewards.repository.interface';
+import { IRewardsRepository } from '../../application/ports/rewards-repository.port';
 import { Reward, RewardClaim } from '@prisma/client';
 
 @Injectable()

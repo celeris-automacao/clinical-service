@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../../dashboard/presentation/listeners/notifications.service';
-import { INotificationsRepository } from '../../dashboard/repositories/interfaces/notifications.repository.interface';
+import { INotificationsRepository } from '../../dashboard/application/ports/notifications-repository.port';
 import { NOTIFICATIONS_REPOSITORY } from '../../dashboard/dashboard.tokens';
 
 describe('NotificationsService - Event Reactions', () => {

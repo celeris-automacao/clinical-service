@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
 import { HandleBossVictoryUseCase } from '../../../records/application/use-cases/handle-boss-victory.use-case';
-import { ITasksRepository } from '../../repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../ports/tasks-repository.port';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,

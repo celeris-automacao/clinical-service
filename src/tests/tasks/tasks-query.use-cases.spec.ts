@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IRecordsRepository } from '../../records/repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
 import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
 import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
-import { ITasksRepository } from '../../tasks/repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../../tasks/application/ports/tasks-repository.port';
 import { RECORDS_REPOSITORY } from '../../records/records.tokens';
 import { TASKS_REPOSITORY } from '../../tasks/tasks.tokens';
 

@@ -6,7 +6,7 @@ import { RewardClaimTransactionPort } from '../../rewards/application/ports/rewa
 import { RewardsEventsPort } from '../../rewards/application/ports/rewards-events.port';
 import { RewardsStatsPort } from '../../rewards/application/ports/rewards-stats.port';
 import { GetAvailableRewardsUseCase } from '../../rewards/application/use-cases/get-available-rewards.use-case';
-import { IRewardsRepository } from '../../rewards/repositories/interfaces/rewards.repository.interface';
+import { IRewardsRepository } from '../../rewards/application/ports/rewards-repository.port';
 import {
   REWARD_CLAIM_TRANSACTION_PORT,
   REWARDS_EVENTS_PORT,

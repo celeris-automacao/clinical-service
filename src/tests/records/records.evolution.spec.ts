@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetPatientStatsUseCase } from '../../records/application/use-cases/get-patient-stats.use-case';
 import { ClinicalProgressCalculator } from '../../records/domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../../records/repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../records/records.tokens';
 
 describe('GetPatientStatsUseCase - Evolution & Ranking', () => {

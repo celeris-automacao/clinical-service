@@ -3,7 +3,7 @@ import { GetClinicOverviewUseCase } from '../../dashboard/application/use-cases/
 import { GetMissingPatientsUseCase } from '../../dashboard/application/use-cases/get-missing-patients.use-case';
 import { GetRecentClaimsUseCase } from '../../dashboard/application/use-cases/get-recent-claims.use-case';
 import { DASHBOARD_REPOSITORY } from '../../dashboard/dashboard.tokens';
-import { IDashboardRepository } from '../../dashboard/repositories/interfaces/dashboard.repository.interface';
+import { IDashboardRepository } from '../../dashboard/application/ports/dashboard-repository.port';
 
 describe('Dashboard Query Use Cases', () => {
   let repository: IDashboardRepository;

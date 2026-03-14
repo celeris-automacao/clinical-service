@@ -7,7 +7,7 @@ import {
   ACHIEVEMENTS_EVENTS_PORT,
   ACHIEVEMENTS_REPOSITORY,
 } from '../../achievements/achievements.tokens';
-import { IAchievementsRepository } from '../../achievements/repositories/interfaces/achievements.repository.interface';
+import { IAchievementsRepository } from '../../achievements/application/ports/achievements-repository.port';
 
 describe('Achievements Use Cases', () => {
   let repository: IAchievementsRepository;

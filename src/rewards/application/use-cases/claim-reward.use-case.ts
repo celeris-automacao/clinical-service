@@ -5,7 +5,7 @@ import {
   REWARDS_EVENTS_PORT,
   REWARDS_REPOSITORY,
 } from '../../rewards.tokens';
-import { IRewardsRepository } from '../../repositories/interfaces/rewards.repository.interface';
+import { IRewardsRepository } from '../ports/rewards-repository.port';
 import { RewardClaimTransactionPort } from '../ports/reward-claim-transaction.port';
 import { RewardsEventsPort } from '../ports/rewards-events.port';
 

@@ -1,7 +1,7 @@
 // src/tasks/infrastructure/persistence/prisma-tasks.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { ITasksRepository } from '../../repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../../application/ports/tasks-repository.port';
 import { DailyTask, TaskCompletion } from '@prisma/client';
 
 @Injectable()

@@ -1,7 +1,7 @@
 // src/records/infrastructure/persistence/prisma-records.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IRecordsRepository } from '../../repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../../application/ports/records-repository.port';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalRecord } from '@prisma/client';
 

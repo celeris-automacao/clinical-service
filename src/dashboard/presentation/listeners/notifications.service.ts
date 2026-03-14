@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NOTIFICATIONS_REPOSITORY } from '../../dashboard.tokens';
-import { INotificationsRepository } from '../../repositories/interfaces/notifications.repository.interface';
+import { INotificationsRepository } from '../../application/ports/notifications-repository.port';
 
 @Injectable()
 export class NotificationsService {

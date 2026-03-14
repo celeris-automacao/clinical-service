@@ -5,7 +5,7 @@ import { RecordsAchievementsPort } from '../../records/application/ports/records
 import { CreateClinicalRecordUseCase } from '../../records/application/use-cases/create-clinical-record.use-case';
 import { HandleBossVictoryUseCase } from '../../records/application/use-cases/handle-boss-victory.use-case';
 import { ClinicalProgressCalculator } from '../../records/domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../../records/repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,

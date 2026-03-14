@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../../repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../ports/records-repository.port';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DASHBOARD_REPOSITORY } from '../../dashboard.tokens';
-import { IDashboardRepository } from '../../repositories/interfaces/dashboard.repository.interface';
+import { IDashboardRepository } from '../ports/dashboard-repository.port';
 
 @Injectable()
 export class GetMissingPatientsUseCase {

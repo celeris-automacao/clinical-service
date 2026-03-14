@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
-import { ITasksRepository } from '../../repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../ports/tasks-repository.port';
 import { TASKS_REPOSITORY } from '../../tasks.tokens';
 
 @Injectable()

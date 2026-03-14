@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IRecordsRepository } from '../../../records/repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../../../records/application/ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../../records/records.tokens';
-import { ITasksRepository } from '../../repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../ports/tasks-repository.port';
 import { TASKS_REPOSITORY } from '../../tasks.tokens';
 
 @Injectable()

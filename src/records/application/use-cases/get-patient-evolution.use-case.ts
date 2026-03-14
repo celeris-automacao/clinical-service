@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
-import { IRecordsRepository } from '../../repositories/interfaces/records.repository.interface';
+import { IRecordsRepository } from '../ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../records.tokens';
 
 @Injectable()

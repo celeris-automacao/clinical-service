@@ -5,7 +5,7 @@ import { HandleBossVictoryUseCase } from '../../records/application/use-cases/ha
 import { CompleteTaskUseCase } from '../../tasks/application/use-cases/complete-task.use-case';
 import { TaskCompletionTransactionPort } from '../../tasks/application/ports/task-completion-transaction.port';
 import { TasksAchievementsPort } from '../../tasks/application/ports/tasks-achievements.port';
-import { ITasksRepository } from '../../tasks/repositories/interfaces/tasks.repository.interface';
+import { ITasksRepository } from '../../tasks/application/ports/tasks-repository.port';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,

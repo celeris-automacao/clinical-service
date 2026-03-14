@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
 import { REWARDS_REPOSITORY, REWARDS_STATS_PORT } from '../../rewards.tokens';
-import { IRewardsRepository } from '../../repositories/interfaces/rewards.repository.interface';
+import { IRewardsRepository } from '../ports/rewards-repository.port';
 import { RewardsStatsPort } from '../ports/rewards-stats.port';
 
 @Injectable()

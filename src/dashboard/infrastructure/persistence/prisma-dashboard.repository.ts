@@ -1,7 +1,7 @@
 // src/dashboard/infrastructure/persistence/prisma-dashboard.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IDashboardRepository } from '../../repositories/interfaces/dashboard.repository.interface';
+import { IDashboardRepository } from '../../application/ports/dashboard-repository.port';
 
 @Injectable()
 export class PrismaDashboardRepository implements IDashboardRepository {
