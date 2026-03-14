@@ -1,27 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { IPatientsRepository } from './interfaces/patients-repository.interface';
 import { CreatePatientDto } from '../dto/create-patient.dto';
+
 @Injectable()
-export class PatientsRepository implements IPatientsRepository {
+export class PatientsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async createWithStats(data: CreatePatientDto, tenantId: string) {
-    // Usamos Transaction para garantir que o herói e seus atributos de RPG sejam criados juntos
     return this.prisma.$transaction(async (tx) => {
       const patient = await tx.patient.create({
         data: {
-          id: data.supabaseId, // O ID que vem do token do Supabase
+          id: data.supabaseId,
           name: data.name,
-          tenantId: tenantId,
+          tenantId,
         },
       });
 
       await tx.playerStats.create({
         data: {
           patientId: patient.id,
-          tenantId: tenantId,
-          currentLevel: 1, // Herói começa no nível 1
+          tenantId,
+          currentLevel: 1,
           currentXp: 0,
           currentGold: 0,
           totalDamageDealt: 0,

@@ -1,7 +1,7 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { INotificationsRepository } from './repositories/interfaces/notifications.repository.interface';
 import { NOTIFICATIONS_REPOSITORY } from './dashboard.tokens';
+import { INotificationsRepository } from './repositories/interfaces/notifications.repository.interface';
 
 @Injectable()
 export class NotificationsService {
@@ -22,8 +22,6 @@ export class NotificationsService {
       message,
       type: 'achievement',
     });
-
-    console.log(`[Notification System] ${title}: ${message}`);
   }
 
   @OnEvent('boss.defeated')
@@ -38,11 +36,5 @@ export class NotificationsService {
       message,
       type: 'boss_defeat',
     });
-
-    console.log('\n' + '='.repeat(40));
-    console.log(title);
-    console.log(`🏥 Clínica: ${payload.tenantId}`);
-    console.log(`⚔️ ${message}`);
-    console.log('='.repeat(40) + '\n');
   }
 }
