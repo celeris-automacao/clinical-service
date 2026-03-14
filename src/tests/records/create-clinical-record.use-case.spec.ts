@@ -6,6 +6,12 @@ import { CreateClinicalRecordUseCase } from '../../records/application/use-cases
 import { HandleBossVictoryUseCase } from '../../records/application/use-cases/handle-boss-victory.use-case';
 import { ClinicalProgressCalculator } from '../../records/domain/services/clinical-progress-calculator';
 import { IRecordsRepository } from '../../records/repositories/interfaces/records.repository.interface';
+import {
+  BOSS_BATTLE_PORT,
+  PLAYER_PROGRESSION_PORT,
+  RECORDS_ACHIEVEMENTS_PORT,
+  RECORDS_REPOSITORY,
+} from '../../records/records.tokens';
 
 describe('CreateClinicalRecordUseCase', () => {
   let useCase: CreateClinicalRecordUseCase;
@@ -23,7 +29,7 @@ describe('CreateClinicalRecordUseCase', () => {
         CreateClinicalRecordUseCase,
         ClinicalProgressCalculator,
         {
-          provide: 'IRecordsRepository',
+          provide: RECORDS_REPOSITORY,
           useValue: {
             create: jest.fn(),
             findAllByPatient: jest.fn().mockResolvedValue([]),
@@ -31,13 +37,13 @@ describe('CreateClinicalRecordUseCase', () => {
           },
         },
         {
-          provide: 'IPlayerProgressionPort',
+          provide: PLAYER_PROGRESSION_PORT,
           useValue: {
             upsertClinicalProgress: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
-          provide: 'IBossBattlePort',
+          provide: BOSS_BATTLE_PORT,
           useValue: {
             findActiveBoss: jest.fn().mockResolvedValue({ id: 'b1', currentHp: 10000, maxHp: 10000 }),
             findById: jest.fn().mockResolvedValue({ id: 'b1', maxHp: 10000 }),
@@ -46,7 +52,7 @@ describe('CreateClinicalRecordUseCase', () => {
           },
         },
         {
-          provide: 'IRecordsAchievementsPort',
+          provide: RECORDS_ACHIEVEMENTS_PORT,
           useValue: {
             checkLevelAchievements: jest.fn().mockResolvedValue(undefined),
             emitGlobalVictory: jest.fn().mockResolvedValue(undefined),
@@ -62,10 +68,10 @@ describe('CreateClinicalRecordUseCase', () => {
     }).compile();
 
     useCase = module.get<CreateClinicalRecordUseCase>(CreateClinicalRecordUseCase);
-    repository = module.get<IRecordsRepository>('IRecordsRepository');
-    bossBattlePort = module.get<BossBattlePort>('IBossBattlePort');
-    playerProgressionPort = module.get<PlayerProgressionPort>('IPlayerProgressionPort');
-    recordsAchievementsPort = module.get<RecordsAchievementsPort>('IRecordsAchievementsPort');
+    repository = module.get<IRecordsRepository>(RECORDS_REPOSITORY);
+    bossBattlePort = module.get<BossBattlePort>(BOSS_BATTLE_PORT);
+    playerProgressionPort = module.get<PlayerProgressionPort>(PLAYER_PROGRESSION_PORT);
+    recordsAchievementsPort = module.get<RecordsAchievementsPort>(RECORDS_ACHIEVEMENTS_PORT);
     handleBossVictoryUseCase = module.get<HandleBossVictoryUseCase>(HandleBossVictoryUseCase);
   });
 

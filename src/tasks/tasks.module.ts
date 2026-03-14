@@ -11,31 +11,34 @@ import { GetTasksTodayUseCase } from './application/use-cases/get-tasks-today.us
 import { TasksAchievementsAdapter } from './infrastructure/adapters/tasks-achievements.adapter';
 import { PrismaTaskCompletionTransactionAdapter } from './infrastructure/persistence/prisma-task-completion-transaction.adapter';
 import { TasksRepository } from './repositories/tasks.repository';
-import { TasksService } from './tasks.service';
+import {
+  TASK_COMPLETION_TRANSACTION_PORT,
+  TASKS_ACHIEVEMENTS_PORT,
+  TASKS_REPOSITORY,
+} from './tasks.tokens';
 
 @Module({
   imports: [GameModule, RecordsModule, AchievementsModule],
   controllers: [TasksController],
   providers: [
-    TasksService,
     CompleteTaskUseCase,
     GetCategorizedRankingUseCase,
     GetDailyTasksUseCase,
     GetRankingUseCase,
     GetTasksTodayUseCase,
     {
-      provide: 'ITasksRepository',
+      provide: TASKS_REPOSITORY,
       useClass: TasksRepository,
     },
     {
-      provide: 'ITaskCompletionTransactionPort',
+      provide: TASK_COMPLETION_TRANSACTION_PORT,
       useClass: PrismaTaskCompletionTransactionAdapter,
     },
     {
-      provide: 'ITasksAchievementsPort',
+      provide: TASKS_ACHIEVEMENTS_PORT,
       useClass: TasksAchievementsAdapter,
     },
   ],
-  exports: [TasksService, 'ITasksRepository'],
+  exports: [TASKS_REPOSITORY],
 })
 export class TasksModule {}

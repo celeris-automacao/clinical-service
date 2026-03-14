@@ -2,13 +2,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import { BossBattlePort } from '../ports/boss-battle.port';
 import { RecordsAchievementsPort } from '../ports/records-achievements.port';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
+import { BOSS_BATTLE_PORT, RECORDS_ACHIEVEMENTS_PORT } from '../../records.tokens';
 
 @Injectable()
 export class HandleBossVictoryUseCase {
   constructor(
-    @Inject('IBossBattlePort')
+    @Inject(BOSS_BATTLE_PORT)
     private readonly bossBattlePort: BossBattlePort,
-    @Inject('IRecordsAchievementsPort')
+    @Inject(RECORDS_ACHIEVEMENTS_PORT)
     private readonly recordsAchievementsPort: RecordsAchievementsPort,
     private readonly clinicalProgressCalculator: ClinicalProgressCalculator,
   ) {}

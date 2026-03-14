@@ -11,6 +11,12 @@ import { PrismaBossBattleAdapter } from './infrastructure/persistence/prisma-bos
 import { PrismaPlayerProgressionAdapter } from './infrastructure/persistence/prisma-player-progression.adapter';
 import { RecordsRepository } from './repositories/records.repository';
 import { RecordsService } from './records.service';
+import {
+  BOSS_BATTLE_PORT,
+  PLAYER_PROGRESSION_PORT,
+  RECORDS_ACHIEVEMENTS_PORT,
+  RECORDS_REPOSITORY,
+} from './records.tokens';
 
 @Module({
   imports: [AchievementsModule],
@@ -23,22 +29,22 @@ import { RecordsService } from './records.service';
     GetPatientEvolutionUseCase,
     ClinicalProgressCalculator,
     {
-      provide: 'IRecordsRepository',
+      provide: RECORDS_REPOSITORY,
       useClass: RecordsRepository,
     },
     {
-      provide: 'IPlayerProgressionPort',
+      provide: PLAYER_PROGRESSION_PORT,
       useClass: PrismaPlayerProgressionAdapter,
     },
     {
-      provide: 'IBossBattlePort',
+      provide: BOSS_BATTLE_PORT,
       useClass: PrismaBossBattleAdapter,
     },
     {
-      provide: 'IRecordsAchievementsPort',
+      provide: RECORDS_ACHIEVEMENTS_PORT,
       useClass: RecordsAchievementsAdapter,
     },
   ],
-  exports: [RecordsService, HandleBossVictoryUseCase, GetPatientStatsUseCase, 'IRecordsRepository'],
+  exports: [RecordsService, HandleBossVictoryUseCase, GetPatientStatsUseCase, RECORDS_REPOSITORY],
 })
 export class RecordsModule {}

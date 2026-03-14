@@ -5,6 +5,7 @@ import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-dail
 import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
 import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
 import { ITasksRepository } from '../../tasks/repositories/interfaces/tasks.repository.interface';
+import { RECORDS_REPOSITORY } from '../../records/records.tokens';
 import { TASKS_REPOSITORY } from '../../tasks/tasks.tokens';
 
 describe('Tasks Query Use Cases', () => {
@@ -33,7 +34,7 @@ describe('Tasks Query Use Cases', () => {
           },
         },
         {
-          provide: 'IRecordsRepository',
+          provide: RECORDS_REPOSITORY,
           useValue: {
             getClinicalDamageByTenant: jest.fn().mockResolvedValue(new Map()),
           },
@@ -42,7 +43,7 @@ describe('Tasks Query Use Cases', () => {
     }).compile();
 
     tasksRepository = module.get<ITasksRepository>(TASKS_REPOSITORY);
-    recordsRepository = module.get<IRecordsRepository>('IRecordsRepository');
+    recordsRepository = module.get<IRecordsRepository>(RECORDS_REPOSITORY);
     getDailyTasksUseCase = module.get<GetDailyTasksUseCase>(GetDailyTasksUseCase);
     getRankingUseCase = module.get<GetRankingUseCase>(GetRankingUseCase);
     getCategorizedRankingUseCase = module.get<GetCategorizedRankingUseCase>(GetCategorizedRankingUseCase);
