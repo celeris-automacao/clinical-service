@@ -1,29 +1,35 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { TenantsService } from './tenants.service';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateTenantUseCase } from './application/use-cases/create-tenant.use-case';
+import { GetTenantByIdUseCase } from './application/use-cases/get-tenant-by-id.use-case';
+import { GetTenantsUseCase } from './application/use-cases/get-tenants.use-case';
 import { CreateTenantDto } from './dto/create-tenant.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Tenants')
-@Controller('tenants') // Se o seu main.ts tiver prefixo 'v1', a rota será /v1/tenants
+@Controller('tenants')
 export class TenantsController {
-  constructor(private readonly tenantsService: TenantsService) {}
+  constructor(
+    private readonly createTenantUseCase: CreateTenantUseCase,
+    private readonly getTenantsUseCase: GetTenantsUseCase,
+    private readonly getTenantByIdUseCase: GetTenantByIdUseCase,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Criar uma nova clínica (Tenant)' })
   @ApiResponse({ status: 201, description: 'Clínica e Boss inicial criados com sucesso.' })
   create(@Body() createTenantDto: CreateTenantDto) {
-    return this.tenantsService.create(createTenantDto);
+    return this.createTenantUseCase.execute(createTenantDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar todas as clínicas cadastradas' })
   findAll() {
-    return this.tenantsService.findAll();
+    return this.getTenantsUseCase.execute();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Buscar detalhes de uma clínica específica' })
   findOne(@Param('id') id: string) {
-    return this.tenantsService.findOne(id);
+    return this.getTenantByIdUseCase.execute(id);
   }
 }

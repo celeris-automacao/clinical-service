@@ -1,51 +1,67 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantsController } from '../../tenants/tenants.controller';
-import { TenantsService } from '../../tenants/tenants.service';
 import { CreateTenantDto } from '../../tenants/dto/create-tenant.dto';
+import { CreateTenantUseCase } from '../../tenants/application/use-cases/create-tenant.use-case';
+import { GetTenantByIdUseCase } from '../../tenants/application/use-cases/get-tenant-by-id.use-case';
+import { GetTenantsUseCase } from '../../tenants/application/use-cases/get-tenants.use-case';
+import { TenantsController } from '../../tenants/tenants.controller';
 
 describe('TenantsController', () => {
   let controller: TenantsController;
-  let service: TenantsService;
+  let createTenantUseCase: CreateTenantUseCase;
+  let getTenantsUseCase: GetTenantsUseCase;
+  let getTenantByIdUseCase: GetTenantByIdUseCase;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TenantsController],
       providers: [
         {
-          provide: TenantsService,
+          provide: CreateTenantUseCase,
           useValue: {
-            create: jest.fn().mockResolvedValue({ id: 'tenant-1', name: 'Clinica Vida' }),
-            findAll: jest.fn().mockResolvedValue([{ id: 'tenant-1', name: 'Clinica Vida' }]),
-            findOne: jest.fn().mockResolvedValue({ id: 'tenant-1', name: 'Clinica Vida' }),
+            execute: jest.fn().mockResolvedValue({ id: 'tenant-1', name: 'Clinica Vida' }),
+          },
+        },
+        {
+          provide: GetTenantsUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue([{ id: 'tenant-1', name: 'Clinica Vida' }]),
+          },
+        },
+        {
+          provide: GetTenantByIdUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue({ id: 'tenant-1', name: 'Clinica Vida' }),
           },
         },
       ],
     }).compile();
 
     controller = module.get<TenantsController>(TenantsController);
-    service = module.get<TenantsService>(TenantsService);
+    createTenantUseCase = module.get<CreateTenantUseCase>(CreateTenantUseCase);
+    getTenantsUseCase = module.get<GetTenantsUseCase>(GetTenantsUseCase);
+    getTenantByIdUseCase = module.get<GetTenantByIdUseCase>(GetTenantByIdUseCase);
   });
 
-  it('deve chamar o service.create com o dto informado', async () => {
+  it('deve chamar o use case de criação com o dto informado', async () => {
     const dto: CreateTenantDto = { name: 'Clinica Vida' };
 
     await controller.create(dto);
 
-    expect(service.create).toHaveBeenCalledWith(dto);
+    expect(createTenantUseCase.execute).toHaveBeenCalledWith(dto);
   });
 
-  it('deve chamar o service.findAll ao listar clinicas', async () => {
+  it('deve chamar o use case de listagem ao listar clínicas', async () => {
     const result = await controller.findAll();
 
-    expect(service.findAll).toHaveBeenCalled();
+    expect(getTenantsUseCase.execute).toHaveBeenCalled();
     expect(result).toEqual([{ id: 'tenant-1', name: 'Clinica Vida' }]);
   });
 
-  it('deve chamar o service.findOne com o id recebido na rota', async () => {
+  it('deve chamar o use case de busca por id com o parâmetro recebido na rota', async () => {
     const tenantId = 'tenant-1';
 
     await controller.findOne(tenantId);
 
-    expect(service.findOne).toHaveBeenCalledWith(tenantId);
+    expect(getTenantByIdUseCase.execute).toHaveBeenCalledWith(tenantId);
   });
 });

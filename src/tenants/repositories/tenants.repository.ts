@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { ITenantsRepository } from './interfaces/tenants-repository.interface';
 import { CreateTenantDto } from '../dto/create-tenant.dto';
+import { TenantsRepositoryPort } from '../application/ports/tenants-repository.port';
 
 @Injectable()
-export class TenantsRepository implements ITenantsRepository {
+export class TenantsRepository implements TenantsRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateTenantDto) {
