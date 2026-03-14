@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
-import { CreateRecordDto } from '../../dto/create-record.dto';
+import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
 import { IRecordsRepository } from '../../repositories/interfaces/records.repository.interface';
 import {

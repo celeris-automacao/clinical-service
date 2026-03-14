@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotificationsService } from '../../dashboard/notifications.service';
+import { NotificationsService } from '../../dashboard/presentation/listeners/notifications.service';
 import { INotificationsRepository } from '../../dashboard/repositories/interfaces/notifications.repository.interface';
 import { NOTIFICATIONS_REPOSITORY } from '../../dashboard/dashboard.tokens';
 

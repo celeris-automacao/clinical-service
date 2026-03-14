@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { GameController } from '../../game/game.controller';
+import { GameController } from '../../game/presentation/http/game.controller';
 import { GetPlayerStatsUseCase } from '../../game/application/use-cases/get-player-stats.use-case';
 
 describe('GameController', () => {

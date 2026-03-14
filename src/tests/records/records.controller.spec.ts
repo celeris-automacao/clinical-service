@@ -1,12 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecordsController } from '../../records/records.controller';
-import { RecordsService } from '../../records/records.service';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { GetUser, UserContext } from '../../common/decorators/get-user.decorator';
+import { CreateClinicalRecordUseCase } from '../../records/application/use-cases/create-clinical-record.use-case';
+import { GetPatientEvolutionUseCase } from '../../records/application/use-cases/get-patient-evolution.use-case';
+import { GetPatientStatsUseCase } from '../../records/application/use-cases/get-patient-stats.use-case';
+import { RecordsController } from '../../records/presentation/http/records.controller';
 
 describe('RecordsController', () => {
   let controller: RecordsController;
-  let service: RecordsService;
+  let createClinicalRecordUseCase: CreateClinicalRecordUseCase;
+  let getPatientEvolutionUseCase: GetPatientEvolutionUseCase;
+  let getPatientStatsUseCase: GetPatientStatsUseCase;
 
   const mockUser: UserContext = {
     userId: 'user-uuid',
@@ -19,35 +23,53 @@ describe('RecordsController', () => {
       controllers: [RecordsController],
       providers: [
         {
-          provide: RecordsService,
+          provide: CreateClinicalRecordUseCase,
           useValue: {
-            createRecord: jest.fn().mockResolvedValue({ id: '1', weight: 80 }),
-            getEvolution: jest.fn().mockResolvedValue([]),
-            getStats: jest.fn().mockResolvedValue({ totalDamage: 0 }),
+            execute: jest.fn().mockResolvedValue({ id: '1', weight: 80 }),
+          },
+        },
+        {
+          provide: GetPatientEvolutionUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue([]),
+          },
+        },
+        {
+          provide: GetPatientStatsUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue({ totalDamage: 0 }),
           },
         },
       ],
     })
       .overrideGuard(SupabaseGuard)
-      .useValue({ canActivate: () => true }) // Simula que o usuário está logado
+      .useValue({ canActivate: () => true })
       .compile();
 
     controller = module.get<RecordsController>(RecordsController);
-    service = module.get<RecordsService>(RecordsService);
+    createClinicalRecordUseCase = module.get<CreateClinicalRecordUseCase>(CreateClinicalRecordUseCase);
+    getPatientEvolutionUseCase = module.get<GetPatientEvolutionUseCase>(GetPatientEvolutionUseCase);
+    getPatientStatsUseCase = module.get<GetPatientStatsUseCase>(GetPatientStatsUseCase);
   });
 
-  it('deve chamar o service com os dados corretos ao criar um registro', async () => {
+  it('deve chamar o use case com os dados corretos ao criar um registro', async () => {
     const dto = { weight: 85.5, skeletal_muscle_mass: 35 };
-    
-    await controller.createRecord(dto, mockUser);
 
-    expect(service.createRecord).toHaveBeenCalledWith(dto, mockUser);
+    await controller.createRecord(dto as any, mockUser);
+
+    expect(createClinicalRecordUseCase.execute).toHaveBeenCalledWith(dto, mockUser);
   });
 
   it('deve retornar o histórico de evolução do paciente', async () => {
     const result = await controller.getEvolution(mockUser);
-    
-    expect(service.getEvolution).toHaveBeenCalledWith(mockUser);
+
+    expect(getPatientEvolutionUseCase.execute).toHaveBeenCalledWith(mockUser);
     expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('deve retornar as estatísticas do paciente', async () => {
+    await controller.getStats(mockUser);
+
+    expect(getPatientStatsUseCase.execute).toHaveBeenCalledWith(mockUser);
   });
 });

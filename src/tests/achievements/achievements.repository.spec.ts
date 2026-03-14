@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AchievementsRepository } from '../../achievements/repositories/achievements.repository';
+import { AchievementsRepository } from '../../achievements/infrastructure/persistence/prisma-achievements.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('AchievementsRepository', () => {

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
-import { SocialController } from './social.controller';
-import { SocialListener } from './social.listener';
 import { CreateSocialPostUseCase } from './application/use-cases/create-social-post.use-case';
 import { GetFeedUseCase } from './application/use-cases/get-feed.use-case';
-import { SocialRepository } from './repositories/social.repository';
+import { SocialController } from './presentation/http/social.controller';
+import { SocialListener } from './presentation/listeners/social.listener';
+import { SocialRepository } from './infrastructure/persistence/prisma-social.repository';
 import { SOCIAL_REPOSITORY } from './social.tokens';
 
 @Module({

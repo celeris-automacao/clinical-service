@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AchievementsModule } from '../achievements/achievements.module';
-import { RecordsController } from './records.controller';
 import { CreateClinicalRecordUseCase } from './application/use-cases/create-clinical-record.use-case';
 import { GetPatientEvolutionUseCase } from './application/use-cases/get-patient-evolution.use-case';
 import { GetPatientStatsUseCase } from './application/use-cases/get-patient-stats.use-case';
@@ -9,8 +8,8 @@ import { ClinicalProgressCalculator } from './domain/services/clinical-progress-
 import { RecordsAchievementsAdapter } from './infrastructure/adapters/records-achievements.adapter';
 import { PrismaBossBattleAdapter } from './infrastructure/persistence/prisma-boss-battle.adapter';
 import { PrismaPlayerProgressionAdapter } from './infrastructure/persistence/prisma-player-progression.adapter';
-import { RecordsRepository } from './repositories/records.repository';
-import { RecordsService } from './records.service';
+import { RecordsController } from './presentation/http/records.controller';
+import { RecordsRepository } from './infrastructure/persistence/prisma-records.repository';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,
@@ -22,7 +21,6 @@ import {
   imports: [AchievementsModule],
   controllers: [RecordsController],
   providers: [
-    RecordsService,
     CreateClinicalRecordUseCase,
     HandleBossVictoryUseCase,
     GetPatientStatsUseCase,
@@ -45,6 +43,6 @@ import {
       useClass: RecordsAchievementsAdapter,
     },
   ],
-  exports: [RecordsService, HandleBossVictoryUseCase, GetPatientStatsUseCase, RECORDS_REPOSITORY],
+  exports: [HandleBossVictoryUseCase, GetPatientStatsUseCase, RECORDS_REPOSITORY],
 })
 export class RecordsModule {}

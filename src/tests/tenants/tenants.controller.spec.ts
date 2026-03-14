@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CreateTenantDto } from '../../tenants/dto/create-tenant.dto';
+import { CreateTenantDto } from '../../tenants/presentation/http/dto/create-tenant.dto';
 import { CreateTenantUseCase } from '../../tenants/application/use-cases/create-tenant.use-case';
 import { GetTenantByIdUseCase } from '../../tenants/application/use-cases/get-tenant-by-id.use-case';
 import { GetTenantsUseCase } from '../../tenants/application/use-cases/get-tenants.use-case';
-import { TenantsController } from '../../tenants/tenants.controller';
+import { TenantsController } from '../../tenants/presentation/http/tenants.controller';
 
 describe('TenantsController', () => {
   let controller: TenantsController;

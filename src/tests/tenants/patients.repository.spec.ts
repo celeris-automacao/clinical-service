@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreatePatientDto } from '../../tenants/dto/create-patient.dto';
-import { PatientsRepository } from '../../tenants/repositories/patients.repository';
+import { CreatePatientDto } from '../../tenants/presentation/http/dto/create-patient.dto';
+import { PatientsRepository } from '../../tenants/infrastructure/persistence/prisma-tenant-patients.repository';
 
 describe('PatientsRepository', () => {
   let repository: PatientsRepository;

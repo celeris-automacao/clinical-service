@@ -1,5 +1,5 @@
-import { CreatePatientDto } from '../../dto/create-patient.dto';
-import { UpdatePatientProfileDto } from '../../dto/update-patient-profile.dto';
+import { CreatePatientDto } from '../../presentation/http/dto/create-patient.dto';
+import { UpdatePatientProfileDto } from '../../presentation/http/dto/update-patient-profile.dto';
 
 export interface PatientsRepositoryPort {
   createWithStats(data: CreatePatientDto, tenantId: string): Promise<any>;

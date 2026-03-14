@@ -1,6 +1,6 @@
 // src/records/repositories/interfaces/records.repository.interface.ts
 import { ClinicalRecord } from '@prisma/client';
-import { CreateRecordDto } from '../../dto/create-record.dto';
+import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 
 export interface IRecordsRepository {
   /** Cria um novo registro clínico */

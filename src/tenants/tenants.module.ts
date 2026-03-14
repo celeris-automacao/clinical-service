@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { CreateTenantUseCase } from './application/use-cases/create-tenant.use-case';
 import { GetTenantByIdUseCase } from './application/use-cases/get-tenant-by-id.use-case';
 import { GetTenantsUseCase } from './application/use-cases/get-tenants.use-case';
-import { TenantsController } from './tenants.controller';
-import { TenantsRepository } from './repositories/tenants.repository';
+import { TenantsController } from './presentation/http/tenants.controller';
+import { TenantsRepository } from './infrastructure/persistence/prisma-tenants.repository';
 import { TENANTS_REPOSITORY } from './tenants.tokens';
 
 @Module({

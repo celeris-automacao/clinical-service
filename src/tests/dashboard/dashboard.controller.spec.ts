@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
-import { DashboardController } from '../../dashboard/dashboard.controller';
+import { DashboardController } from '../../dashboard/presentation/http/dashboard.controller';
 import { GetClinicOverviewUseCase } from '../../dashboard/application/use-cases/get-clinic-overview.use-case';
 import { GetMissingPatientsUseCase } from '../../dashboard/application/use-cases/get-missing-patients.use-case';
 import { GetRecentClaimsUseCase } from '../../dashboard/application/use-cases/get-recent-claims.use-case';

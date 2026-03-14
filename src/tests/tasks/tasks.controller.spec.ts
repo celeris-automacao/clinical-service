@@ -6,7 +6,7 @@ import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/
 import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
 import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
-import { TasksController } from '../../tasks/tasks.controller';
+import { TasksController } from '../../tasks/presentation/http/tasks.controller';
 
 describe('TasksController', () => {
   let controller: TasksController;

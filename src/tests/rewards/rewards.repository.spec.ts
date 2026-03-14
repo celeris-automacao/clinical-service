@@ -1,6 +1,6 @@
 // src/tests/rewards/rewards.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { RewardsRepository } from '../../rewards/repositories/rewards.repository';
+import { RewardsRepository } from '../../rewards/infrastructure/persistence/prisma-rewards.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('RewardsRepository - Cobertura Total', () => {

@@ -1,6 +1,6 @@
 // src/tests/game/game.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { GameRepository } from '../../game/repositories/game.repository';
+import { GameRepository } from '../../game/infrastructure/persistence/prisma-game.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('GameRepository', () => {

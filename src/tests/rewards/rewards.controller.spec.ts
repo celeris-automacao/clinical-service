@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { RewardsController } from '../../rewards/rewards.controller';
+import { RewardsController } from '../../rewards/presentation/http/rewards.controller';
 import { ClaimRewardUseCase } from '../../rewards/application/use-cases/claim-reward.use-case';
 import { GetAvailableRewardsUseCase } from '../../rewards/application/use-cases/get-available-rewards.use-case';
 

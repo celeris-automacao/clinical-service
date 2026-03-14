@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { RecordsModule } from '../records/records.module';
-import { RewardsController } from './rewards.controller';
 import { ClaimRewardUseCase } from './application/use-cases/claim-reward.use-case';
 import { GetAvailableRewardsUseCase } from './application/use-cases/get-available-rewards.use-case';
 import { RecordsRewardsStatsAdapter } from './infrastructure/adapters/records-rewards-stats.adapter';
 import { RewardsEventsAdapter } from './infrastructure/adapters/rewards-events.adapter';
 import { PrismaRewardClaimTransactionAdapter } from './infrastructure/persistence/prisma-reward-claim-transaction.adapter';
-import { RewardsRepository } from './repositories/rewards.repository';
+import { RewardsController } from './presentation/http/rewards.controller';
+import { RewardsRepository } from './infrastructure/persistence/prisma-rewards.repository';
 import {
   REWARD_CLAIM_TRANSACTION_PORT,
   REWARDS_EVENTS_PORT,

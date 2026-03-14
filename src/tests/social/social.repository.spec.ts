@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SocialRepository } from '../../social/repositories/social.repository';
+import { SocialRepository } from '../../social/infrastructure/persistence/prisma-social.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('SocialRepository', () => {

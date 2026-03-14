@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TasksRepository } from '../../tasks/repositories/tasks.repository';
+import { TasksRepository } from '../../tasks/infrastructure/persistence/prisma-tasks.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('TasksRepository', () => {

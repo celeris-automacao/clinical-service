@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SocialListener } from '../../social/social.listener';
+import { SocialListener } from '../../social/presentation/listeners/social.listener';
 import { CreateSocialPostUseCase } from '../../social/application/use-cases/create-social-post.use-case';
 
 describe('SocialListener', () => {

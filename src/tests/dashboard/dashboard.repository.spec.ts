@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DashboardRepository } from '../../dashboard/repositories/dashboard.repository';
+import { DashboardRepository } from '../../dashboard/infrastructure/persistence/prisma-dashboard.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 
 describe('DashboardRepository', () => {

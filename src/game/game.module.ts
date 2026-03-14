@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '../prisma/prisma.module';
 import { RecordsModule } from '../records/records.module';
-import { GameController } from './game.controller';
 import { GetPlayerStatsUseCase } from './application/use-cases/get-player-stats.use-case';
 import { RecordsPlayerClinicalStatsAdapter } from './infrastructure/adapters/records-player-clinical-stats.adapter';
-import { GameRepository } from './repositories/game.repository';
+import { GameController } from './presentation/http/game.controller';
+import { GameRepository } from './infrastructure/persistence/prisma-game.repository';
 import { GAME_REPOSITORY, PLAYER_CLINICAL_STATS_PORT } from './game.tokens';
 
 @Module({

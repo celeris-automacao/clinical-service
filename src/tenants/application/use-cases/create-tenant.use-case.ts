@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CreateTenantDto } from '../../dto/create-tenant.dto';
+import { CreateTenantDto } from '../../presentation/http/dto/create-tenant.dto';
 import { TENANTS_REPOSITORY } from '../../tenants.tokens';
 import { TenantsRepositoryPort } from '../ports/tenants-repository.port';
 

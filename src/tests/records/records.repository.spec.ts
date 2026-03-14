@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecordsRepository } from '../../records/repositories/records.repository';
+import { RecordsRepository } from '../../records/infrastructure/persistence/prisma-records.repository';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
 

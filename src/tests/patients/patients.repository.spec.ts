@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Gender } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
-import { PatientsRepository } from '../../patients/repositories/patients.repository';
+import { PatientsRepository } from '../../patients/infrastructure/persistence/prisma-patients.repository';
 
 describe('PatientsRepository', () => {
   let repository: PatientsRepository;

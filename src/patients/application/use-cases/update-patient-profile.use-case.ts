@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UpdatePatientProfileDto } from '../../dto/update-patient-profile.dto';
+import { UpdatePatientProfileDto } from '../../presentation/http/dto/update-patient-profile.dto';
 import { GetPatientByIdUseCase } from './get-patient-by-id.use-case';
 import { Inject } from '@nestjs/common';
 import { PATIENTS_REPOSITORY } from '../../patients.tokens';

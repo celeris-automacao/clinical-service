@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Gender } from '@prisma/client';
-import { PatientsController } from '../../patients/patients.controller';
+import { PatientsController } from '../../patients/presentation/http/patients.controller';
 import { CreatePatientUseCase } from '../../patients/application/use-cases/create-patient.use-case';
 import { GetPatientByIdUseCase } from '../../patients/application/use-cases/get-patient-by-id.use-case';
 import { UpdatePatientProfileUseCase } from '../../patients/application/use-cases/update-patient-profile.use-case';
