@@ -1,0 +1,1 @@
+export const PATIENTS_REPOSITORY = Symbol('PATIENTS_REPOSITORY');

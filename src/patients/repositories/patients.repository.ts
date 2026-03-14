@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { IPatientsRepository } from './interfaces/patients-repository.interface';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientProfileDto } from '../dto/update-patient-profile.dto';
+import { PatientsRepositoryPort } from '../application/ports/patients-repository.port';
 
 @Injectable()
-export class PatientsRepository implements IPatientsRepository {
+export class PatientsRepository implements PatientsRepositoryPort {
   constructor(private readonly prisma: PrismaService) { }
 
   async createWithStats(data: CreatePatientDto, tenantId: string) {
