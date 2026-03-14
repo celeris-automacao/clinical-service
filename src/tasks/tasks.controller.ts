@@ -1,46 +1,48 @@
-// src/tasks/tasks.controller.ts
-import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
-import { TasksService } from './tasks.service';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { SupabaseGuard } from '../auth/guards/supabase.guard';
 import { GetUser, UserContext } from '../common/decorators/get-user.decorator';
+import { CompleteTaskUseCase } from './application/use-cases/complete-task.use-case';
+import { GetCategorizedRankingUseCase } from './application/use-cases/get-categorized-ranking.use-case';
+import { GetDailyTasksUseCase } from './application/use-cases/get-daily-tasks.use-case';
+import { GetRankingUseCase } from './application/use-cases/get-ranking.use-case';
+import { GetTasksTodayUseCase } from './application/use-cases/get-tasks-today.use-case';
 
 @Controller('tasks')
 @UseGuards(SupabaseGuard)
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) { }
+  constructor(
+    private readonly getDailyTasksUseCase: GetDailyTasksUseCase,
+    private readonly completeTaskUseCase: CompleteTaskUseCase,
+    private readonly getRankingUseCase: GetRankingUseCase,
+    private readonly getCategorizedRankingUseCase: GetCategorizedRankingUseCase,
+    private readonly getTasksTodayUseCase: GetTasksTodayUseCase,
+  ) {}
 
   @Get()
   getDailyTasks(@GetUser() user: UserContext) {
-    return this.tasksService.getDailyTasks(user);
+    return this.getDailyTasksUseCase.execute(user);
   }
 
   @Post(':id/complete')
-  completeTask(
-    @Param('id') taskId: string,
-    @GetUser() user: UserContext
-  ) {
-    return this.tasksService.completeTask(taskId, user);
+  completeTask(@Param('id') taskId: string, @GetUser() user: UserContext) {
+    return this.completeTaskUseCase.execute(taskId, user);
   }
+
   @Get('ranking')
   @UseGuards(SupabaseGuard)
   getRanking(@GetUser() user: UserContext) {
-    return this.tasksService.getRanking(user);
+    return this.getRankingUseCase.execute(user);
   }
-
-  // No src/tasks/tasks.controller.ts
 
   @Get('ranking/detailed')
   @UseGuards(SupabaseGuard)
   async getDetailedRanking(@GetUser() user: UserContext) {
-    // Retorna o ranking segmentado por categorias para a clínica
-    return this.tasksService.getCategorizedRanking(user.tenantId);
+    return this.getCategorizedRankingUseCase.execute(user.tenantId);
   }
 
-  @Get('today') // Rota: GET /v1/tasks/today 
+  @Get('today')
   @UseGuards(SupabaseGuard)
   getTasksToday(@GetUser() user: UserContext) {
-    return this.tasksService.getTasksToday(user);
+    return this.getTasksTodayUseCase.execute(user);
   }
-
-  
 }

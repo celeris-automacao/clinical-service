@@ -29,7 +29,7 @@ describe('RecordsRepository', () => {
 
   describe('create', () => {
     it('deve persistir um novo registro clínico com os campos mapeados corretamente', async () => {
-      const dto = { weight: 80.5, skeletal_muscle_mass: 35, body_fat_mass: 20 };
+      const dto = { weight: 80.5, skeletalMuscleMass: 35, bodyFatMass: 20 };
       const userId = 'user-123';
       const tenantId = 'tenant-456';
 
@@ -38,8 +38,8 @@ describe('RecordsRepository', () => {
       expect(prisma.clinicalRecord.create).toHaveBeenCalledWith({
         data: {
           weight: dto.weight,
-          skeletalMuscleMass: dto.skeletal_muscle_mass,
-          bodyFatMass: dto.body_fat_mass,
+          skeletalMuscleMass: dto.skeletalMuscleMass,
+          bodyFatMass: dto.bodyFatMass,
           patientId: userId,
           tenantId: tenantId,
         },

@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../../dashboard/notifications.service';
-import { NotificationsRepository } from '../../dashboard/repositories/notifications.repository';
+import { INotificationsRepository } from '../../dashboard/repositories/interfaces/notifications.repository.interface';
 
 describe('NotificationsService - Event Reactions', () => {
   let service: NotificationsService;
-  let repository: NotificationsRepository;
+  let repository: INotificationsRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificationsService,
         {
-          provide: NotificationsRepository,
+          provide: 'INotificationsRepository',
           useValue: {
             createNotification: jest.fn().mockResolvedValue({ id: 'notif-123' }),
           },
@@ -20,7 +20,7 @@ describe('NotificationsService - Event Reactions', () => {
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
-    repository = module.get<NotificationsRepository>(NotificationsRepository);
+    repository = module.get<INotificationsRepository>('INotificationsRepository');
   });
 
   describe('handleAchievement', () => {

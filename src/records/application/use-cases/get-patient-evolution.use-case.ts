@@ -1,0 +1,22 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { UserContext } from '../../../common/decorators/get-user.decorator';
+import { IRecordsRepository } from '../../repositories/interfaces/records.repository.interface';
+
+@Injectable()
+export class GetPatientEvolutionUseCase {
+  constructor(
+    @Inject('IRecordsRepository')
+    private readonly repository: IRecordsRepository,
+  ) {}
+
+  async execute(user: UserContext) {
+    const records = await this.repository.findAllByPatient(user.userId, user.tenantId);
+
+    return records.map((record) => ({
+      recordedAt: record.recordedAt,
+      weight: Number(record.weight),
+      skeletalMuscleMass: record.skeletalMuscleMass ? Number(record.skeletalMuscleMass) : null,
+      bodyFatMass: record.bodyFatMass ? Number(record.bodyFatMass) : null,
+    }));
+  }
+}
