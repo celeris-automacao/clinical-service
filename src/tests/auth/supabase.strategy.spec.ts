@@ -1,48 +1,51 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { AuthConfigPort } from '../../auth/application/ports/auth-config.port';
+import { MapSupabaseUserUseCase } from '../../auth/application/use-cases/map-supabase-user.use-case';
+import { AUTH_CONFIG_PORT } from '../../auth/auth.tokens';
 import { SupabaseStrategy } from '../../auth/strategies/supabase.strategy';
 
 describe('SupabaseStrategy', () => {
   let strategy: SupabaseStrategy;
+  let mapSupabaseUserUseCase: MapSupabaseUserUseCase;
 
-  beforeEach(() => {
-    // Precisamos garantir que a variável de ambiente exista para o constructor não falhar
-    process.env.SUPABASE_JWT_SECRET = 'test-secret';
-    strategy = new SupabaseStrategy();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SupabaseStrategy,
+        MapSupabaseUserUseCase,
+        {
+          provide: AUTH_CONFIG_PORT,
+          useValue: {
+            getSupabaseJwtSecret: jest.fn().mockReturnValue('test-secret'),
+          } satisfies AuthConfigPort,
+        },
+      ],
+    }).compile();
+
+    strategy = module.get<SupabaseStrategy>(SupabaseStrategy);
+    mapSupabaseUserUseCase = module.get<MapSupabaseUserUseCase>(MapSupabaseUserUseCase);
   });
 
-  describe('validate', () => {
-    it('deve extrair e retornar o contexto do usuário corretamente do payload JWT', async () => {
-      // Mock do payload que o Supabase envia no JWT
-      const payload = {
-        sub: 'user-uuid-123',
-        email: 'paciente@teste.com',
-        user_metadata: {
-          tenant_id: 'clinica-xyz',
-          role: 'patient'
-        }
-      };
-
-      const result = await strategy.validate(payload);
-
-      // Valida se o mapeamento das linhas 18-23 está correto
-      expect(result).toEqual({
-        userId: 'user-uuid-123',
-        tenantId: 'clinica-xyz',
+  it('deve delegar o payload JWT para o use case de mapeamento', async () => {
+    const payload = {
+      sub: 'user-uuid-123',
+      email: 'paciente@teste.com',
+      user_metadata: {
+        tenant_id: 'clinica-xyz',
         role: 'patient',
-        email: 'paciente@teste.com'
-      });
-    });
+      },
+    };
 
-    it('deve usar o fallback "patient" se a role não estiver no metadata', async () => {
-      const payload = {
-        sub: 'user-123',
-        email: 'test@test.com',
-        user_metadata: {} // Metadata vazio
-      };
+    const spy = jest.spyOn(mapSupabaseUserUseCase, 'execute');
 
-      const result = await strategy.validate(payload);
+    const result = await strategy.validate(payload);
 
-      // Verifica a linha 21: role || 'patient'
-      expect(result.role).toBe('patient');
+    expect(spy).toHaveBeenCalledWith(payload);
+    expect(result).toEqual({
+      userId: 'user-uuid-123',
+      tenantId: 'clinica-xyz',
+      role: 'patient',
+      email: 'paciente@teste.com',
     });
   });
 });
