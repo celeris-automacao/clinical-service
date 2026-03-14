@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { PlayerProgressionPort } from '../../application/ports/player-progression.port';
 
 @Injectable()
 export class PrismaPlayerProgressionAdapter implements PlayerProgressionPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async upsertClinicalProgress(input: {
     patientId: string;
     tenantId: string;
     damageDealt: number;
   }): Promise<void> {
-    await this.prisma.playerStats.upsert({
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId: input.patientId,
+      tenantId: input.tenantId,
+    });
+
+    await prisma.playerStats.upsert({
       where: { patientId: input.patientId },
       update: {
         totalDamageDealt: { increment: input.damageDealt },

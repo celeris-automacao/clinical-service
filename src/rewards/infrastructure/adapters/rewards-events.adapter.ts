@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { RewardsEventsPort } from '../../application/ports/rewards-events.port';
+import {
+  APPLICATION_EVENTS,
+  createApplicationEvent,
+} from '../../../shared/application/events/application-events';
 import { ApplicationEventBusPort } from '../../../shared/application/ports/application-event-bus.port';
 import { APPLICATION_EVENT_BUS } from '../../../shared/shared.tokens';
+import { RewardsEventsPort } from '../../application/ports/rewards-events.port';
 
 @Injectable()
 export class RewardsEventsAdapter implements RewardsEventsPort {
@@ -15,6 +19,12 @@ export class RewardsEventsAdapter implements RewardsEventsPort {
     tenantId: string;
     achievement: string;
   }): Promise<void> {
-    this.eventBus.emit('achievement.unlocked', input);
+    this.eventBus.publish(
+      createApplicationEvent(APPLICATION_EVENTS.rewardClaimed, {
+        userId: input.userId,
+        tenantId: input.tenantId,
+        rewardTitle: input.achievement,
+      }),
+    );
   }
 }

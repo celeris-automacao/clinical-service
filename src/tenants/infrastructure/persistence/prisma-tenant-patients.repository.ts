@@ -1,37 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { CreatePatientDto } from '../../presentation/http/dto/create-patient.dto';
 
 @Injectable()
 export class PrismaTenantPatientsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async createWithStats(data: CreatePatientDto, tenantId: string) {
-    return this.prisma.$transaction(async (tx) => {
-      const patient = await tx.patient.create({
-        data: {
-          id: data.supabaseId,
-          name: data.name,
-          tenantId,
-        },
-      });
+    return this.tenantScopedPrismaFactory.runInTenantTransaction(
+      { userId: data.supabaseId, tenantId },
+      async (tx) => {
+        const patient = await tx.patient.create({
+          data: {
+            id: data.supabaseId,
+            name: data.name,
+            tenantId,
+          },
+        });
 
-      await tx.playerStats.create({
-        data: {
-          patientId: patient.id,
-          tenantId,
-          currentLevel: 1,
-          currentXp: 0,
-          currentGold: 0,
-          totalDamageDealt: 0,
-        },
-      });
+        await tx.playerStats.create({
+          data: {
+            patientId: patient.id,
+            tenantId,
+            currentLevel: 1,
+            currentXp: 0,
+            currentGold: 0,
+            totalDamageDealt: 0,
+          },
+        });
 
-      return patient;
-    });
+        return patient;
+      },
+    );
   }
 
-  async findBySupabaseId(id: string) {
-    return this.prisma.patient.findUnique({ where: { id } });
+  async findBySupabaseId(id: string, tenantId?: string) {
+    const prisma = tenantId
+      ? this.tenantScopedPrismaFactory.forTenant(tenantId, id)
+      : this.tenantScopedPrismaFactory.forRoot();
+    return prisma.patient.findFirst({
+      where: tenantId ? { id, tenantId } : { id },
+    });
   }
 }

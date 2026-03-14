@@ -1,72 +1,79 @@
-// src/tests/rewards/rewards.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaRewardsRepository } from '../../rewards/infrastructure/persistence/prisma-rewards.repository';
-import { PrismaService } from '../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 
-describe('PrismaRewardsRepository - Cobertura Total', () => {
+describe('PrismaRewardsRepository', () => {
   let repository: PrismaRewardsRepository;
-  let prisma: PrismaService;
+  let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
+  const tenantPrisma = {
+    reward: { findMany: jest.fn(), findFirst: jest.fn() },
+    rewardClaim: { findMany: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaRewardsRepository,
         {
-          provide: PrismaService,
+          provide: TenantScopedPrismaFactory,
           useValue: {
-            reward: { findMany: jest.fn(), findUnique: jest.fn() },
-            rewardClaim: { findMany: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
+            forTenant: jest.fn().mockReturnValue(tenantPrisma),
+            forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
           },
         },
       ],
     }).compile();
 
     repository = module.get<PrismaRewardsRepository>(PrismaRewardsRepository);
-    prisma = module.get<PrismaService>(PrismaService);
+    tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
-  it('deve executar findClaimsByPatient (Linhas 17-21)', async () => {
-    const spy = jest.spyOn(prisma.rewardClaim, 'findMany').mockResolvedValue([]);
-    await repository.findClaimsByPatient('u1');
-    expect(spy).toHaveBeenCalledWith({ where: { patientId: 'u1' } }); //
-  });
+  it('deve buscar claims do paciente dentro do tenant', async () => {
+    await repository.findClaimsByPatient('u1', 't1');
 
-  it('findClaimsByPatient deve buscar o histórico do paciente', async () => {
-    const patientId = 'u1';
-    const spy = jest.spyOn(prisma.rewardClaim, 'findMany').mockResolvedValue([]);
-    
-    await repository.findClaimsByPatient(patientId);
-    
-    expect(spy).toHaveBeenCalledWith({ where: { patientId } });
-  });
-
-  it('findAllActiveByTenant deve filtrar por clínica e recompensas ativas', async () => {
-    const tenantId = 'tenant-123';
-    const spy = jest.spyOn(prisma.reward, 'findMany').mockResolvedValue([]);
-
-    await repository.findAllActiveByTenant(tenantId);
-
-    expect(spy).toHaveBeenCalledWith({
-      where: { tenantId, isActive: true },
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'u1',
+      tenantId: 't1',
+    });
+    expect(tenantPrisma.rewardClaim.findMany).toHaveBeenCalledWith({
+      where: { patientId: 'u1', tenantId: 't1' },
     });
   });
 
-  it('deve executar findById (Linhas 23-27)', async () => {
-    const spy = jest.spyOn(prisma.reward, 'findUnique').mockResolvedValue(null);
-    await repository.findById('r1');
-    expect(spy).toHaveBeenCalledWith({ where: { id: 'r1' } }); //
+  it('deve filtrar recompensas ativas por tenant', async () => {
+    await repository.findAllActiveByTenant('tenant-123');
+
+    expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-123');
+    expect(tenantPrisma.reward.findMany).toHaveBeenCalledWith({
+      where: { isActive: true, tenantId: 'tenant-123' },
+    });
   });
 
-  it('deve executar findSpecificClaim (Linhas 29-33)', async () => {
-    const spy = jest.spyOn(prisma.rewardClaim, 'findFirst').mockResolvedValue(null);
-    await repository.findSpecificClaim('r1', 'u1');
-    expect(spy).toHaveBeenCalledWith({ where: { rewardId: 'r1', patientId: 'u1' } }); //
+  it('deve buscar recompensa por id dentro do tenant', async () => {
+    await repository.findById('r1', 't1');
+
+    expect(tenantPrisma.reward.findFirst).toHaveBeenCalledWith({
+      where: { id: 'r1', tenantId: 't1' },
+    });
   });
 
-  it('deve executar createClaim (Linhas 35-37)', async () => {
+  it('deve buscar claim especifica dentro do tenant', async () => {
+    await repository.findSpecificClaim('r1', 'u1', 't1');
+
+    expect(tenantPrisma.rewardClaim.findFirst).toHaveBeenCalledWith({
+      where: { rewardId: 'r1', patientId: 'u1', tenantId: 't1' },
+    });
+  });
+
+  it('deve criar claim com tenant-scoped prisma', async () => {
     const data = { rewardId: 'r1', patientId: 'u1', tenantId: 't1' };
-    const spy = jest.spyOn(prisma.rewardClaim, 'create').mockResolvedValue({} as any);
+
     await repository.createClaim(data);
-    expect(spy).toHaveBeenCalledWith({ data }); //
+
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'u1',
+      tenantId: 't1',
+    });
+    expect(tenantPrisma.rewardClaim.create).toHaveBeenCalledWith({ data });
   });
 });

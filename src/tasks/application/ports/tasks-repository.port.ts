@@ -9,7 +9,7 @@ export interface TasksRepositoryPort {
     start: Date,
     end: Date,
   ): Promise<TaskCompletion | null>;
-  findById(id: string): Promise<DailyTask | null>;
+  findById(id: string, tenantId: string): Promise<DailyTask | null>;
   findPendingTasksToday(userId: string, tenantId: string, today: Date): Promise<DailyTask[]>;
   getPlayerStatsRanking(tenantId: string): Promise<any[]>;
   findPatientsWithActivity(tenantId: string): Promise<any[]>;

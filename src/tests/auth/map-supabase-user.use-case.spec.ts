@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common';
 import { MapSupabaseUserUseCase } from '../../auth/application/use-cases/map-supabase-user.use-case';
 
 describe('MapSupabaseUserUseCase', () => {
@@ -7,7 +8,7 @@ describe('MapSupabaseUserUseCase', () => {
     useCase = new MapSupabaseUserUseCase();
   });
 
-  it('deve extrair e retornar o contexto do usuário corretamente do payload JWT', () => {
+  it('deve extrair e retornar o contexto do usuario corretamente do payload JWT', () => {
     const payload = {
       sub: 'user-uuid-123',
       email: 'paciente@teste.com',
@@ -27,15 +28,26 @@ describe('MapSupabaseUserUseCase', () => {
     });
   });
 
-  it('deve usar o fallback patient se a role não estiver no metadata', () => {
+  it('deve usar o fallback patient se a role nao estiver no metadata', () => {
     const payload = {
       sub: 'user-123',
       email: 'test@test.com',
-      user_metadata: {},
+      user_metadata: {
+        tenant_id: 'tenant-1',
+      },
     };
 
     const result = useCase.execute(payload);
 
     expect(result.role).toBe('patient');
+  });
+
+  it('deve rejeitar JWT sem tenant', () => {
+    expect(() =>
+      useCase.execute({
+        sub: 'user-123',
+        user_metadata: {},
+      }),
+    ).toThrow(UnauthorizedException);
   });
 });

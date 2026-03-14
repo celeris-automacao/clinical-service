@@ -1,14 +1,14 @@
-// src/achievements/infrastructure/persistence/prisma-achievements.repository.ts
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { AchievementsRepositoryPort } from '../../application/ports/achievements-repository.port';
 
 @Injectable()
 export class PrismaAchievementsRepository implements AchievementsRepositoryPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async getOrCreateBadge(tenantId: string, title: string, icon: string) {
-    return this.prisma.reward.upsert({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.reward.upsert({
       where: { title_tenantId: { title, tenantId } },
       update: {},
       create: {
@@ -22,13 +22,15 @@ export class PrismaAchievementsRepository implements AchievementsRepositoryPort 
   }
 
   async findClaim(patientId: string, rewardId: string) {
-    return this.prisma.rewardClaim.findFirst({
+    const prisma = this.tenantScopedPrismaFactory.forRoot();
+    return prisma.rewardClaim.findFirst({
       where: { patientId, rewardId },
     });
   }
 
   async createClaim(patientId: string, tenantId: string, rewardId: string) {
-    return this.prisma.rewardClaim.create({
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: patientId, tenantId });
+    return prisma.rewardClaim.create({
       data: { rewardId, patientId, tenantId },
     });
   }

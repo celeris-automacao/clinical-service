@@ -1,21 +1,23 @@
-// src/game/infrastructure/persistence/prisma-game.repository.ts
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
+import { byPatientAndTenant, byTenant } from '../../../shared/infrastructure/persistence/tenant-scope';
 import { GameRepositoryPort } from '../../application/ports/game-repository.port';
 
 @Injectable()
 export class PrismaGameRepository implements GameRepositoryPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
-  async findPlayerProgress(patientId: string) {
-    return this.prisma.playerStats.findUnique({
-      where: { patientId },
+  async findPlayerProgress(patientId: string, tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: patientId, tenantId });
+    return prisma.playerStats.findFirst({
+      where: byPatientAndTenant(patientId, tenantId),
     });
   }
 
   async findActiveBoss(tenantId: string) {
-    return this.prisma.bossBattle.findFirst({
-      where: { tenantId, isActive: true },
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.bossBattle.findFirst({
+      where: byTenant(tenantId, { isActive: true }),
     });
   }
 }

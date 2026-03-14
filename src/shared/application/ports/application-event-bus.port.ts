@@ -1,3 +1,5 @@
+import { ApplicationEventEnvelope, ApplicationEventName } from '../events/application-events';
+
 export interface ApplicationEventBusPort {
-  emit(eventName: string, payload: unknown): void;
+  publish<TName extends ApplicationEventName>(event: ApplicationEventEnvelope<TName>): void;
 }

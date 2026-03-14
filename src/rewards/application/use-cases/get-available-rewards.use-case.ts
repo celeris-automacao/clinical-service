@@ -18,7 +18,7 @@ export class GetAvailableRewardsUseCase {
 
     const [rewards, claims] = await Promise.all([
       this.repository.findAllActiveByTenant(user.tenantId),
-      this.repository.findClaimsByPatient(user.userId),
+      this.repository.findClaimsByPatient(user.userId, user.tenantId),
     ]);
 
     return rewards.map((reward) => ({

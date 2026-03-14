@@ -34,37 +34,39 @@ describe('GetPlayerStatsUseCase', () => {
     playerClinicalStatsPort = module.get<PlayerClinicalStatsPort>(PLAYER_CLINICAL_STATS_PORT);
   });
 
-  it('deve consolidar nível, XP e status do Boss com precisão', async () => {
+  it('deve consolidar nivel, XP e status do boss com precisao', async () => {
     (playerClinicalStatsPort.getStats as jest.Mock).mockResolvedValue({ totalDamage: 5000 });
     (repository.findPlayerProgress as jest.Mock).mockResolvedValue({
       currentLevel: 5,
       currentXp: 450,
     });
     (repository.findActiveBoss as jest.Mock).mockResolvedValue({
-      name: 'Dragão de Açúcar',
+      name: 'Dragao de Acucar',
       currentHp: { toNumber: () => 500 },
       maxHp: { toNumber: () => 1000 },
     });
 
     const stats = await useCase.execute(mockUser as any);
 
+    expect(repository.findPlayerProgress).toHaveBeenCalledWith('u1', 't1');
     expect(stats.level).toBe(5);
     expect(stats.nextLevelXp).toBe(5000);
     expect(stats.totalDamageDealt).toBe(5000);
     expect(stats.boss).toEqual({
-      name: 'Dragão de Açúcar',
+      name: 'Dragao de Acucar',
       hpPercentage: 50,
       currentHp: 500,
     });
   });
 
-  it('deve retornar valores iniciais seguros se o jogador não tiver dados', async () => {
+  it('deve retornar valores iniciais seguros se o jogador nao tiver dados', async () => {
     (playerClinicalStatsPort.getStats as jest.Mock).mockResolvedValue({ totalDamage: 0 });
     (repository.findPlayerProgress as jest.Mock).mockResolvedValue(null);
     (repository.findActiveBoss as jest.Mock).mockResolvedValue(null);
 
     const stats = await useCase.execute(mockUser as any);
 
+    expect(repository.findPlayerProgress).toHaveBeenCalledWith('u1', 't1');
     expect(stats.level).toBe(1);
     expect(stats.currentXp).toBe(0);
     expect(stats.boss).toBeNull();

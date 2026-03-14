@@ -1,29 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { PrismaTaskCompletionTransactionAdapter } from '../../tasks/infrastructure/persistence/prisma-task-completion-transaction.adapter';
 
 describe('PrismaTaskCompletionTransactionAdapter', () => {
   let adapter: PrismaTaskCompletionTransactionAdapter;
-  let prisma: PrismaService;
+  let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaTaskCompletionTransactionAdapter,
         {
-          provide: PrismaService,
+          provide: TenantScopedPrismaFactory,
           useValue: {
-            $transaction: jest.fn(),
+            runInTenantTransaction: jest.fn(),
           },
         },
       ],
     }).compile();
 
     adapter = module.get<PrismaTaskCompletionTransactionAdapter>(PrismaTaskCompletionTransactionAdapter);
-    prisma = module.get<PrismaService>(PrismaService);
+    tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
-  it('deve concluir a tarefa, atualizar progressão e aplicar dano normal ao boss', async () => {
+  it('deve concluir a tarefa, atualizar progressao e aplicar dano normal ao boss', async () => {
     const tx = {
       taskCompletion: { create: jest.fn() },
       playerStats: {
@@ -36,7 +36,9 @@ describe('PrismaTaskCompletionTransactionAdapter', () => {
       },
     };
 
-    jest.spyOn(prisma, '$transaction').mockImplementation(async (cb) => cb(tx as any));
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock).mockImplementation(
+      async (_context, callback) => callback(tx as any),
+    );
 
     const result = await adapter.execute({
       taskId: 'task-1',
@@ -45,6 +47,10 @@ describe('PrismaTaskCompletionTransactionAdapter', () => {
       xpReward: 50,
     });
 
+    expect(tenantScopedPrismaFactory.runInTenantTransaction).toHaveBeenCalledWith(
+      { userId: 'user-1', tenantId: 'tenant-1' },
+      expect.any(Function),
+    );
     expect(tx.taskCompletion.create).toHaveBeenCalled();
     expect(tx.playerStats.upsert).toHaveBeenCalled();
     expect(tx.playerStats.update).toHaveBeenCalled();
@@ -69,7 +75,9 @@ describe('PrismaTaskCompletionTransactionAdapter', () => {
       },
     };
 
-    jest.spyOn(prisma, '$transaction').mockImplementation(async (cb) => cb(tx as any));
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock).mockImplementation(
+      async (_context, callback) => callback(tx as any),
+    );
 
     const result = await adapter.execute({
       taskId: 'task-1',
@@ -83,7 +91,7 @@ describe('PrismaTaskCompletionTransactionAdapter', () => {
     expect(result.defeatedBossId).toBe('boss-1');
   });
 
-  it('deve retornar dano zero se não houver boss ativo', async () => {
+  it('deve retornar dano zero se nao houver boss ativo', async () => {
     const tx = {
       taskCompletion: { create: jest.fn() },
       playerStats: {
@@ -96,7 +104,9 @@ describe('PrismaTaskCompletionTransactionAdapter', () => {
       },
     };
 
-    jest.spyOn(prisma, '$transaction').mockImplementation(async (cb) => cb(tx as any));
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock).mockImplementation(
+      async (_context, callback) => callback(tx as any),
+    );
 
     const result = await adapter.execute({
       taskId: 'task-1',

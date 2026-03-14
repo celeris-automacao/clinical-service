@@ -1,8 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../shared/auth/user-context';
-import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
-import { RecordsRepositoryPort } from '../ports/records-repository.port';
+import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,
@@ -12,6 +11,7 @@ import {
 import { BossBattlePort } from '../ports/boss-battle.port';
 import { PlayerProgressionPort } from '../ports/player-progression.port';
 import { RecordsAchievementsPort } from '../ports/records-achievements.port';
+import { RecordsRepositoryPort } from '../ports/records-repository.port';
 import { HandleBossVictoryUseCase } from './handle-boss-victory.use-case';
 
 @Injectable()
@@ -53,17 +53,17 @@ export class CreateClinicalRecordUseCase {
       damage: damageDealt,
       message:
         damageDealt > 0
-          ? `🔥 ATAQUE CRÍTICO! Você causou ${damageDealt.toLocaleString()} de dano no Boss!`
-          : 'Registro salvo. Continue focado na sua evolução!',
+          ? `ATAQUE CRITICO! Voce causou ${damageDealt.toLocaleString()} de dano no Boss!`
+          : 'Registro salvo. Continue focado na sua evolucao!',
     };
   }
 
-  async handleBossVictory(bossId: string, tenantId: string) {
-    return this.handleBossVictoryUseCase.execute(bossId, tenantId);
+  async handleBossVictory(bossId: string, tenantId: string, killerId: string) {
+    return this.handleBossVictoryUseCase.execute(bossId, tenantId, killerId);
   }
 
   private async calculateAndApplyDamage(userId: string, tenantId: string): Promise<number> {
-    const records = await this.repository.findLastTwo(userId);
+    const records = await this.repository.findLastTwo(userId, tenantId);
     const totalDamage = this.clinicalProgressCalculator.calculateDamageFromLatestRecords(records);
 
     if (totalDamage <= 0) {
@@ -79,9 +79,9 @@ export class CreateClinicalRecordUseCase {
     const newHp = boss.currentHp - totalDamage;
 
     if (newHp <= 0) {
-      await this.handleBossVictoryUseCase.execute(boss.id, tenantId);
+      await this.handleBossVictoryUseCase.execute(boss.id, tenantId, userId);
     } else {
-      await this.bossBattlePort.applyDamage(boss.id, newHp);
+      await this.bossBattlePort.applyDamage(boss.id, newHp, tenantId);
     }
 
     return totalDamage;

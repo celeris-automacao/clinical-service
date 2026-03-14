@@ -1,9 +1,12 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { UserContext } from '../../../shared/auth/user-context';
+import {
+  APPLICATION_EVENTS,
+  createApplicationEvent,
+} from '../../../shared/application/events/application-events';
 import { ApplicationEventBusPort } from '../../../shared/application/ports/application-event-bus.port';
+import { UserContext } from '../../../shared/auth/user-context';
 import { APPLICATION_EVENT_BUS } from '../../../shared/shared.tokens';
 import { HandleBossVictoryUseCase } from '../../../records/application/use-cases/handle-boss-victory.use-case';
-import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,
@@ -11,6 +14,7 @@ import {
 } from '../../tasks.tokens';
 import { TaskCompletionTransactionPort } from '../ports/task-completion-transaction.port';
 import { TasksAchievementsPort } from '../ports/tasks-achievements.port';
+import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 
 @Injectable()
 export class CompleteTaskUseCase {
@@ -43,7 +47,7 @@ export class CompleteTaskUseCase {
       throw new BadRequestException('Voce ja completou esta missao hoje!');
     }
 
-    const task = await this.repository.findById(taskId);
+    const task = await this.repository.findById(taskId, user.tenantId);
     if (!task) {
       throw new BadRequestException('Missao nao encontrada.');
     }
@@ -56,7 +60,7 @@ export class CompleteTaskUseCase {
     });
 
     if (result.defeatedBossId) {
-      await this.handleBossVictoryUseCase.execute(result.defeatedBossId, user.tenantId);
+      await this.handleBossVictoryUseCase.execute(result.defeatedBossId, user.tenantId, user.userId);
     }
 
     if (result.leveledUp) {
@@ -67,7 +71,14 @@ export class CompleteTaskUseCase {
       });
     }
 
-    this.eventBus.emit('task.completed', { taskId, userId: user.userId, xp: task.xpReward });
+    this.eventBus.publish(
+      createApplicationEvent(APPLICATION_EVENTS.taskCompleted, {
+        taskId,
+        userId: user.userId,
+        tenantId: user.tenantId,
+        xp: task.xpReward,
+      }),
+    );
 
     return {
       success: true,

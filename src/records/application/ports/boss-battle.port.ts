@@ -5,12 +5,13 @@ export interface BossBattlePort {
     maxHp: number;
   } | null>;
 
-  findById(bossId: string): Promise<{
+  findById(bossId: string, tenantId: string): Promise<{
     id: string;
+    name: string;
     maxHp: number;
   } | null>;
 
-  applyDamage(bossId: string, newHp: number): Promise<void>;
+  applyDamage(bossId: string, newHp: number, tenantId: string): Promise<void>;
 
   handleVictory(input: {
     bossId: string;

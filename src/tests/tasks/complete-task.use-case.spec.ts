@@ -38,7 +38,7 @@ describe('CompleteTaskUseCase', () => {
             execute: jest.fn(),
           },
         },
-        { provide: APPLICATION_EVENT_BUS, useValue: { emit: jest.fn() } },
+        { provide: APPLICATION_EVENT_BUS, useValue: { publish: jest.fn() } },
         {
           provide: TASKS_ACHIEVEMENTS_PORT,
           useValue: {
@@ -61,20 +61,20 @@ describe('CompleteTaskUseCase', () => {
     handleBossVictoryUseCase = module.get<HandleBossVictoryUseCase>(HandleBossVictoryUseCase);
   });
 
-  it('deve lançar erro se a tarefa já foi completada hoje', async () => {
+  it('deve lancar erro se a tarefa ja foi completada hoje', async () => {
     jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue({ id: 'comp1' } as any);
 
     await expect(useCase.execute('task1', mockUser as any)).rejects.toThrow(BadRequestException);
   });
 
-  it('deve lançar erro se a missão não existir', async () => {
+  it('deve lancar erro se a missao nao existir', async () => {
     jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
     await expect(useCase.execute('task-x', mockUser as any)).rejects.toThrow(BadRequestException);
   });
 
-  it('deve processar a conclusão com sucesso e dar dano no boss', async () => {
+  it('deve processar a conclusao com sucesso e dar dano no boss', async () => {
     jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
     jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'task1', xpReward: 50 } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
@@ -91,7 +91,7 @@ describe('CompleteTaskUseCase', () => {
     expect(result.boss_damage).toBe(50);
   });
 
-  it('deve subir de nível e disparar conquistas quando o XP atinge o limite', async () => {
+  it('deve subir de nivel e disparar conquistas quando o XP atinge o limite', async () => {
     jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
     jest.spyOn(repository, 'findById').mockResolvedValue({ id: 't1', xpReward: 1000 } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
@@ -111,7 +111,7 @@ describe('CompleteTaskUseCase', () => {
     });
   });
 
-  it('deve disparar o use case de vitória quando a transação indicar boss derrotado', async () => {
+  it('deve disparar o use case de vitoria quando a transacao indicar boss derrotado', async () => {
     jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
     jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'task-id', xpReward: 100 } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
@@ -124,6 +124,10 @@ describe('CompleteTaskUseCase', () => {
 
     await useCase.execute('task-id', mockUser as any);
 
-    expect(handleBossVictoryUseCase.execute).toHaveBeenCalledWith('boss-1', mockUser.tenantId);
+    expect(handleBossVictoryUseCase.execute).toHaveBeenCalledWith(
+      'boss-1',
+      mockUser.tenantId,
+      mockUser.userId,
+    );
   });
 });

@@ -21,12 +21,16 @@ export class ClaimRewardUseCase {
   ) {}
 
   async execute(rewardId: string, user: UserContext) {
-    const reward = await this.repository.findById(rewardId);
+    const reward = await this.repository.findById(rewardId, user.tenantId);
     if (!reward) {
       throw new BadRequestException('Recompensa não encontrada.');
     }
 
-    const alreadyClaimed = await this.repository.findSpecificClaim(rewardId, user.userId);
+    const alreadyClaimed = await this.repository.findSpecificClaim(
+      rewardId,
+      user.userId,
+      user.tenantId,
+    );
     if (alreadyClaimed) {
       throw new BadRequestException('Você já resgatou esta recompensa!');
     }

@@ -37,7 +37,7 @@ describe('Patients Use Cases', () => {
     updatePatientProfileUseCase = module.get<UpdatePatientProfileUseCase>(UpdatePatientProfileUseCase);
   });
 
-  it('deve delegar create para o repositório com tenantId', async () => {
+  it('deve delegar create para o repositorio com tenantId', async () => {
     const dto = {
       supabaseId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
       name: 'Paciente Teste',
@@ -54,33 +54,35 @@ describe('Patients Use Cases', () => {
     expect(result).toEqual(createdPatient);
   });
 
-  it('deve retornar o paciente quando ele existir', async () => {
+  it('deve retornar o paciente quando ele existir no tenant', async () => {
     const patient = { id: 'patient-1', name: 'Paciente Teste' };
 
     jest.spyOn(repository, 'findById').mockResolvedValue(patient);
 
-    const result = await getPatientByIdUseCase.execute('patient-1');
+    const result = await getPatientByIdUseCase.execute('patient-1', 'tenant-1');
 
-    expect(repository.findById).toHaveBeenCalledWith('patient-1');
+    expect(repository.findById).toHaveBeenCalledWith('patient-1', 'tenant-1');
     expect(result).toEqual(patient);
   });
 
-  it('deve lançar NotFoundException quando o paciente não existir', async () => {
+  it('deve lancar NotFoundException quando o paciente nao existir no tenant', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
 
-    await expect(getPatientByIdUseCase.execute('patient-404')).rejects.toThrow(NotFoundException);
+    await expect(getPatientByIdUseCase.execute('patient-404', 'tenant-1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
-  it('deve validar a existência do paciente antes de atualizar o perfil', async () => {
+  it('deve validar a existencia do paciente no tenant antes de atualizar o perfil', async () => {
     const dto = { initialGoals: 'Ganhar massa muscular' };
 
     jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'patient-1' });
     jest.spyOn(repository, 'updateProfile').mockResolvedValue({ patientId: 'patient-1', ...dto });
 
-    const result = await updatePatientProfileUseCase.execute('patient-1', dto);
+    const result = await updatePatientProfileUseCase.execute('patient-1', 'tenant-1', dto);
 
-    expect(repository.findById).toHaveBeenCalledWith('patient-1');
-    expect(repository.updateProfile).toHaveBeenCalledWith('patient-1', dto);
+    expect(repository.findById).toHaveBeenCalledWith('patient-1', 'tenant-1');
+    expect(repository.updateProfile).toHaveBeenCalledWith('patient-1', 'tenant-1', dto);
     expect(result).toEqual({ patientId: 'patient-1', ...dto });
   });
 });

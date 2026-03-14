@@ -9,10 +9,10 @@ export class GetPatientByIdUseCase {
     private readonly repository: PatientsRepositoryPort,
   ) {}
 
-  async execute(id: string) {
-    const patient = await this.repository.findById(id);
+  async execute(id: string, tenantId: string) {
+    const patient = await this.repository.findById(id, tenantId);
     if (!patient) {
-      throw new NotFoundException('Paciente não encontrado.');
+      throw new NotFoundException('Paciente nao encontrado.');
     }
 
     return patient;

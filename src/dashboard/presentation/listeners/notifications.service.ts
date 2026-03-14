@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { NOTIFICATIONS_REPOSITORY } from '../../dashboard.tokens';
+import {
+  APPLICATION_EVENTS,
+  ApplicationEventEnvelope,
+} from '../../../shared/application/events/application-events';
 import { NotificationsRepositoryPort } from '../../application/ports/notifications-repository.port';
+import { NOTIFICATIONS_REPOSITORY } from '../../dashboard.tokens';
 
 @Injectable()
 export class NotificationsService {
@@ -10,30 +14,30 @@ export class NotificationsService {
     private readonly repository: NotificationsRepositoryPort,
   ) {}
 
-  @OnEvent('achievement.unlocked')
-  async handleAchievement(payload: any) {
-    const title = '🏆 NOVA CONQUISTA!';
-    const message = `Paciente ${payload.patientId} desbloqueou "${payload.achievement}"`;
-
+  @OnEvent(APPLICATION_EVENTS.achievementUnlocked)
+  async handleAchievement(
+    event: ApplicationEventEnvelope<typeof APPLICATION_EVENTS.achievementUnlocked>,
+  ) {
+    const payload = event.payload;
     await this.repository.createNotification({
       tenantId: payload.tenantId,
       userId: payload.patientId,
-      title,
-      message,
+      title: 'NOVA CONQUISTA!',
+      message: `Paciente ${payload.patientId} desbloqueou "${payload.achievement}"`,
       type: 'achievement',
     });
   }
 
-  @OnEvent('boss.defeated')
-  async handleBossDefeated(payload: any) {
-    const title = '📢 VITÓRIA ÉPICA!';
-    const message = `O Boss "${payload.bossName}" foi derrotado pelo paciente ${payload.killerId}!`;
-
+  @OnEvent(APPLICATION_EVENTS.bossDefeated)
+  async handleBossDefeated(
+    event: ApplicationEventEnvelope<typeof APPLICATION_EVENTS.bossDefeated>,
+  ) {
+    const payload = event.payload;
     await this.repository.createNotification({
       tenantId: payload.tenantId,
       userId: payload.killerId,
-      title,
-      message,
+      title: 'VITORIA EPICA!',
+      message: `O Boss "${payload.bossName}" foi derrotado pelo paciente ${payload.killerId}!`,
       type: 'boss_defeat',
     });
   }

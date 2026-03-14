@@ -1,18 +1,18 @@
-// src/social/infrastructure/persistence/prisma-social.repository.ts
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
 import { SocialPost } from '@prisma/client';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { SocialRepositoryPort } from '../../application/ports/social-repository.port';
 
 @Injectable()
 export class PrismaSocialRepository implements SocialRepositoryPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async findFeedByTenant(tenantId: string, limit: number = 20): Promise<SocialPost[]> {
-    return this.prisma.socialPost.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.socialPost.findMany({
       where: { tenantId },
-      include: { 
-        patient: { select: { name: true } } 
+      include: {
+        patient: { select: { name: true } },
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -20,7 +20,11 @@ export class PrismaSocialRepository implements SocialRepositoryPort {
   }
 
   async createPost(data: { patientId: string; tenantId: string; content: string; type: string }): Promise<SocialPost> {
-    return this.prisma.socialPost.create({
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId: data.patientId,
+      tenantId: data.tenantId,
+    });
+    return prisma.socialPost.create({
       data,
     });
   }

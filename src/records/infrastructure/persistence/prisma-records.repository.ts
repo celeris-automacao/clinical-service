@@ -1,66 +1,69 @@
-// src/records/infrastructure/persistence/prisma-records.repository.ts
+import { ClinicalRecord } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { RecordsRepositoryPort } from '../../application/ports/records-repository.port';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
-import { ClinicalRecord } from '@prisma/client';
 
 @Injectable()
 export class PrismaRecordsRepository implements RecordsRepositoryPort {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async create(data: CreateRecordDto, userId: string, tenantId: string): Promise<ClinicalRecord> {
-    return this.prisma.clinicalRecord.create({
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId, tenantId });
+    return prisma.clinicalRecord.create({
       data: {
         weight: data.weight,
         skeletalMuscleMass: data.skeletalMuscleMass,
         bodyFatMass: data.bodyFatMass,
         patientId: userId,
-        tenantId: tenantId,
+        tenantId,
       },
     });
   }
 
   async findAllByPatient(patientId: string, tenantId: string): Promise<ClinicalRecord[]> {
-    return this.prisma.clinicalRecord.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId, patientId);
+    return prisma.clinicalRecord.findMany({
       where: { patientId, tenantId },
-      orderBy: { recordedAt: 'asc' }, // Essencial para o cálculo de evolução
+      orderBy: { recordedAt: 'asc' },
     });
   }
 
-  async findLastTwo(patientId: string): Promise<ClinicalRecord[]> {
-    return this.prisma.clinicalRecord.findMany({
-      where: { patientId },
+  async findLastTwo(patientId: string, tenantId: string): Promise<ClinicalRecord[]> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId, patientId);
+    return prisma.clinicalRecord.findMany({
+      where: { patientId, tenantId },
       orderBy: { recordedAt: 'desc' },
-      take: 2, // Para comparar o peso atual com o anterior
+      take: 2,
     });
   }
 
   async getClinicalDamageByTenant(tenantId: string) {
-    // Busca todos os registros de peso da clínica ordenados por data
-    const allRecords = await this.prisma.clinicalRecord.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    const allRecords = await prisma.clinicalRecord.findMany({
       where: { tenantId },
       select: { patientId: true, weight: true, recordedAt: true },
       orderBy: { recordedAt: 'asc' },
     });
 
-    // Agrupa e calcula o dano (perda de peso) por paciente
     const damageMap = new Map<string, number>();
-
-    // Lógica de cálculo: soma apenas as diferenças positivas (perda de peso)
     const patientGroups = allRecords.reduce<Record<string, typeof allRecords>>((groups, record) => {
-      if (!groups[record.patientId]) groups[record.patientId] = [];
+      if (!groups[record.patientId]) {
+        groups[record.patientId] = [];
+      }
       groups[record.patientId].push(record);
       return groups;
     }, {});
 
     Object.entries(patientGroups).forEach(([patientId, records]) => {
       let totalLoss = 0;
-      for (let i = 1; i < records.length; i++) {
+      for (let i = 1; i < records.length; i += 1) {
         const diff = Number(records[i - 1].weight) - Number(records[i].weight);
-        if (diff > 0) totalLoss += diff;
+        if (diff > 0) {
+          totalLoss += diff;
+        }
       }
-      damageMap.set(patientId, Math.round(totalLoss * 7700)); // Aplica a constante de 7700
+      damageMap.set(patientId, Math.round(totalLoss * 7700));
     });
 
     return damageMap;

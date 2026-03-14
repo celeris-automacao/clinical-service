@@ -1,48 +1,51 @@
-// src/dashboard/infrastructure/persistence/prisma-dashboard.repository.ts
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { DashboardRepositoryPort } from '../../application/ports/dashboard-repository.port';
 
 @Injectable()
 export class PrismaDashboardRepository implements DashboardRepositoryPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async countActivePlayers(tenantId: string, since: Date): Promise<number> {
-    return this.prisma.playerStats.count({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.playerStats.count({
       where: {
         tenantId,
-        lastActivityAt: { gte: since }
-      }
+        lastActivityAt: { gte: since },
+      },
     });
   }
 
   async findRecentAchievements(tenantId: string, limit: number): Promise<any[]> {
-    return this.prisma.socialPost.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.socialPost.findMany({
       where: {
         tenantId,
-        type: 'achievement'
+        type: 'achievement',
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
       include: {
-        patient: { select: { name: true } }
-      }
+        patient: { select: { name: true } },
+      },
     });
   }
 
   async findTopPlayers(tenantId: string, limit: number): Promise<any[]> {
-    return this.prisma.playerStats.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.playerStats.findMany({
       where: { tenantId },
       orderBy: { totalDamageDealt: 'desc' },
       take: limit,
       include: {
-        patient: { select: { name: true } }
-      }
+        patient: { select: { name: true } },
+      },
     });
   }
 
   async getTaskCompletionsHistory(tenantId: string): Promise<any[]> {
-    return this.prisma.taskCompletion.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.taskCompletion.findMany({
       where: { tenantId },
       select: {
         patientId: true,
@@ -55,7 +58,8 @@ export class PrismaDashboardRepository implements DashboardRepositoryPort {
   }
 
   async findRecentClaims(tenantId: string, limit: number): Promise<any[]> {
-    return this.prisma.rewardClaim.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.rewardClaim.findMany({
       where: { tenantId },
       include: { reward: true },
       orderBy: { claimedAt: 'desc' },

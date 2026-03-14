@@ -1,33 +1,37 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { Gender } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaPatientsRepository } from '../../patients/infrastructure/persistence/prisma-patients.repository';
+import { TenantScopedPrismaFactory } from '../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 
 describe('PrismaPatientsRepository', () => {
   let repository: PrismaPatientsRepository;
-  let prisma: PrismaService;
+  let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
+
+  const tenantPrisma = {
+    patient: {
+      findFirst: jest.fn(),
+    },
+    patientProfile: {
+      upsert: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaPatientsRepository,
         {
-          provide: PrismaService,
+          provide: TenantScopedPrismaFactory,
           useValue: {
-            $transaction: jest.fn(),
-            patient: {
-              findUnique: jest.fn(),
-            },
-            patientProfile: {
-              upsert: jest.fn(),
-            },
+            forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
+            runInTenantTransaction: jest.fn(),
           },
         },
       ],
     }).compile();
 
     repository = module.get<PrismaPatientsRepository>(PrismaPatientsRepository);
-    prisma = module.get<PrismaService>(PrismaService);
+    tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
   it('deve criar paciente e playerStats iniciais dentro da transacao', async () => {
@@ -48,7 +52,9 @@ describe('PrismaPatientsRepository', () => {
       },
     };
 
-    jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback(tx));
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock).mockImplementation(
+      async (_context: any, callback: any) => callback(tx),
+    );
 
     const result = await repository.createWithStats(dto, tenantId);
 
@@ -71,23 +77,27 @@ describe('PrismaPatientsRepository', () => {
     expect(result).toEqual(createdPatient);
   });
 
-  it('deve buscar paciente por supabaseId', async () => {
-    await repository.findBySupabaseId('patient-1');
+  it('deve buscar paciente por supabaseId dentro do tenant', async () => {
+    await repository.findBySupabaseId('patient-1', 'tenant-1');
 
-    expect(prisma.patient.findUnique).toHaveBeenCalledWith({
-      where: { id: 'patient-1' },
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'patient-1',
+      tenantId: 'tenant-1',
+    });
+    expect(tenantPrisma.patient.findFirst).toHaveBeenCalledWith({
+      where: { id: 'patient-1', tenantId: 'tenant-1' },
     });
   });
 
-  it('deve buscar paciente por id', async () => {
-    await repository.findById('patient-2');
+  it('deve buscar paciente por id dentro do tenant', async () => {
+    await repository.findById('patient-2', 'tenant-1');
 
-    expect(prisma.patient.findUnique).toHaveBeenCalledWith({
-      where: { id: 'patient-2' },
+    expect(tenantPrisma.patient.findFirst).toHaveBeenCalledWith({
+      where: { id: 'patient-2', tenantId: 'tenant-1' },
     });
   });
 
-  it('deve fazer upsert do perfil clinico do paciente', async () => {
+  it('deve fazer upsert do perfil clinico do paciente do tenant', async () => {
     const dto = {
       initialGoals: 'Perder peso',
       symptoms: 'Dor lombar',
@@ -95,9 +105,16 @@ describe('PrismaPatientsRepository', () => {
       medicalNotes: 'Acompanhar pressao',
     };
 
-    await repository.updateProfile('patient-1', dto);
+    jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'patient-1', tenantId: 'tenant-1' } as any);
 
-    expect(prisma.patientProfile.upsert).toHaveBeenCalledWith({
+    await repository.updateProfile('patient-1', 'tenant-1', dto);
+
+    expect(repository.findById).toHaveBeenCalledWith('patient-1', 'tenant-1');
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'patient-1',
+      tenantId: 'tenant-1',
+    });
+    expect(tenantPrisma.patientProfile.upsert).toHaveBeenCalledWith({
       where: { patientId: 'patient-1' },
       update: dto,
       create: {

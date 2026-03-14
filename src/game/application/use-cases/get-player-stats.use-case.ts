@@ -17,7 +17,7 @@ export class GetPlayerStatsUseCase {
     const clinicalStats = await this.playerClinicalStatsPort.getStats(user);
 
     const [playerProgress, currentBoss] = await Promise.all([
-      this.repository.findPlayerProgress(user.userId),
+      this.repository.findPlayerProgress(user.userId, user.tenantId),
       this.repository.findActiveBoss(user.tenantId),
     ]);
 

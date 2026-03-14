@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { CreateTenantDto } from '../../presentation/http/dto/create-tenant.dto';
+import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { TenantsRepositoryPort } from '../../application/ports/tenants-repository.port';
+import { CreateTenantDto } from '../../presentation/http/dto/create-tenant.dto';
 
 @Injectable()
 export class PrismaTenantsRepository implements TenantsRepositoryPort {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async create(data: CreateTenantDto) {
-    // Ao criar a clínica, aproveitamos a relação para já criar o primeiro BossBattle [cite: 16]
-    return this.prisma.tenant.create({
+    const prisma = this.tenantScopedPrismaFactory.forRoot();
+    return prisma.tenant.create({
       data: {
         name: data.name,
         bossBattles: {
@@ -25,18 +25,20 @@ export class PrismaTenantsRepository implements TenantsRepositoryPort {
   }
 
   async findById(id: string) {
-    return this.prisma.tenant.findUnique({
+    const prisma = this.tenantScopedPrismaFactory.forRoot();
+    return prisma.tenant.findUnique({
       where: { id },
     });
   }
 
   async findAll() {
-    return this.prisma.tenant.findMany({
+    const prisma = this.tenantScopedPrismaFactory.forRoot();
+    return prisma.tenant.findMany({
       include: {
         _count: {
-          select: { patients: true } // Mostra quantos pacientes cada clínica tem [cite: 16]
-        }
-      }
+          select: { patients: true },
+        },
+      },
     });
   }
 }

@@ -1,40 +1,50 @@
-// src/tests/game/game.repository.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaGameRepository } from '../../game/infrastructure/persistence/prisma-game.repository';
-import { PrismaService } from '../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 
 describe('PrismaGameRepository', () => {
   let repository: PrismaGameRepository;
-  let prisma: PrismaService;
+  let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
+  const tenantPrisma = {
+    playerStats: { findFirst: jest.fn() },
+    bossBattle: { findFirst: jest.fn() },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaGameRepository,
         {
-          provide: PrismaService,
+          provide: TenantScopedPrismaFactory,
           useValue: {
-            playerStats: { findUnique: jest.fn() },
-            bossBattle: { findFirst: jest.fn() },
+            forTenant: jest.fn().mockReturnValue(tenantPrisma),
+            forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
           },
         },
       ],
     }).compile();
 
     repository = module.get<PrismaGameRepository>(PrismaGameRepository);
-    prisma = module.get<PrismaService>(PrismaService);
+    tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
-  it('findPlayerProgress deve buscar pelo patientId único', async () => {
-    await repository.findPlayerProgress('u1');
-    expect(prisma.playerStats.findUnique).toHaveBeenCalledWith({
-      where: { patientId: 'u1' },
+  it('findPlayerProgress deve buscar pelo patientId dentro do tenant', async () => {
+    await repository.findPlayerProgress('u1', 't1');
+
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'u1',
+      tenantId: 't1',
+    });
+    expect(tenantPrisma.playerStats.findFirst).toHaveBeenCalledWith({
+      where: { patientId: 'u1', tenantId: 't1' },
     });
   });
 
-  it('findActiveBoss deve buscar apenas o Boss ativo da clínica', async () => {
+  it('findActiveBoss deve buscar apenas o boss ativo da clinica', async () => {
     await repository.findActiveBoss('tenant-1');
-    expect(prisma.bossBattle.findFirst).toHaveBeenCalledWith({
+
+    expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-1');
+    expect(tenantPrisma.bossBattle.findFirst).toHaveBeenCalledWith({
       where: { tenantId: 'tenant-1', isActive: true },
     });
   });

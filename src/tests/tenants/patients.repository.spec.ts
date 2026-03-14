@@ -1,30 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from '../../prisma/prisma.service';
+import { TenantScopedPrismaFactory } from '../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { CreatePatientDto } from '../../tenants/presentation/http/dto/create-patient.dto';
 import { PrismaTenantPatientsRepository } from '../../tenants/infrastructure/persistence/prisma-tenant-patients.repository';
 
 describe('PrismaTenantPatientsRepository', () => {
   let repository: PrismaTenantPatientsRepository;
-  let prisma: PrismaService;
+  let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
+
+  const rootPrisma = {
+    patient: {
+      findFirst: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaTenantPatientsRepository,
         {
-          provide: PrismaService,
+          provide: TenantScopedPrismaFactory,
           useValue: {
-            $transaction: jest.fn(),
-            patient: {
-              findUnique: jest.fn(),
-            },
+            forRoot: jest.fn().mockReturnValue(rootPrisma),
+            forTenant: jest.fn().mockReturnValue(rootPrisma),
+            runInTenantTransaction: jest.fn(),
           },
         },
       ],
     }).compile();
 
     repository = module.get<PrismaTenantPatientsRepository>(PrismaTenantPatientsRepository);
-    prisma = module.get<PrismaService>(PrismaService);
+    tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
   it('deve criar o paciente e os atributos iniciais dentro de uma transacao', async () => {
@@ -43,11 +48,13 @@ describe('PrismaTenantPatientsRepository', () => {
       },
     };
 
-    jest.spyOn(prisma, '$transaction').mockImplementation(async (callback: any) => callback(tx));
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock).mockImplementation(
+      async (_context: any, callback: any) => callback(tx),
+    );
 
     const result = await repository.createWithStats(dto, tenantId);
 
-    expect(prisma.$transaction).toHaveBeenCalled();
+    expect(tenantScopedPrismaFactory.runInTenantTransaction).toHaveBeenCalled();
     expect(tx.patient.create).toHaveBeenCalledWith({
       data: {
         id: dto.supabaseId,
@@ -71,7 +78,7 @@ describe('PrismaTenantPatientsRepository', () => {
   it('deve buscar um paciente pelo supabaseId', async () => {
     await repository.findBySupabaseId('patient-1');
 
-    expect(prisma.patient.findUnique).toHaveBeenCalledWith({
+    expect(rootPrisma.patient.findFirst).toHaveBeenCalledWith({
       where: { id: 'patient-1' },
     });
   });
