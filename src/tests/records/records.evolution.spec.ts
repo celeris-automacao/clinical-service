@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetPatientStatsUseCase } from '../../records/application/use-cases/get-patient-stats.use-case';
 import { ClinicalProgressCalculator } from '../../records/domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
+import { RecordsRepositoryPort } from '../../records/application/ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../records/records.tokens';
 
 describe('GetPatientStatsUseCase - Evolution & Ranking', () => {
   let useCase: GetPatientStatsUseCase;
-  let repository: IRecordsRepository;
+  let repository: RecordsRepositoryPort;
 
   const mockUser = {
     userId: 'user-1',
@@ -29,7 +29,7 @@ describe('GetPatientStatsUseCase - Evolution & Ranking', () => {
     }).compile();
 
     useCase = module.get<GetPatientStatsUseCase>(GetPatientStatsUseCase);
-    repository = module.get<IRecordsRepository>(RECORDS_REPOSITORY);
+    repository = module.get<RecordsRepositoryPort>(RECORDS_REPOSITORY);
   });
 
   it('deve calcular corretamente o dano total acumulado (12kg = 92.400 kcal)', async () => {

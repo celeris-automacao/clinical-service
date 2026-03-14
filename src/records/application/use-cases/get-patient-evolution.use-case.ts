@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
-import { IRecordsRepository } from '../ports/records-repository.port';
+import { RecordsRepositoryPort } from '../ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../records.tokens';
 
 @Injectable()
 export class GetPatientEvolutionUseCase {
   constructor(
     @Inject(RECORDS_REPOSITORY)
-    private readonly repository: IRecordsRepository,
+    private readonly repository: RecordsRepositoryPort,
   ) {}
 
   async execute(user: UserContext) {

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
+import { RecordsRepositoryPort } from '../../records/application/ports/records-repository.port';
 import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
 import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
-import { ITasksRepository } from '../../tasks/application/ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../../tasks/application/ports/tasks-repository.port';
 import { RECORDS_REPOSITORY } from '../../records/records.tokens';
 import { TASKS_REPOSITORY } from '../../tasks/tasks.tokens';
 
 describe('Tasks Query Use Cases', () => {
-  let tasksRepository: ITasksRepository;
-  let recordsRepository: IRecordsRepository;
+  let tasksRepository: TasksRepositoryPort;
+  let recordsRepository: RecordsRepositoryPort;
   let getDailyTasksUseCase: GetDailyTasksUseCase;
   let getRankingUseCase: GetRankingUseCase;
   let getCategorizedRankingUseCase: GetCategorizedRankingUseCase;
@@ -42,8 +42,8 @@ describe('Tasks Query Use Cases', () => {
       ],
     }).compile();
 
-    tasksRepository = module.get<ITasksRepository>(TASKS_REPOSITORY);
-    recordsRepository = module.get<IRecordsRepository>(RECORDS_REPOSITORY);
+    tasksRepository = module.get<TasksRepositoryPort>(TASKS_REPOSITORY);
+    recordsRepository = module.get<RecordsRepositoryPort>(RECORDS_REPOSITORY);
     getDailyTasksUseCase = module.get<GetDailyTasksUseCase>(GetDailyTasksUseCase);
     getRankingUseCase = module.get<GetRankingUseCase>(GetRankingUseCase);
     getCategorizedRankingUseCase = module.get<GetCategorizedRankingUseCase>(GetCategorizedRankingUseCase);

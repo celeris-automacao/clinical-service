@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
-import { ITasksRepository } from '../ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import { TASKS_REPOSITORY } from '../../tasks.tokens';
 
 @Injectable()
 export class GetRankingUseCase {
   constructor(
     @Inject(TASKS_REPOSITORY)
-    private readonly repository: ITasksRepository,
+    private readonly repository: TasksRepositoryPort,
   ) {}
 
   async execute(user: UserContext) {

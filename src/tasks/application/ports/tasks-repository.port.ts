@@ -1,6 +1,6 @@
 import { DailyTask, TaskCompletion } from '@prisma/client';
 
-export interface ITasksRepository {
+export interface TasksRepositoryPort {
   findTasksByTenant(tenantId: string): Promise<DailyTask[]>;
   findCompletionsByPatientToday(patientId: string, startOfDay: Date): Promise<TaskCompletion[]>;
   findSpecificCompletionToday(

@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ACHIEVEMENTS_EVENTS_PORT, ACHIEVEMENTS_REPOSITORY } from '../../achievements.tokens';
-import { IAchievementsRepository } from '../ports/achievements-repository.port';
+import { AchievementsRepositoryPort } from '../ports/achievements-repository.port';
 import { AchievementsEventsPort } from '../ports/achievements-events.port';
 
 @Injectable()
 export class CheckLevelAchievementsUseCase {
   constructor(
     @Inject(ACHIEVEMENTS_REPOSITORY)
-    private readonly repository: IAchievementsRepository,
+    private readonly repository: AchievementsRepositoryPort,
     @Inject(ACHIEVEMENTS_EVENTS_PORT)
     private readonly eventsPort: AchievementsEventsPort,
   ) {}

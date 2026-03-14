@@ -1,6 +1,6 @@
 import { Reward, RewardClaim } from '@prisma/client';
 
-export interface IRewardsRepository {
+export interface RewardsRepositoryPort {
   findAllActiveByTenant(tenantId: string): Promise<Reward[]>;
   findClaimsByPatient(patientId: string): Promise<RewardClaim[]>;
   findById(rewardId: string): Promise<Reward | null>;

@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IRecordsRepository } from '../../../records/application/ports/records-repository.port';
+import { RecordsRepositoryPort } from '../../../records/application/ports/records-repository.port';
 import { RECORDS_REPOSITORY } from '../../../records/records.tokens';
-import { ITasksRepository } from '../ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import { TASKS_REPOSITORY } from '../../tasks.tokens';
 
 @Injectable()
 export class GetCategorizedRankingUseCase {
   constructor(
     @Inject(TASKS_REPOSITORY)
-    private readonly repository: ITasksRepository,
+    private readonly repository: TasksRepositoryPort,
     @Inject(RECORDS_REPOSITORY)
-    private readonly recordsRepository: IRecordsRepository,
+    private readonly recordsRepository: RecordsRepositoryPort,
   ) {}
 
   async execute(tenantId: string) {

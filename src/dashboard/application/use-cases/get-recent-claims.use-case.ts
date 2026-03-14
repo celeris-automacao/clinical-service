@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DASHBOARD_REPOSITORY } from '../../dashboard.tokens';
-import { IDashboardRepository } from '../ports/dashboard-repository.port';
+import { DashboardRepositoryPort } from '../ports/dashboard-repository.port';
 
 @Injectable()
 export class GetRecentClaimsUseCase {
   constructor(
     @Inject(DASHBOARD_REPOSITORY)
-    private readonly repository: IDashboardRepository,
+    private readonly repository: DashboardRepositoryPort,
   ) {}
 
   async execute(tenantId: string) {

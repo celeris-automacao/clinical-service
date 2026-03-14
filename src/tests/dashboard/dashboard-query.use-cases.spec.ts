@@ -3,10 +3,10 @@ import { GetClinicOverviewUseCase } from '../../dashboard/application/use-cases/
 import { GetMissingPatientsUseCase } from '../../dashboard/application/use-cases/get-missing-patients.use-case';
 import { GetRecentClaimsUseCase } from '../../dashboard/application/use-cases/get-recent-claims.use-case';
 import { DASHBOARD_REPOSITORY } from '../../dashboard/dashboard.tokens';
-import { IDashboardRepository } from '../../dashboard/application/ports/dashboard-repository.port';
+import { DashboardRepositoryPort } from '../../dashboard/application/ports/dashboard-repository.port';
 
 describe('Dashboard Query Use Cases', () => {
-  let repository: IDashboardRepository;
+  let repository: DashboardRepositoryPort;
   let getClinicOverviewUseCase: GetClinicOverviewUseCase;
   let getMissingPatientsUseCase: GetMissingPatientsUseCase;
   let getRecentClaimsUseCase: GetRecentClaimsUseCase;
@@ -31,7 +31,7 @@ describe('Dashboard Query Use Cases', () => {
       ],
     }).compile();
 
-    repository = module.get<IDashboardRepository>(DASHBOARD_REPOSITORY);
+    repository = module.get<DashboardRepositoryPort>(DASHBOARD_REPOSITORY);
     getClinicOverviewUseCase = module.get<GetClinicOverviewUseCase>(GetClinicOverviewUseCase);
     getMissingPatientsUseCase = module.get<GetMissingPatientsUseCase>(GetMissingPatientsUseCase);
     getRecentClaimsUseCase = module.get<GetRecentClaimsUseCase>(GetRecentClaimsUseCase);

@@ -1,10 +1,10 @@
 // src/dashboard/infrastructure/persistence/prisma-dashboard.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IDashboardRepository } from '../../application/ports/dashboard-repository.port';
+import { DashboardRepositoryPort } from '../../application/ports/dashboard-repository.port';
 
 @Injectable()
-export class PrismaDashboardRepository implements IDashboardRepository {
+export class PrismaDashboardRepository implements DashboardRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async countActivePlayers(tenantId: string, since: Date): Promise<number> {

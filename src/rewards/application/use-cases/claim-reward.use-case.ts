@@ -5,7 +5,7 @@ import {
   REWARDS_EVENTS_PORT,
   REWARDS_REPOSITORY,
 } from '../../rewards.tokens';
-import { IRewardsRepository } from '../ports/rewards-repository.port';
+import { RewardsRepositoryPort } from '../ports/rewards-repository.port';
 import { RewardClaimTransactionPort } from '../ports/reward-claim-transaction.port';
 import { RewardsEventsPort } from '../ports/rewards-events.port';
 
@@ -13,7 +13,7 @@ import { RewardsEventsPort } from '../ports/rewards-events.port';
 export class ClaimRewardUseCase {
   constructor(
     @Inject(REWARDS_REPOSITORY)
-    private readonly repository: IRewardsRepository,
+    private readonly repository: RewardsRepositoryPort,
     @Inject(REWARD_CLAIM_TRANSACTION_PORT)
     private readonly rewardClaimTransactionPort: RewardClaimTransactionPort,
     @Inject(REWARDS_EVENTS_PORT)

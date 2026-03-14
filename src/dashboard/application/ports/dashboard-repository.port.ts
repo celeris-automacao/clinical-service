@@ -1,4 +1,4 @@
-export interface IDashboardRepository {
+export interface DashboardRepositoryPort {
   countActivePlayers(tenantId: string, since: Date): Promise<number>;
   findRecentAchievements(tenantId: string, limit: number): Promise<any[]>;
   findTopPlayers(tenantId: string, limit: number): Promise<any[]>;

@@ -6,7 +6,7 @@ import { RewardClaimTransactionPort } from '../../rewards/application/ports/rewa
 import { RewardsEventsPort } from '../../rewards/application/ports/rewards-events.port';
 import { RewardsStatsPort } from '../../rewards/application/ports/rewards-stats.port';
 import { GetAvailableRewardsUseCase } from '../../rewards/application/use-cases/get-available-rewards.use-case';
-import { IRewardsRepository } from '../../rewards/application/ports/rewards-repository.port';
+import { RewardsRepositoryPort } from '../../rewards/application/ports/rewards-repository.port';
 import {
   REWARD_CLAIM_TRANSACTION_PORT,
   REWARDS_EVENTS_PORT,
@@ -15,7 +15,7 @@ import {
 } from '../../rewards/rewards.tokens';
 
 describe('Rewards Use Cases', () => {
-  let repository: IRewardsRepository;
+  let repository: RewardsRepositoryPort;
   let rewardsStatsPort: RewardsStatsPort;
   let rewardClaimTransactionPort: RewardClaimTransactionPort;
   let rewardsEventsPort: RewardsEventsPort;
@@ -59,7 +59,7 @@ describe('Rewards Use Cases', () => {
       ],
     }).compile();
 
-    repository = module.get<IRewardsRepository>(REWARDS_REPOSITORY);
+    repository = module.get<RewardsRepositoryPort>(REWARDS_REPOSITORY);
     rewardsStatsPort = module.get<RewardsStatsPort>(REWARDS_STATS_PORT);
     rewardClaimTransactionPort = module.get<RewardClaimTransactionPort>(REWARD_CLAIM_TRANSACTION_PORT);
     rewardsEventsPort = module.get<RewardsEventsPort>(REWARDS_EVENTS_PORT);

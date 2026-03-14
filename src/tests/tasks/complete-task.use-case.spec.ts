@@ -5,7 +5,7 @@ import { HandleBossVictoryUseCase } from '../../records/application/use-cases/ha
 import { CompleteTaskUseCase } from '../../tasks/application/use-cases/complete-task.use-case';
 import { TaskCompletionTransactionPort } from '../../tasks/application/ports/task-completion-transaction.port';
 import { TasksAchievementsPort } from '../../tasks/application/ports/tasks-achievements.port';
-import { ITasksRepository } from '../../tasks/application/ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../../tasks/application/ports/tasks-repository.port';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,
@@ -14,7 +14,7 @@ import {
 
 describe('CompleteTaskUseCase', () => {
   let useCase: CompleteTaskUseCase;
-  let repository: ITasksRepository;
+  let repository: TasksRepositoryPort;
   let transactionPort: TaskCompletionTransactionPort;
   let tasksAchievementsPort: TasksAchievementsPort;
   let handleBossVictoryUseCase: HandleBossVictoryUseCase;
@@ -55,7 +55,7 @@ describe('CompleteTaskUseCase', () => {
     }).compile();
 
     useCase = module.get<CompleteTaskUseCase>(CompleteTaskUseCase);
-    repository = module.get<ITasksRepository>(TASKS_REPOSITORY);
+    repository = module.get<TasksRepositoryPort>(TASKS_REPOSITORY);
     transactionPort = module.get<TaskCompletionTransactionPort>(TASK_COMPLETION_TRANSACTION_PORT);
     tasksAchievementsPort = module.get<TasksAchievementsPort>(TASKS_ACHIEVEMENTS_PORT);
     handleBossVictoryUseCase = module.get<HandleBossVictoryUseCase>(HandleBossVictoryUseCase);

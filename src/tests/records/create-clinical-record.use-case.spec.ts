@@ -5,7 +5,7 @@ import { RecordsAchievementsPort } from '../../records/application/ports/records
 import { CreateClinicalRecordUseCase } from '../../records/application/use-cases/create-clinical-record.use-case';
 import { HandleBossVictoryUseCase } from '../../records/application/use-cases/handle-boss-victory.use-case';
 import { ClinicalProgressCalculator } from '../../records/domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../../records/application/ports/records-repository.port';
+import { RecordsRepositoryPort } from '../../records/application/ports/records-repository.port';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,
@@ -15,7 +15,7 @@ import {
 
 describe('CreateClinicalRecordUseCase', () => {
   let useCase: CreateClinicalRecordUseCase;
-  let repository: IRecordsRepository;
+  let repository: RecordsRepositoryPort;
   let bossBattlePort: BossBattlePort;
   let playerProgressionPort: PlayerProgressionPort;
   let recordsAchievementsPort: RecordsAchievementsPort;
@@ -68,7 +68,7 @@ describe('CreateClinicalRecordUseCase', () => {
     }).compile();
 
     useCase = module.get<CreateClinicalRecordUseCase>(CreateClinicalRecordUseCase);
-    repository = module.get<IRecordsRepository>(RECORDS_REPOSITORY);
+    repository = module.get<RecordsRepositoryPort>(RECORDS_REPOSITORY);
     bossBattlePort = module.get<BossBattlePort>(BOSS_BATTLE_PORT);
     playerProgressionPort = module.get<PlayerProgressionPort>(PLAYER_PROGRESSION_PORT);
     recordsAchievementsPort = module.get<RecordsAchievementsPort>(RECORDS_ACHIEVEMENTS_PORT);

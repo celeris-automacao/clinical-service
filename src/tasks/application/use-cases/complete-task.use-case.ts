@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
 import { HandleBossVictoryUseCase } from '../../../records/application/use-cases/handle-boss-victory.use-case';
-import { ITasksRepository } from '../ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../ports/tasks-repository.port';
 import {
   TASK_COMPLETION_TRANSACTION_PORT,
   TASKS_ACHIEVEMENTS_PORT,
@@ -15,7 +15,7 @@ import { TasksAchievementsPort } from '../ports/tasks-achievements.port';
 export class CompleteTaskUseCase {
   constructor(
     @Inject(TASKS_REPOSITORY)
-    private readonly repository: ITasksRepository,
+    private readonly repository: TasksRepositoryPort,
     @Inject(TASK_COMPLETION_TRANSACTION_PORT)
     private readonly taskCompletionTransactionPort: TaskCompletionTransactionPort,
     private readonly eventEmitter: EventEmitter2,

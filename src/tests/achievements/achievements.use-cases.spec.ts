@@ -7,10 +7,10 @@ import {
   ACHIEVEMENTS_EVENTS_PORT,
   ACHIEVEMENTS_REPOSITORY,
 } from '../../achievements/achievements.tokens';
-import { IAchievementsRepository } from '../../achievements/application/ports/achievements-repository.port';
+import { AchievementsRepositoryPort } from '../../achievements/application/ports/achievements-repository.port';
 
 describe('Achievements Use Cases', () => {
-  let repository: IAchievementsRepository;
+  let repository: AchievementsRepositoryPort;
   let eventsPort: AchievementsEventsPort;
   let checkLevelAchievementsUseCase: CheckLevelAchievementsUseCase;
   let emitGlobalVictoryUseCase: EmitGlobalVictoryUseCase;
@@ -38,7 +38,7 @@ describe('Achievements Use Cases', () => {
       ],
     }).compile();
 
-    repository = module.get<IAchievementsRepository>(ACHIEVEMENTS_REPOSITORY);
+    repository = module.get<AchievementsRepositoryPort>(ACHIEVEMENTS_REPOSITORY);
     eventsPort = module.get<AchievementsEventsPort>(ACHIEVEMENTS_EVENTS_PORT);
     checkLevelAchievementsUseCase = module.get<CheckLevelAchievementsUseCase>(
       CheckLevelAchievementsUseCase,

@@ -1,11 +1,11 @@
 // src/tasks/infrastructure/persistence/prisma-tasks.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { ITasksRepository } from '../../application/ports/tasks-repository.port';
+import { TasksRepositoryPort } from '../../application/ports/tasks-repository.port';
 import { DailyTask, TaskCompletion } from '@prisma/client';
 
 @Injectable()
-export class PrismaTasksRepository implements ITasksRepository {
+export class PrismaTasksRepository implements TasksRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async findTasksByTenant(tenantId: string): Promise<DailyTask[]> {

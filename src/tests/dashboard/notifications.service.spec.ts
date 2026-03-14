@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from '../../dashboard/presentation/listeners/notifications.service';
-import { INotificationsRepository } from '../../dashboard/application/ports/notifications-repository.port';
+import { NotificationsRepositoryPort } from '../../dashboard/application/ports/notifications-repository.port';
 import { NOTIFICATIONS_REPOSITORY } from '../../dashboard/dashboard.tokens';
 
 describe('NotificationsService - Event Reactions', () => {
   let service: NotificationsService;
-  let repository: INotificationsRepository;
+  let repository: NotificationsRepositoryPort;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,7 +21,7 @@ describe('NotificationsService - Event Reactions', () => {
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
-    repository = module.get<INotificationsRepository>(NOTIFICATIONS_REPOSITORY);
+    repository = module.get<NotificationsRepositoryPort>(NOTIFICATIONS_REPOSITORY);
   });
 
   describe('handleAchievement', () => {

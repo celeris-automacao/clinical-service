@@ -1,4 +1,4 @@
-export interface INotificationsRepository {
+export interface NotificationsRepositoryPort {
   createNotification(data: {
     tenantId: string;
     userId: string;

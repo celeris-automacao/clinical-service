@@ -1,10 +1,10 @@
 // src/achievements/infrastructure/persistence/prisma-achievements.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IAchievementsRepository } from '../../application/ports/achievements-repository.port';
+import { AchievementsRepositoryPort } from '../../application/ports/achievements-repository.port';
 
 @Injectable()
-export class PrismaAchievementsRepository implements IAchievementsRepository {
+export class PrismaAchievementsRepository implements AchievementsRepositoryPort {
   constructor(private readonly prisma: PrismaService) {}
 
   async getOrCreateBadge(tenantId: string, title: string, icon: string) {

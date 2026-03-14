@@ -1,12 +1,12 @@
 // src/records/infrastructure/persistence/prisma-records.repository.ts
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { IRecordsRepository } from '../../application/ports/records-repository.port';
+import { RecordsRepositoryPort } from '../../application/ports/records-repository.port';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalRecord } from '@prisma/client';
 
 @Injectable()
-export class PrismaRecordsRepository implements IRecordsRepository {
+export class PrismaRecordsRepository implements RecordsRepositoryPort {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(data: CreateRecordDto, userId: string, tenantId: string): Promise<ClinicalRecord> {

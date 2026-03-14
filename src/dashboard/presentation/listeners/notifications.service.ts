@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { NOTIFICATIONS_REPOSITORY } from '../../dashboard.tokens';
-import { INotificationsRepository } from '../../application/ports/notifications-repository.port';
+import { NotificationsRepositoryPort } from '../../application/ports/notifications-repository.port';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @Inject(NOTIFICATIONS_REPOSITORY)
-    private readonly repository: INotificationsRepository,
+    private readonly repository: NotificationsRepositoryPort,
   ) {}
 
   @OnEvent('achievement.unlocked')

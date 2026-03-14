@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { UserContext } from '../../../common/decorators/get-user.decorator';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
 import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
-import { IRecordsRepository } from '../ports/records-repository.port';
+import { RecordsRepositoryPort } from '../ports/records-repository.port';
 import {
   BOSS_BATTLE_PORT,
   PLAYER_PROGRESSION_PORT,
@@ -18,7 +18,7 @@ import { HandleBossVictoryUseCase } from './handle-boss-victory.use-case';
 export class CreateClinicalRecordUseCase {
   constructor(
     @Inject(RECORDS_REPOSITORY)
-    private readonly repository: IRecordsRepository,
+    private readonly repository: RecordsRepositoryPort,
     @Inject(PLAYER_PROGRESSION_PORT)
     private readonly playerProgressionPort: PlayerProgressionPort,
     @Inject(BOSS_BATTLE_PORT)
