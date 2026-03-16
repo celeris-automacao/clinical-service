@@ -20,8 +20,7 @@ let AssignTaskTemplateUseCase = class AssignTaskTemplateUseCase {
         this.repository = repository;
     }
     async execute(dto, tenantId, assignedByUserId) {
-        const dueDate = new Date(dto.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
+        const dueDate = this.parseLocalDate(dto.dueDate);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         if (dueDate < today) {
@@ -56,6 +55,16 @@ let AssignTaskTemplateUseCase = class AssignTaskTemplateUseCase {
             dueDate,
             assignedByUserId,
         });
+    }
+    parseLocalDate(input) {
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input);
+        if (match) {
+            const [, year, month, day] = match;
+            return new Date(Number(year), Number(month) - 1, Number(day), 0, 0, 0, 0);
+        }
+        const parsed = new Date(input);
+        parsed.setHours(0, 0, 0, 0);
+        return parsed;
     }
 };
 exports.AssignTaskTemplateUseCase = AssignTaskTemplateUseCase;

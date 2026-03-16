@@ -14,12 +14,12 @@ if (!secret) {
 const seededTenantId = 'c56a4180-65aa-42ec-a945-5fd21dec0538';
 const seededProfiles = {
   owner: {
-    sub: '11111111-1111-1111-1111-111111111111',
+    sub: '11111111-1111-4111-8111-111111111111',
     email: 'owner@clinica.com',
     role: 'owner',
   },
   staff: {
-    sub: '22222222-2222-2222-2222-222222222222',
+    sub: '22222222-2222-4222-8222-222222222222',
     email: 'medico@clinica.com',
     role: 'doctor',
   },

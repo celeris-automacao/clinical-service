@@ -146,6 +146,32 @@ describe('Tasks Query Use Cases', () => {
     expect(result).toEqual({ id: 'assignment-1' });
   });
 
+  it('deve aceitar atribuicao para a data de hoje quando recebida em formato YYYY-MM-DD', async () => {
+    const today = new Date();
+    const todayString = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    jest.spyOn(tasksRepository, 'findTemplateById').mockResolvedValue({ id: 'template-1', isActive: true } as any);
+    jest.spyOn(tasksRepository, 'findPatientById').mockResolvedValue({ id: 'patient-1' });
+    jest.spyOn(tasksRepository, 'findActiveAssignment').mockResolvedValue(null);
+    jest.spyOn(tasksRepository, 'createAssignment').mockResolvedValue({ id: 'assignment-1' } as any);
+
+    await expect(
+      assignTaskTemplateUseCase.execute(
+        {
+          templateId: 'template-1',
+          patientId: 'patient-1',
+          dueDate: todayString,
+        } as any,
+        't1',
+        'staff-1',
+      ),
+    ).resolves.toEqual({ id: 'assignment-1' });
+  });
+
   it('deve falhar quando o template nao existir', async () => {
     jest.spyOn(tasksRepository, 'findTemplateById').mockResolvedValue(null);
     jest.spyOn(tasksRepository, 'findPatientById').mockResolvedValue({ id: 'patient-1' });

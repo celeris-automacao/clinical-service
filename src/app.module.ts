@@ -9,6 +9,7 @@ import { SocialModule } from './social/social.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { PatientsModule } from './patients/patients.module';
 import { PlansModule } from './plans/plans.module';
+import { RewardsModule } from './rewards/rewards.module';
 import { SharedInfrastructureModule } from './shared/infrastructure/shared-infrastructure.module';
 import { StaffModule } from './staff/staff.module';
 
@@ -24,6 +25,7 @@ import { StaffModule } from './staff/staff.module';
     TenantsModule,
     PatientsModule,
     PlansModule,
+    RewardsModule,
     StaffModule,
   ],
   controllers: [],

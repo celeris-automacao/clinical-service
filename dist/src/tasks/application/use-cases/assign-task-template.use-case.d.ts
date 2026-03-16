@@ -4,4 +4,5 @@ export declare class AssignTaskTemplateUseCase {
     private readonly repository;
     constructor(repository: TasksRepositoryPort);
     execute(dto: AssignTaskTemplateDto, tenantId: string, assignedByUserId: string): Promise<any>;
+    private parseLocalDate;
 }
