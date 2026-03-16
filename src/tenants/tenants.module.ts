@@ -1,17 +1,23 @@
 import { Module } from '@nestjs/common';
-import { TenantsRepository } from './repositories/tenants.repository';
-import { TenantsService } from './tenants.service';
-import { TenantsController } from './tenants.controller';
+import { ChangeTenantStatusUseCase } from './application/use-cases/change-tenant-status.use-case';
+import { CreateTenantUseCase } from './application/use-cases/create-tenant.use-case';
+import { GetTenantByIdUseCase } from './application/use-cases/get-tenant-by-id.use-case';
+import { GetTenantsUseCase } from './application/use-cases/get-tenants.use-case';
+import { PrismaTenantsRepository } from './infrastructure/persistence/prisma-tenants.repository';
+import { TenantsController } from './presentation/http/tenants.controller';
+import { TENANTS_REPOSITORY } from './tenants.tokens';
 
 @Module({
   controllers: [TenantsController],
   providers: [
-    TenantsService,
+    CreateTenantUseCase,
+    GetTenantsUseCase,
+    GetTenantByIdUseCase,
+    ChangeTenantStatusUseCase,
     {
-      provide: 'ITenantsRepository',
-      useClass: TenantsRepository,
+      provide: TENANTS_REPOSITORY,
+      useClass: PrismaTenantsRepository,
     },
   ],
-  exports: [TenantsService], // Exportamos para que outros módulos (como o de Patients) possam usá-lo
 })
 export class TenantsModule {}

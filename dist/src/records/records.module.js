@@ -8,29 +8,49 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RecordsModule = void 0;
 const common_1 = require("@nestjs/common");
-const records_controller_1 = require("./records.controller");
-const records_repository_1 = require("./repositories/records.repository");
-const records_service_1 = require("./records.service");
-const game_module_1 = require("../game/game.module");
 const achievements_module_1 = require("../achievements/achievements.module");
+const create_clinical_record_use_case_1 = require("./application/use-cases/create-clinical-record.use-case");
+const get_patient_evolution_use_case_1 = require("./application/use-cases/get-patient-evolution.use-case");
+const get_patient_stats_use_case_1 = require("./application/use-cases/get-patient-stats.use-case");
+const handle_boss_victory_use_case_1 = require("./application/use-cases/handle-boss-victory.use-case");
+const clinical_progress_calculator_1 = require("./domain/services/clinical-progress-calculator");
+const records_achievements_adapter_1 = require("./infrastructure/adapters/records-achievements.adapter");
+const prisma_boss_battle_adapter_1 = require("./infrastructure/persistence/prisma-boss-battle.adapter");
+const prisma_player_progression_adapter_1 = require("./infrastructure/persistence/prisma-player-progression.adapter");
+const records_controller_1 = require("./presentation/http/records.controller");
+const prisma_records_repository_1 = require("./infrastructure/persistence/prisma-records.repository");
+const records_tokens_1 = require("./records.tokens");
 let RecordsModule = class RecordsModule {
 };
 exports.RecordsModule = RecordsModule;
 exports.RecordsModule = RecordsModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            (0, common_1.forwardRef)(() => game_module_1.GameModule),
-            (0, common_1.forwardRef)(() => achievements_module_1.AchievementsModule),
-        ],
+        imports: [achievements_module_1.AchievementsModule],
         controllers: [records_controller_1.RecordsController],
         providers: [
-            records_service_1.RecordsService,
+            create_clinical_record_use_case_1.CreateClinicalRecordUseCase,
+            handle_boss_victory_use_case_1.HandleBossVictoryUseCase,
+            get_patient_stats_use_case_1.GetPatientStatsUseCase,
+            get_patient_evolution_use_case_1.GetPatientEvolutionUseCase,
+            clinical_progress_calculator_1.ClinicalProgressCalculator,
             {
-                provide: 'IRecordsRepository',
-                useClass: records_repository_1.RecordsRepository,
+                provide: records_tokens_1.RECORDS_REPOSITORY,
+                useClass: prisma_records_repository_1.PrismaRecordsRepository,
+            },
+            {
+                provide: records_tokens_1.PLAYER_PROGRESSION_PORT,
+                useClass: prisma_player_progression_adapter_1.PrismaPlayerProgressionAdapter,
+            },
+            {
+                provide: records_tokens_1.BOSS_BATTLE_PORT,
+                useClass: prisma_boss_battle_adapter_1.PrismaBossBattleAdapter,
+            },
+            {
+                provide: records_tokens_1.RECORDS_ACHIEVEMENTS_PORT,
+                useClass: records_achievements_adapter_1.RecordsAchievementsAdapter,
             },
         ],
-        exports: [records_service_1.RecordsService, 'IRecordsRepository'],
+        exports: [handle_boss_victory_use_case_1.HandleBossVictoryUseCase, get_patient_stats_use_case_1.GetPatientStatsUseCase, records_tokens_1.RECORDS_REPOSITORY],
     })
 ], RecordsModule);
 //# sourceMappingURL=records.module.js.map

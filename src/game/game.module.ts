@@ -1,23 +1,24 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { GameController } from './game.controller';
-import { GameService } from './game.service'; // Nome corrigido
-import { GameRepository } from './repositories/game.repository';
+import { Module } from '@nestjs/common';
 import { RecordsModule } from '../records/records.module';
-import { PrismaModule } from '../prisma/prisma.module';
+import { GetPlayerStatsUseCase } from './application/use-cases/get-player-stats.use-case';
+import { RecordsPlayerClinicalStatsAdapter } from './infrastructure/adapters/records-player-clinical-stats.adapter';
+import { GameController } from './presentation/http/game.controller';
+import { PrismaGameRepository } from './infrastructure/persistence/prisma-game.repository';
+import { GAME_REPOSITORY, PLAYER_CLINICAL_STATS_PORT } from './game.tokens';
 
 @Module({
-  imports: [
-    PrismaModule,
-    forwardRef(() => RecordsModule), //
-  ],
-  controllers: [GameController], //
+  imports: [RecordsModule],
+  controllers: [GameController],
   providers: [
-    GameService, //
+    GetPlayerStatsUseCase,
     {
-      provide: 'IGameRepository',
-      useClass: GameRepository,
+      provide: GAME_REPOSITORY,
+      useClass: PrismaGameRepository,
+    },
+    {
+      provide: PLAYER_CLINICAL_STATS_PORT,
+      useClass: RecordsPlayerClinicalStatsAdapter,
     },
   ],
-  exports: [GameService, 'IGameRepository'], //
 })
-export class GameModule { }
+export class GameModule {}

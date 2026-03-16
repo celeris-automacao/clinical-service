@@ -8,31 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocialModule = void 0;
 const common_1 = require("@nestjs/common");
-const social_controller_1 = require("./social.controller");
-const social_service_1 = require("./social.service");
-const social_listener_1 = require("./social.listener");
-const social_repository_1 = require("./repositories/social.repository");
-const prisma_module_1 = require("../prisma/prisma.module");
-const event_emitter_1 = require("@nestjs/event-emitter");
+const create_social_post_use_case_1 = require("./application/use-cases/create-social-post.use-case");
+const get_feed_use_case_1 = require("./application/use-cases/get-feed.use-case");
+const social_controller_1 = require("./presentation/http/social.controller");
+const social_listener_1 = require("./presentation/listeners/social.listener");
+const prisma_social_repository_1 = require("./infrastructure/persistence/prisma-social.repository");
+const social_tokens_1 = require("./social.tokens");
 let SocialModule = class SocialModule {
 };
 exports.SocialModule = SocialModule;
 exports.SocialModule = SocialModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            prisma_module_1.PrismaModule,
-            event_emitter_1.EventEmitterModule.forRoot(),
-        ],
         controllers: [social_controller_1.SocialController],
         providers: [
-            social_service_1.SocialService,
+            get_feed_use_case_1.GetFeedUseCase,
+            create_social_post_use_case_1.CreateSocialPostUseCase,
             social_listener_1.SocialListener,
             {
-                provide: 'ISocialRepository',
-                useClass: social_repository_1.SocialRepository,
+                provide: social_tokens_1.SOCIAL_REPOSITORY,
+                useClass: prisma_social_repository_1.PrismaSocialRepository,
             },
         ],
-        exports: [social_service_1.SocialService, 'ISocialRepository'],
     })
 ], SocialModule);
 //# sourceMappingURL=social.module.js.map

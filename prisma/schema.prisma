@@ -16,6 +16,15 @@ datasource db {
 model Tenant {
   id        String   @id @default(uuid()) @db.Uuid
   name      String
+  legalName String   @map("legal_name")
+  cnpj      String   @unique
+  status    String   @default("active")
+  responsibleName  String  @map("responsible_name")
+  responsibleEmail String  @map("responsible_email")
+  responsiblePhone String? @map("responsible_phone")
+  planId    String   @map("plan_id") @db.Uuid
+  activatedAt DateTime? @map("activated_at")
+  deactivatedAt DateTime? @map("deactivated_at")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -23,6 +32,8 @@ model Tenant {
   patients        Patient[]
   bossBattles     BossBattle[]
   dailyTasks      DailyTask[]
+  taskTemplates   TaskTemplate[]
+  taskAssignments TaskAssignment[]
   records         ClinicalRecord[]
   rewards         Reward[]
   playerStats     PlayerStats[]
@@ -30,8 +41,45 @@ model Tenant {
   rewardClaims    RewardClaim[]
   socialPosts     SocialPost[]
   staff           Staff[]
+  plan            Plan @relation(fields: [planId], references: [id])
+  address         TenantAddress?
 
   @@map("tenants")
+  @@schema("access")
+}
+
+model Plan {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  code         String   @unique
+  description  String?
+  maxStaff     Int      @default(5) @map("max_staff")
+  maxPatients  Int      @default(100) @map("max_patients")
+  monthlyPrice Decimal  @default(0) @map("monthly_price") @db.Decimal(10, 2)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tenants Tenant[]
+
+  @@map("plans")
+  @@schema("access")
+}
+
+model TenantAddress {
+  tenantId      String  @id @map("tenant_id") @db.Uuid
+  zipCode       String  @map("zip_code")
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  country       String  @default("BR")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id])
+
+  @@map("tenant_addresses")
   @@schema("access")
 }
 
@@ -86,27 +134,89 @@ model DailyTask {
   @@schema("clinical")
 }
 
+model TaskTemplate {
+  id              String   @id @default(uuid()) @db.Uuid
+  tenantId        String   @map("tenant_id") @db.Uuid
+  title           String
+  description     String?
+  taskType        String   @map("task_type")
+  xpReward        Int      @default(50) @map("xp_reward")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdByUserId String   @map("created_by_user_id") @db.Uuid
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  assignments TaskAssignment[]
+
+  @@unique([tenantId, title, taskType])
+  @@map("task_templates")
+  @@schema("clinical")
+}
+
+model TaskAssignment {
+  id               String    @id @default(uuid()) @db.Uuid
+  tenantId         String    @map("tenant_id") @db.Uuid
+  templateId       String    @map("template_id") @db.Uuid
+  patientId        String    @map("patient_id") @db.Uuid
+  dueDate          DateTime  @map("due_date") @db.Date
+  status           String    @default("pending")
+  assignedByUserId String    @map("assigned_by_user_id") @db.Uuid
+  completedAt      DateTime? @map("completed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  tenant   Tenant       @relation(fields: [tenantId], references: [id])
+  template TaskTemplate @relation(fields: [templateId], references: [id])
+  patient  Patient      @relation(fields: [patientId], references: [id])
+
+  @@map("task_assignments")
+  @@schema("clinical")
+}
+
 model Patient {
   id        String    @id @default(uuid()) @db.Uuid
   tenantId  String    @map("tenant_id") @db.Uuid
   name      String
+  email     String?   @map("email")
+  phone     String?   @map("phone")
+  document  String?   @map("document")
   gender    Gender?
   birthDate DateTime? @map("birth_date") @db.Date
 
   // Relações Clínicas
   tenant          Tenant           @relation(fields: [tenantId], references: [id])
   clinicalRecords ClinicalRecord[]
+  address         PatientAddress?
   profile         PatientProfile? // 1:1 com o perfil de intake 
 
   // Relações de Jogo (O que estava faltando e causou o erro) [cite: 16]
-  completions  TaskCompletion[] // Corrigindo erro na linha 161 [cite: 16]
-  rewardClaims RewardClaim[] // Corrigindo erro na linha 194 [cite: 16]
-  playerStats  PlayerStats?
+  completions     TaskCompletion[] // Corrigindo erro na linha 161 [cite: 16]
+  taskAssignments TaskAssignment[]
+  rewardClaims    RewardClaim[] // Corrigindo erro na linha 194 [cite: 16]
+  playerStats     PlayerStats?
 
   // Relação Social [cite: 16]
   socialPosts SocialPost[] // Corrigindo erro na linha 230 [cite: 16]
 
   @@map("patients")
+  @@schema("clinical")
+}
+
+model PatientAddress {
+  patientId      String  @id @map("patient_id") @db.Uuid
+  zipCode        String  @map("zip_code")
+  street         String
+  number         String
+  complement     String?
+  neighborhood   String
+  city           String
+  state          String
+  country        String  @default("BR")
+
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  @@map("patient_addresses")
   @@schema("clinical")
 }
 
@@ -124,17 +234,62 @@ model PatientProfile {
 }
 
 model Staff {
-  id        String @id @default(uuid()) @db.Uuid
-  tenantId  String @map("tenant_id") @db.Uuid
-  userId    String @unique @map("user_id") @db.Uuid
-  name      String
-  document  String
-  specialty String
-  role      String @default("doctor")
+  id               String   @id @default(uuid()) @db.Uuid
+  tenantId         String   @map("tenant_id") @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  name             String
+  document         String
+  email            String?
+  phone            String?
+  professionalType String   @default("doctor") @map("professional_type")
+  specialty        String
+  role             String   @default("doctor")
+  licenseNumber    String?  @map("license_number")
+  status           String   @default("active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
+  @@unique([tenantId, userId])
+  @@unique([tenantId, document])
+  @@unique([tenantId, email])
+  @@unique([tenantId, licenseNumber])
   @@map("staff")
+  @@schema("clinical")
+}
+
+model StaffInvitation {
+  id               String   @id @default(uuid()) @db.Uuid
+  tenantId         String   @map("tenant_id") @db.Uuid
+  email            String
+  name             String
+  document         String
+  professionalType String   @map("professional_type")
+  specialty        String
+  role             String
+  licenseNumber    String?  @map("license_number")
+  invitedByUserId  String   @map("invited_by_user_id") @db.Uuid
+  token            String   @unique
+  status           String   @default("pending")
+  expiresAt        DateTime @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("staff_invitations")
+  @@schema("clinical")
+}
+
+model StaffAuditLog {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @map("tenant_id") @db.Uuid
+  actorUserId  String   @map("actor_user_id") @db.Uuid
+  targetStaffId String? @map("target_staff_id") @db.Uuid
+  action       String
+  metadata     String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("staff_audit_logs")
   @@schema("clinical")
 }
 

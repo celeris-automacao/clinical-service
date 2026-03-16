@@ -1,26 +1,21 @@
-// src/social/social.module.ts
 import { Module } from '@nestjs/common';
-import { SocialController } from './social.controller';
-import { SocialService } from './social.service';
-import { SocialListener } from './social.listener';
-import { SocialRepository } from './repositories/social.repository';
-import { PrismaModule } from '../prisma/prisma.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { CreateSocialPostUseCase } from './application/use-cases/create-social-post.use-case';
+import { GetFeedUseCase } from './application/use-cases/get-feed.use-case';
+import { SocialController } from './presentation/http/social.controller';
+import { SocialListener } from './presentation/listeners/social.listener';
+import { PrismaSocialRepository } from './infrastructure/persistence/prisma-social.repository';
+import { SOCIAL_REPOSITORY } from './social.tokens';
 
 @Module({
-  imports: [
-    PrismaModule,
-    EventEmitterModule.forRoot(),
-  ],
   controllers: [SocialController],
   providers: [
-    SocialService, 
+    GetFeedUseCase,
+    CreateSocialPostUseCase,
     SocialListener,
     {
-      provide: 'ISocialRepository',
-      useClass: SocialRepository,
+      provide: SOCIAL_REPOSITORY,
+      useClass: PrismaSocialRepository,
     },
   ],
-  exports: [SocialService, 'ISocialRepository'],
 })
 export class SocialModule {}
