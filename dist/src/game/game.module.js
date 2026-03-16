@@ -8,29 +8,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameModule = void 0;
 const common_1 = require("@nestjs/common");
-const game_controller_1 = require("./game.controller");
-const game_service_1 = require("./game.service");
-const game_repository_1 = require("./repositories/game.repository");
 const records_module_1 = require("../records/records.module");
-const prisma_module_1 = require("../prisma/prisma.module");
+const get_player_stats_use_case_1 = require("./application/use-cases/get-player-stats.use-case");
+const records_player_clinical_stats_adapter_1 = require("./infrastructure/adapters/records-player-clinical-stats.adapter");
+const game_controller_1 = require("./presentation/http/game.controller");
+const prisma_game_repository_1 = require("./infrastructure/persistence/prisma-game.repository");
+const game_tokens_1 = require("./game.tokens");
 let GameModule = class GameModule {
 };
 exports.GameModule = GameModule;
 exports.GameModule = GameModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            prisma_module_1.PrismaModule,
-            (0, common_1.forwardRef)(() => records_module_1.RecordsModule),
-        ],
+        imports: [records_module_1.RecordsModule],
         controllers: [game_controller_1.GameController],
         providers: [
-            game_service_1.GameService,
+            get_player_stats_use_case_1.GetPlayerStatsUseCase,
             {
-                provide: 'IGameRepository',
-                useClass: game_repository_1.GameRepository,
+                provide: game_tokens_1.GAME_REPOSITORY,
+                useClass: prisma_game_repository_1.PrismaGameRepository,
+            },
+            {
+                provide: game_tokens_1.PLAYER_CLINICAL_STATS_PORT,
+                useClass: records_player_clinical_stats_adapter_1.RecordsPlayerClinicalStatsAdapter,
             },
         ],
-        exports: [game_service_1.GameService, 'IGameRepository'],
     })
 ], GameModule);
 //# sourceMappingURL=game.module.js.map

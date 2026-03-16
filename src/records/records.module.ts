@@ -1,25 +1,48 @@
-// src/records/records.module.ts
-import { Module, forwardRef } from '@nestjs/common';
-import { RecordsController } from './records.controller';
-import { RecordsRepository } from './repositories/records.repository';  
-import { RecordsService } from './records.service';
-import { GameModule } from '../game/game.module';
-import { AchievementsModule } from '../achievements/achievements.module'; // <--- IMPORTAÇÃO DO MÓDULO DE CONQUISTAS
+import { Module } from '@nestjs/common';
+import { AchievementsModule } from '../achievements/achievements.module';
+import { CreateClinicalRecordUseCase } from './application/use-cases/create-clinical-record.use-case';
+import { GetPatientEvolutionUseCase } from './application/use-cases/get-patient-evolution.use-case';
+import { GetPatientStatsUseCase } from './application/use-cases/get-patient-stats.use-case';
+import { HandleBossVictoryUseCase } from './application/use-cases/handle-boss-victory.use-case';
+import { ClinicalProgressCalculator } from './domain/services/clinical-progress-calculator';
+import { RecordsAchievementsAdapter } from './infrastructure/adapters/records-achievements.adapter';
+import { PrismaBossBattleAdapter } from './infrastructure/persistence/prisma-boss-battle.adapter';
+import { PrismaPlayerProgressionAdapter } from './infrastructure/persistence/prisma-player-progression.adapter';
+import { RecordsController } from './presentation/http/records.controller';
+import { PrismaRecordsRepository } from './infrastructure/persistence/prisma-records.repository';
+import {
+  BOSS_BATTLE_PORT,
+  PLAYER_PROGRESSION_PORT,
+  RECORDS_ACHIEVEMENTS_PORT,
+  RECORDS_REPOSITORY,
+} from './records.tokens';
 
 @Module({
-  imports: [
-    forwardRef(() => GameModule),
-    forwardRef(() => AchievementsModule), // <--- ADICIONE ESTA LINHA
-  ],
+  imports: [AchievementsModule],
   controllers: [RecordsController],
   providers: [
-    RecordsService, 
+    CreateClinicalRecordUseCase,
+    HandleBossVictoryUseCase,
+    GetPatientStatsUseCase,
+    GetPatientEvolutionUseCase,
+    ClinicalProgressCalculator,
     {
-      /** Token de Injeção para desacoplamento */
-      provide: 'IRecordsRepository',
-      useClass: RecordsRepository,
+      provide: RECORDS_REPOSITORY,
+      useClass: PrismaRecordsRepository,
+    },
+    {
+      provide: PLAYER_PROGRESSION_PORT,
+      useClass: PrismaPlayerProgressionAdapter,
+    },
+    {
+      provide: BOSS_BATTLE_PORT,
+      useClass: PrismaBossBattleAdapter,
+    },
+    {
+      provide: RECORDS_ACHIEVEMENTS_PORT,
+      useClass: RecordsAchievementsAdapter,
     },
   ],
-  exports: [RecordsService, 'IRecordsRepository'], // Exportando o token
+  exports: [HandleBossVictoryUseCase, GetPatientStatsUseCase, RECORDS_REPOSITORY],
 })
 export class RecordsModule {}

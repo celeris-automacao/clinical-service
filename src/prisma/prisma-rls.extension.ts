@@ -1,14 +1,24 @@
-// src/prisma/prisma-rls.extension.ts
 import { PrismaClient } from '@prisma/client';
+
+type RlsCapableClient = {
+  $executeRaw: PrismaClient['$executeRaw'];
+};
+
+export const applyTenantRlsContext = async (
+  client: RlsCapableClient,
+  userId: string,
+  tenantId: string,
+) => {
+  await client.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
+  await client.$executeRaw`SELECT set_config('app.current_tenant_id', ${tenantId}, true)`;
+};
 
 export const getSecurePrisma = (client: PrismaClient, userId: string, tenantId: string) => {
   return client.$extends({
     query: {
       $allModels: {
         async $allOperations({ args, query }) {
-          // Injeta as variáveis de sessão para ativar as POLICIES do SQL [cite: 63, 333, 353]
-          await client.$executeRawUnsafe(`SET LOCAL "app.current_user_id" = '${userId}';`);
-          await client.$executeRawUnsafe(`SET LOCAL "app.current_tenant_id" = '${tenantId}';`);
+          await applyTenantRlsContext(client, userId, tenantId);
           return query(args);
         },
       },

@@ -1,21 +1,30 @@
-// src/achievements/achievements.module.ts
 import { Module } from '@nestjs/common';
-import { AchievementsService } from './achievements.service';
-import { AchievementsRepository } from './repositories/achievements.repository';
-import { forwardRef } from '@nestjs/common';
-import { RecordsModule } from '../records/records.module'; // <--- IMPORTAÇÃO DO MÓDULO DE REGISTROS
+import { CheckLevelAchievementsUseCase } from './application/use-cases/check-level-achievements.use-case';
+import { EmitBossDefeatedUseCase } from './application/use-cases/emit-boss-defeated.use-case';
+import { EmitGlobalVictoryUseCase } from './application/use-cases/emit-global-victory.use-case';
+import { ACHIEVEMENTS_EVENTS_PORT, ACHIEVEMENTS_REPOSITORY } from './achievements.tokens';
+import { AchievementsEventsAdapter } from './infrastructure/adapters/achievements-events.adapter';
+import { PrismaAchievementsRepository } from './infrastructure/persistence/prisma-achievements.repository';
 
 @Module({
-  imports: [
-    forwardRef(() => RecordsModule), // <--- ADICIONE PARA RECIPROCIDADE
-  ],
   providers: [
-    AchievementsService,
+    CheckLevelAchievementsUseCase,
+    EmitBossDefeatedUseCase,
+    EmitGlobalVictoryUseCase,
     {
-      provide: 'IAchievementsRepository',
-      useClass: AchievementsRepository,
+      provide: ACHIEVEMENTS_REPOSITORY,
+      useClass: PrismaAchievementsRepository,
+    },
+    {
+      provide: ACHIEVEMENTS_EVENTS_PORT,
+      useClass: AchievementsEventsAdapter,
     },
   ],
-  exports: [AchievementsService, 'IAchievementsRepository'],
+  exports: [
+    CheckLevelAchievementsUseCase,
+    EmitBossDefeatedUseCase,
+    EmitGlobalVictoryUseCase,
+    ACHIEVEMENTS_REPOSITORY,
+  ],
 })
 export class AchievementsModule {}

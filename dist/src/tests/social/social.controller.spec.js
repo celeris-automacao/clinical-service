@@ -1,25 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const social_controller_1 = require("../../social/social.controller");
-const social_service_1 = require("../../social/social.service");
 const supabase_guard_1 = require("../../auth/guards/supabase.guard");
+const social_controller_1 = require("../../social/presentation/http/social.controller");
+const get_feed_use_case_1 = require("../../social/application/use-cases/get-feed.use-case");
 describe('SocialController', () => {
     let controller;
-    let service;
+    let getFeedUseCase;
     const mockUser = {
         userId: 'user-123',
         tenantId: 'tenant-456',
-        role: 'patient'
+        role: 'patient',
     };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             controllers: [social_controller_1.SocialController],
             providers: [
                 {
-                    provide: social_service_1.SocialService,
+                    provide: get_feed_use_case_1.GetFeedUseCase,
                     useValue: {
-                        getFeed: jest.fn().mockResolvedValue([{ id: '1', content: 'Post épico!' }]),
+                        execute: jest.fn().mockResolvedValue([{ id: '1', content: 'Post épico!' }]),
                     },
                 },
             ],
@@ -28,15 +28,13 @@ describe('SocialController', () => {
             .useValue({ canActivate: () => true })
             .compile();
         controller = module.get(social_controller_1.SocialController);
-        service = module.get(social_service_1.SocialService);
+        getFeedUseCase = module.get(get_feed_use_case_1.GetFeedUseCase);
     });
-    describe('getFeed', () => {
-        it('deve chamar o service.getFeed com o tenantId do usuário logado', async () => {
-            const result = await controller.getFeed(mockUser);
-            expect(service.getFeed).toHaveBeenCalledWith(mockUser.tenantId);
-            expect(result).toHaveLength(1);
-            expect(result[0].content).toBe('Post épico!');
-        });
+    it('deve chamar o use case com o tenantId do usuário logado', async () => {
+        const result = await controller.getFeed(mockUser);
+        expect(getFeedUseCase.execute).toHaveBeenCalledWith(mockUser.tenantId);
+        expect(result).toHaveLength(1);
+        expect(result[0].content).toBe('Post épico!');
     });
 });
 //# sourceMappingURL=social.controller.spec.js.map

@@ -1,0 +1,2 @@
+export const STAFF_REPOSITORY = Symbol('STAFF_REPOSITORY');
+export const STAFF_AUDIT_LOG_PORT = Symbol('STAFF_AUDIT_LOG_PORT');

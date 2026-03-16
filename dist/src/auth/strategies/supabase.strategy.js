@@ -8,31 +8,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SupabaseStrategy = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_jwt_1 = require("passport-jwt");
+const map_supabase_user_use_case_1 = require("../application/use-cases/map-supabase-user.use-case");
+const auth_tokens_1 = require("../auth.tokens");
 let SupabaseStrategy = class SupabaseStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'supabase') {
-    constructor() {
+    constructor(authConfigPort, mapSupabaseUserUseCase) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: process.env.SUPABASE_JWT_SECRET,
+            secretOrKey: authConfigPort.getSupabaseJwtSecret(),
         });
+        this.mapSupabaseUserUseCase = mapSupabaseUserUseCase;
     }
     async validate(payload) {
-        return {
-            userId: payload.sub,
-            tenantId: payload.user_metadata?.tenant_id,
-            role: payload.user_metadata?.role || 'patient',
-            email: payload.email,
-        };
+        return this.mapSupabaseUserUseCase.execute(payload);
     }
 };
 exports.SupabaseStrategy = SupabaseStrategy;
 exports.SupabaseStrategy = SupabaseStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __param(0, (0, common_1.Inject)(auth_tokens_1.AUTH_CONFIG_PORT)),
+    __metadata("design:paramtypes", [Object, map_supabase_user_use_case_1.MapSupabaseUserUseCase])
 ], SupabaseStrategy);
 //# sourceMappingURL=supabase.strategy.js.map

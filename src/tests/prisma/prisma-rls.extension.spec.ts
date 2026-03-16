@@ -1,48 +1,25 @@
 import { PrismaClient } from '@prisma/client';
 import { getSecurePrisma } from '../../prisma/prisma-rls.extension';
 
-describe('Prisma RLS Extension', () => {
-  let mockClient: any;
+describe('getSecurePrisma', () => {
+  it('deve injetar app.current_user_id e app.current_tenant_id com bind seguro', async () => {
+    const query = jest.fn().mockResolvedValue({ ok: true });
+    const mockClient = {
+      $executeRaw: jest.fn().mockResolvedValue(undefined),
+      $extends: jest.fn().mockImplementation((extension) => extension),
+    } as unknown as PrismaClient;
 
-  beforeEach(() => {
-    // Mockamos o cliente Prisma de forma que ele capture a lógica da extensão
-    mockClient = {
-      $extends: jest.fn().mockImplementation((ext) => {
-        // Simulamos o comportamento do interceptor para fins de teste
-        return {
-          query: ext.query,
-          // Criamos um método simulado (ex: findMany) que dispara o interceptor
-          $executeOperation: async (args: any) => {
-            return ext.query.$allModels.$allOperations({
-              args,
-              query: (queryArgs: any) => Promise.resolve([{ id: 1, data: 'secure' }])
-            });
-          }
-        };
-      }),
-      $executeRawUnsafe: jest.fn().mockResolvedValue({}),
-    };
-  });
-
-  it('deve injetar "app.current_user_id" e "app.current_tenant_id" no banco (Linhas 10-11)', async () => {
-    const userId = 'user-001';
+    const userId = 'user-123';
     const tenantId = 'tenant-999';
 
-    // Inicializa a extensão
-    const extendedClient = getSecurePrisma(mockClient, userId, tenantId);
+    const extendedClient = getSecurePrisma(mockClient, userId, tenantId) as any;
 
-    // Disparamos uma operação simulada que aciona o interceptor
-    const result = await (extendedClient as any).$executeOperation({});
+    await extendedClient.query.$allModels.$allOperations({
+      args: { where: { id: '1' } },
+      query,
+    });
 
-    // VERIFICAÇÃO CRÍTICA: As linhas 10 e 11 da imagem_9038e0.png foram chamadas?
-    expect(mockClient.$executeRawUnsafe).toHaveBeenCalledWith(
-      `SET LOCAL "app.current_user_id" = '${userId}';`
-    );
-    expect(mockClient.$executeRawUnsafe).toHaveBeenCalledWith(
-      `SET LOCAL "app.current_tenant_id" = '${tenantId}';`
-    );
-
-    // Garante que a query original (linha 12) retornou o resultado esperado
-    expect(result).toEqual([{ id: 1, data: 'secure' }]);
+    expect(mockClient.$executeRaw).toHaveBeenCalledTimes(2);
+    expect(query).toHaveBeenCalledWith({ where: { id: '1' } });
   });
 });
