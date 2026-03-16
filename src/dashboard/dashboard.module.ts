@@ -1,25 +1,28 @@
-// src/dashboard/dashboard.module.ts
 import { Module } from '@nestjs/common';
-import { DashboardService } from './dashboard.service';
-import { DashboardController } from './dashboard.controller';
-import { DashboardRepository } from './repositories/dashboard.repository';
-import { NotificationsService } from './notifications.service';
-import { NotificationsRepository } from './repositories/notifications.repository';
+import { PrismaDashboardRepository } from './infrastructure/persistence/prisma-dashboard.repository';
+import { PrismaNotificationsRepository } from './infrastructure/persistence/prisma-notifications.repository';
+import { GetClinicOverviewUseCase } from './application/use-cases/get-clinic-overview.use-case';
+import { GetMissingPatientsUseCase } from './application/use-cases/get-missing-patients.use-case';
+import { GetRecentClaimsUseCase } from './application/use-cases/get-recent-claims.use-case';
+import { DashboardController } from './presentation/http/dashboard.controller';
+import { NotificationsService } from './presentation/listeners/notifications.service';
+import { DASHBOARD_REPOSITORY, NOTIFICATIONS_REPOSITORY } from './dashboard.tokens';
 
 @Module({
   controllers: [DashboardController],
   providers: [
-    DashboardService,
+    GetClinicOverviewUseCase,
+    GetMissingPatientsUseCase,
+    GetRecentClaimsUseCase,
     NotificationsService,
     {
-      provide: 'IDashboardRepository', // Token de Injeção
-      useClass: DashboardRepository,
+      provide: DASHBOARD_REPOSITORY,
+      useClass: PrismaDashboardRepository,
     },
     {
-      provide: 'INotificationsRepository',
-      useClass: NotificationsRepository,
+      provide: NOTIFICATIONS_REPOSITORY,
+      useClass: PrismaNotificationsRepository,
     },
   ],
-  exports: [DashboardService, 'IDashboardRepository', NotificationsService, 'INotificationsRepository'], // Exportamos os serviços e repositórios para uso em outros módulos
 })
 export class DashboardModule {}

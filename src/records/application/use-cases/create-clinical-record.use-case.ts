@@ -1,0 +1,89 @@
+import { Inject, Injectable } from '@nestjs/common';
+import { UserContext } from '../../../shared/auth/user-context';
+import { ClinicalProgressCalculator } from '../../domain/services/clinical-progress-calculator';
+import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
+import {
+  BOSS_BATTLE_PORT,
+  PLAYER_PROGRESSION_PORT,
+  RECORDS_ACHIEVEMENTS_PORT,
+  RECORDS_REPOSITORY,
+} from '../../records.tokens';
+import { BossBattlePort } from '../ports/boss-battle.port';
+import { PlayerProgressionPort } from '../ports/player-progression.port';
+import { RecordsAchievementsPort } from '../ports/records-achievements.port';
+import { RecordsRepositoryPort } from '../ports/records-repository.port';
+import { HandleBossVictoryUseCase } from './handle-boss-victory.use-case';
+
+@Injectable()
+export class CreateClinicalRecordUseCase {
+  constructor(
+    @Inject(RECORDS_REPOSITORY)
+    private readonly repository: RecordsRepositoryPort,
+    @Inject(PLAYER_PROGRESSION_PORT)
+    private readonly playerProgressionPort: PlayerProgressionPort,
+    @Inject(BOSS_BATTLE_PORT)
+    private readonly bossBattlePort: BossBattlePort,
+    @Inject(RECORDS_ACHIEVEMENTS_PORT)
+    private readonly recordsAchievementsPort: RecordsAchievementsPort,
+    private readonly clinicalProgressCalculator: ClinicalProgressCalculator,
+    private readonly handleBossVictoryUseCase: HandleBossVictoryUseCase,
+  ) {}
+
+  async execute(dto: CreateRecordDto, user: UserContext) {
+    const newRecord = await this.repository.create(dto, user.userId, user.tenantId);
+    const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId);
+
+    await this.playerProgressionPort.upsertClinicalProgress({
+      patientId: user.userId,
+      tenantId: user.tenantId,
+      damageDealt,
+    });
+
+    const history = await this.repository.findAllByPatient(user.userId, user.tenantId);
+    const stats = this.clinicalProgressCalculator.calculateStats(history);
+
+    await this.recordsAchievementsPort.checkLevelAchievements({
+      patientId: user.userId,
+      tenantId: user.tenantId,
+      newLevel: stats.currentLevel,
+    });
+
+    return {
+      ...newRecord,
+      damage: damageDealt,
+      message:
+        damageDealt > 0
+          ? `ATAQUE CRITICO! Voce causou ${damageDealt.toLocaleString()} de dano no Boss!`
+          : 'Registro salvo. Continue focado na sua evolucao!',
+    };
+  }
+
+  async handleBossVictory(bossId: string, tenantId: string, killerId: string) {
+    return this.handleBossVictoryUseCase.execute(bossId, tenantId, killerId);
+  }
+
+  private async calculateAndApplyDamage(userId: string, tenantId: string): Promise<number> {
+    const records = await this.repository.findLastTwo(userId, tenantId);
+    const totalDamage = this.clinicalProgressCalculator.calculateDamageFromLatestRecords(records);
+
+    if (totalDamage <= 0) {
+      return 0;
+    }
+
+    const boss = await this.bossBattlePort.findActiveBoss(tenantId);
+
+    if (!boss) {
+      return totalDamage;
+    }
+
+    const newHp = boss.currentHp - totalDamage;
+
+    if (newHp <= 0) {
+      await this.handleBossVictoryUseCase.execute(boss.id, tenantId, userId);
+    } else {
+      await this.bossBattlePort.applyDamage(boss.id, newHp, tenantId);
+    }
+
+    return totalDamage;
+  }
+}

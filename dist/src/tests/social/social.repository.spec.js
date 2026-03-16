@@ -1,63 +1,65 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const social_repository_1 = require("../../social/repositories/social.repository");
-const prisma_service_1 = require("../../prisma/prisma.service");
-describe('SocialRepository', () => {
+const prisma_social_repository_1 = require("../../social/infrastructure/persistence/prisma-social.repository");
+const tenant_scoped_prisma_factory_1 = require("../../shared/infrastructure/persistence/tenant-scoped-prisma.factory");
+describe('PrismaSocialRepository', () => {
     let repository;
-    let prisma;
+    let tenantScopedPrismaFactory;
+    const tenantPrisma = {
+        socialPost: {
+            findMany: jest.fn(),
+            create: jest.fn(),
+        },
+    };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             providers: [
-                social_repository_1.SocialRepository,
+                prisma_social_repository_1.PrismaSocialRepository,
                 {
-                    provide: prisma_service_1.PrismaService,
+                    provide: tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory,
                     useValue: {
-                        socialPost: {
-                            findMany: jest.fn(),
-                            create: jest.fn(),
-                        },
+                        forTenant: jest.fn().mockReturnValue(tenantPrisma),
+                        forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
                     },
                 },
             ],
         }).compile();
-        repository = module.get(social_repository_1.SocialRepository);
-        prisma = module.get(prisma_service_1.PrismaService);
+        repository = module.get(prisma_social_repository_1.PrismaSocialRepository);
+        tenantScopedPrismaFactory = module.get(tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory);
     });
-    describe('findFeedByTenant', () => {
-        it('deve chamar prisma.socialPost.findMany com os filtros e ordenação corretos', async () => {
-            const tenantId = 'tenant-123';
-            const limit = 10;
-            await repository.findFeedByTenant(tenantId, limit);
-            expect(prisma.socialPost.findMany).toHaveBeenCalledWith({
-                where: { tenantId },
-                include: {
-                    patient: { select: { name: true } }
-                },
-                orderBy: { createdAt: 'desc' },
-                take: limit,
-            });
-        });
-        it('deve usar o limite padrão de 20 postagens se o parâmetro for omitido', async () => {
-            const tenantId = 'tenant-123';
-            await repository.findFeedByTenant(tenantId);
-            expect(prisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
-                take: 20,
-            }));
+    it('deve chamar socialPost.findMany com tenant scope e ordenacao correta', async () => {
+        await repository.findFeedByTenant('tenant-123', 10);
+        expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-123');
+        expect(tenantPrisma.socialPost.findMany).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-123' },
+            include: {
+                patient: { select: { name: true } },
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 10,
         });
     });
-    describe('createPost', () => {
-        it('deve chamar prisma.socialPost.create com os dados mapeados corretamente', async () => {
-            const postData = {
-                patientId: 'u1',
-                tenantId: 't1',
-                content: 'Novo Recorde Alcançado!',
-                type: 'achievement'
-            };
-            await repository.createPost(postData);
-            expect(prisma.socialPost.create).toHaveBeenCalledWith({
-                data: postData,
-            });
+    it('deve usar o limite padrao de 20 se omitido', async () => {
+        await repository.findFeedByTenant('tenant-123');
+        expect(tenantPrisma.socialPost.findMany).toHaveBeenCalledWith(expect.objectContaining({
+            take: 20,
+        }));
+    });
+    it('deve criar post com tenant-scoped prisma', async () => {
+        const postData = {
+            patientId: 'u1',
+            tenantId: 't1',
+            content: 'Novo Recorde Alcancado!',
+            type: 'achievement',
+        };
+        await repository.createPost(postData);
+        expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+            userId: 'u1',
+            tenantId: 't1',
+        });
+        expect(tenantPrisma.socialPost.create).toHaveBeenCalledWith({
+            data: postData,
         });
     });
 });

@@ -8,26 +8,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AchievementsModule = void 0;
 const common_1 = require("@nestjs/common");
-const achievements_service_1 = require("./achievements.service");
-const achievements_repository_1 = require("./repositories/achievements.repository");
-const common_2 = require("@nestjs/common");
-const records_module_1 = require("../records/records.module");
+const check_level_achievements_use_case_1 = require("./application/use-cases/check-level-achievements.use-case");
+const emit_boss_defeated_use_case_1 = require("./application/use-cases/emit-boss-defeated.use-case");
+const emit_global_victory_use_case_1 = require("./application/use-cases/emit-global-victory.use-case");
+const achievements_tokens_1 = require("./achievements.tokens");
+const achievements_events_adapter_1 = require("./infrastructure/adapters/achievements-events.adapter");
+const prisma_achievements_repository_1 = require("./infrastructure/persistence/prisma-achievements.repository");
 let AchievementsModule = class AchievementsModule {
 };
 exports.AchievementsModule = AchievementsModule;
 exports.AchievementsModule = AchievementsModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            (0, common_2.forwardRef)(() => records_module_1.RecordsModule),
-        ],
         providers: [
-            achievements_service_1.AchievementsService,
+            check_level_achievements_use_case_1.CheckLevelAchievementsUseCase,
+            emit_boss_defeated_use_case_1.EmitBossDefeatedUseCase,
+            emit_global_victory_use_case_1.EmitGlobalVictoryUseCase,
             {
-                provide: 'IAchievementsRepository',
-                useClass: achievements_repository_1.AchievementsRepository,
+                provide: achievements_tokens_1.ACHIEVEMENTS_REPOSITORY,
+                useClass: prisma_achievements_repository_1.PrismaAchievementsRepository,
+            },
+            {
+                provide: achievements_tokens_1.ACHIEVEMENTS_EVENTS_PORT,
+                useClass: achievements_events_adapter_1.AchievementsEventsAdapter,
             },
         ],
-        exports: [achievements_service_1.AchievementsService, 'IAchievementsRepository'],
+        exports: [
+            check_level_achievements_use_case_1.CheckLevelAchievementsUseCase,
+            emit_boss_defeated_use_case_1.EmitBossDefeatedUseCase,
+            emit_global_victory_use_case_1.EmitGlobalVictoryUseCase,
+            achievements_tokens_1.ACHIEVEMENTS_REPOSITORY,
+        ],
     })
 ], AchievementsModule);
 //# sourceMappingURL=achievements.module.js.map

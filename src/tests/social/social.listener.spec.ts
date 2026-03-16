@@ -1,59 +1,64 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SocialListener } from '../../social/social.listener';
-import { SocialService } from '../../social/social.service';
+import {
+  APPLICATION_EVENTS,
+  createApplicationEvent,
+} from '../../shared/application/events/application-events';
+import { CreateSocialPostUseCase } from '../../social/application/use-cases/create-social-post.use-case';
+import { SocialListener } from '../../social/presentation/listeners/social.listener';
 
 describe('SocialListener', () => {
   let listener: SocialListener;
-  let socialService: SocialService;
+  let createSocialPostUseCase: CreateSocialPostUseCase;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SocialListener,
         {
-          provide: SocialService,
+          provide: CreateSocialPostUseCase,
           useValue: {
-            createPost: jest.fn(),
+            execute: jest.fn(),
           },
         },
       ],
     }).compile();
 
     listener = module.get<SocialListener>(SocialListener);
-    socialService = module.get<SocialService>(SocialService);
+    createSocialPostUseCase = module.get<CreateSocialPostUseCase>(CreateSocialPostUseCase);
   });
 
-  it('deve criar um post automático quando um Boss for derrotado', async () => {
-    const payload = {
-      killerId: 'u1',
-      tenantId: 't1',
-      bossName: 'Dragão de Açúcar'
-    };
-
-    await listener.handleBossDefeated(payload);
-
-    expect(socialService.createPost).toHaveBeenCalledWith(
-      'u1',
-      't1',
-      expect.stringContaining('Dragão de Açúcar'),
-      'boss_defeat'
+  it('deve criar um post automatico quando um boss for derrotado', async () => {
+    await listener.handleBossDefeated(
+      createApplicationEvent(APPLICATION_EVENTS.bossDefeated, {
+        killerId: 'u1',
+        tenantId: 't1',
+        bossId: 'boss-1',
+        bossName: 'Dragao de Acucar',
+      }),
     );
+
+    expect(createSocialPostUseCase.execute).toHaveBeenCalledWith({
+      patientId: 'u1',
+      tenantId: 't1',
+      content: expect.stringContaining('Dragao de Acucar'),
+      type: 'boss_defeat',
+    });
   });
 
-  it('deve criar um post automático quando uma conquista for desbloqueada', async () => {
-    const payload = {
+  it('deve criar um post automatico quando uma conquista for desbloqueada', async () => {
+    await listener.handleAchievement(
+      createApplicationEvent(APPLICATION_EVENTS.achievementUnlocked, {
+        patientId: 'u2',
+        tenantId: 't1',
+        achievement: 'Maratonista',
+      }),
+    );
+
+    expect(createSocialPostUseCase.execute).toHaveBeenCalledWith({
       patientId: 'u2',
       tenantId: 't1',
-      achievement: 'Maratonista'
-    };
-
-    await listener.handleAchievement(payload);
-
-    expect(socialService.createPost).toHaveBeenCalledWith(
-      'u2',
-      't1',
-      expect.stringContaining('Maratonista'),
-      'achievement'
-    );
+      content: expect.stringContaining('Maratonista'),
+      type: 'achievement',
+    });
   });
 });

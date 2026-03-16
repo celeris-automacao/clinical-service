@@ -1,25 +1,25 @@
-// src/auth/strategies/supabase.strategy.ts
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { MapSupabaseUserUseCase } from '../application/use-cases/map-supabase-user.use-case';
+import { AuthConfigPort } from '../application/ports/auth-config.port';
+import { AUTH_CONFIG_PORT } from '../auth.tokens';
 
 @Injectable()
 export class SupabaseStrategy extends PassportStrategy(Strategy, 'supabase') {
-  constructor() {
+  constructor(
+    @Inject(AUTH_CONFIG_PORT)
+    authConfigPort: AuthConfigPort,
+    private readonly mapSupabaseUserUseCase: MapSupabaseUserUseCase,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.SUPABASE_JWT_SECRET, // Sua CURRENT KEY do .env
+      secretOrKey: authConfigPort.getSupabaseJwtSecret(),
     });
   }
 
   async validate(payload: any) {
-    // O payload contém os dados que o Supabase inseriu no JWT
-    return {
-      userId: payload.sub,
-      tenantId: payload.user_metadata?.tenant_id, // Vinculado à clínica [cite: 40]
-      role: payload.user_metadata?.role || 'patient', // Role definida no SQL [cite: 205]
-      email: payload.email,
-    };
+    return this.mapSupabaseUserUseCase.execute(payload);
   }
 }

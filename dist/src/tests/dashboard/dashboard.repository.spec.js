@@ -1,94 +1,97 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const dashboard_repository_1 = require("../../dashboard/repositories/dashboard.repository");
-const prisma_service_1 = require("../../prisma/prisma.service");
-describe('DashboardRepository', () => {
+const prisma_dashboard_repository_1 = require("../../dashboard/infrastructure/persistence/prisma-dashboard.repository");
+const tenant_scoped_prisma_factory_1 = require("../../shared/infrastructure/persistence/tenant-scoped-prisma.factory");
+describe('PrismaDashboardRepository', () => {
     let repository;
-    let prisma;
+    let tenantScopedPrismaFactory;
+    const prisma = {
+        playerStats: {
+            count: jest.fn(),
+            findMany: jest.fn(),
+        },
+        socialPost: {
+            findMany: jest.fn(),
+        },
+        rewardClaim: {
+            findMany: jest.fn(),
+        },
+        taskCompletion: {
+            findMany: jest.fn(),
+        },
+    };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             providers: [
-                dashboard_repository_1.DashboardRepository,
+                prisma_dashboard_repository_1.PrismaDashboardRepository,
                 {
-                    provide: prisma_service_1.PrismaService,
+                    provide: tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory,
                     useValue: {
-                        playerStats: {
-                            count: jest.fn(),
-                            findMany: jest.fn(),
-                        },
-                        socialPost: {
-                            findMany: jest.fn(),
-                        },
-                        taskCompletion: {
-                            findMany: jest.fn(),
-                        },
+                        forTenant: jest.fn().mockReturnValue(prisma),
                     },
                 },
             ],
         }).compile();
-        repository = module.get(dashboard_repository_1.DashboardRepository);
-        prisma = module.get(prisma_service_1.PrismaService);
+        repository = module.get(prisma_dashboard_repository_1.PrismaDashboardRepository);
+        tenantScopedPrismaFactory = module.get(tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory);
     });
-    describe('countActivePlayers', () => {
-        it('deve chamar prisma.playerStats.count com os filtros de tenant e data de atividade', async () => {
-            const tenantId = 'tenant-abc';
-            const since = new Date('2026-01-01');
-            await repository.countActivePlayers(tenantId, since);
-            expect(prisma.playerStats.count).toHaveBeenCalledWith({
-                where: {
-                    tenantId,
-                    lastActivityAt: { gte: since },
-                },
-            });
+    it('deve contar jogadores ativos com tenant scope', async () => {
+        const since = new Date('2026-01-01');
+        await repository.countActivePlayers('tenant-abc', since);
+        expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-abc');
+        expect(prisma.playerStats.count).toHaveBeenCalledWith({
+            where: {
+                tenantId: 'tenant-abc',
+                lastActivityAt: { gte: since },
+            },
         });
     });
-    describe('findRecentAchievements', () => {
-        it('deve buscar posts do tipo achievement com ordenação decrescente', async () => {
-            const tenantId = 'tenant-abc';
-            const limit = 5;
-            await repository.findRecentAchievements(tenantId, limit);
-            expect(prisma.socialPost.findMany).toHaveBeenCalledWith({
-                where: {
-                    tenantId,
-                    type: 'achievement',
-                },
-                orderBy: { createdAt: 'desc' },
-                take: limit,
-                include: {
-                    patient: { select: { name: true } },
-                },
-            });
+    it('deve buscar achievements recentes com tenant scope', async () => {
+        await repository.findRecentAchievements('tenant-abc', 5);
+        expect(prisma.socialPost.findMany).toHaveBeenCalledWith({
+            where: {
+                tenantId: 'tenant-abc',
+                type: 'achievement',
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            include: {
+                patient: { select: { name: true } },
+            },
         });
     });
-    describe('findTopPlayers', () => {
-        it('deve chamar o ranking de dano total incluindo o nome do paciente', async () => {
-            const tenantId = 'tenant-abc';
-            await repository.findTopPlayers(tenantId, 3);
-            expect(prisma.playerStats.findMany).toHaveBeenCalledWith({
-                where: { tenantId },
-                orderBy: { totalDamageDealt: 'desc' },
-                take: 3,
-                include: {
-                    patient: { select: { name: true } },
-                },
-            });
+    it('deve buscar top players com tenant scope', async () => {
+        await repository.findTopPlayers('tenant-abc', 3);
+        expect(prisma.playerStats.findMany).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-abc' },
+            orderBy: { totalDamageDealt: 'desc' },
+            take: 3,
+            include: {
+                patient: { select: { name: true } },
+            },
         });
     });
-    describe('getTaskCompletionsHistory', () => {
-        it('deve buscar o histórico de conclusões para o cálculo de retenção', async () => {
-            const tenantId = 'tenant-abc';
-            await repository.getTaskCompletionsHistory(tenantId);
-            expect(prisma.taskCompletion.findMany).toHaveBeenCalledWith({
-                where: { tenantId },
-                select: {
-                    patientId: true,
-                    completedAt: true,
-                },
-                orderBy: {
-                    completedAt: 'desc',
-                },
-            });
+    it('deve buscar historico de task completions com tenant scope', async () => {
+        await repository.getTaskCompletionsHistory('tenant-abc');
+        expect(prisma.taskCompletion.findMany).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-abc' },
+            select: {
+                patientId: true,
+                completedAt: true,
+            },
+            orderBy: {
+                completedAt: 'desc',
+            },
+        });
+    });
+    it('deve buscar recent claims com tenant scope', async () => {
+        await repository.findRecentClaims('tenant-abc', 10);
+        expect(prisma.rewardClaim.findMany).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-abc' },
+            include: { reward: true },
+            orderBy: { claimedAt: 'desc' },
+            take: 10,
         });
     });
 });

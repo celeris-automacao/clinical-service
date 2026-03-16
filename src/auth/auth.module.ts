@@ -1,12 +1,21 @@
-// src/auth/auth.module.ts
-import { Module, Global } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { StaffModule } from '../staff/staff.module';
+import { MapSupabaseUserUseCase } from './application/use-cases/map-supabase-user.use-case';
+import { AUTH_CONFIG_PORT } from './auth.tokens';
+import { EnvAuthConfigAdapter } from './infrastructure/adapters/env-auth-config.adapter';
 import { SupabaseStrategy } from './strategies/supabase.strategy';
 
-@Global() // Torna o módulo disponível para Records, Game e Social sem precisar reimportar [cite: 28]
+@Global()
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: 'supabase' })],
-  providers: [SupabaseStrategy],
-  exports: [PassportModule, SupabaseStrategy],
+  imports: [PassportModule.register({ defaultStrategy: 'supabase' }), StaffModule],
+  providers: [
+    MapSupabaseUserUseCase,
+    {
+      provide: AUTH_CONFIG_PORT,
+      useClass: EnvAuthConfigAdapter,
+    },
+    SupabaseStrategy,
+  ],
 })
 export class AuthModule {}

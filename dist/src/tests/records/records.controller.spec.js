@@ -1,12 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const records_controller_1 = require("../../records/records.controller");
-const records_service_1 = require("../../records/records.service");
 const supabase_guard_1 = require("../../auth/guards/supabase.guard");
+const create_clinical_record_use_case_1 = require("../../records/application/use-cases/create-clinical-record.use-case");
+const get_patient_evolution_use_case_1 = require("../../records/application/use-cases/get-patient-evolution.use-case");
+const get_patient_stats_use_case_1 = require("../../records/application/use-cases/get-patient-stats.use-case");
+const records_controller_1 = require("../../records/presentation/http/records.controller");
 describe('RecordsController', () => {
     let controller;
-    let service;
+    let createClinicalRecordUseCase;
+    let getPatientEvolutionUseCase;
+    let getPatientStatsUseCase;
     const mockUser = {
         userId: 'user-uuid',
         tenantId: 'tenant-uuid',
@@ -17,11 +21,21 @@ describe('RecordsController', () => {
             controllers: [records_controller_1.RecordsController],
             providers: [
                 {
-                    provide: records_service_1.RecordsService,
+                    provide: create_clinical_record_use_case_1.CreateClinicalRecordUseCase,
                     useValue: {
-                        createRecord: jest.fn().mockResolvedValue({ id: '1', weight: 80 }),
-                        getEvolution: jest.fn().mockResolvedValue([]),
-                        getStats: jest.fn().mockResolvedValue({ totalDamage: 0 }),
+                        execute: jest.fn().mockResolvedValue({ id: '1', weight: 80 }),
+                    },
+                },
+                {
+                    provide: get_patient_evolution_use_case_1.GetPatientEvolutionUseCase,
+                    useValue: {
+                        execute: jest.fn().mockResolvedValue([]),
+                    },
+                },
+                {
+                    provide: get_patient_stats_use_case_1.GetPatientStatsUseCase,
+                    useValue: {
+                        execute: jest.fn().mockResolvedValue({ totalDamage: 0 }),
                     },
                 },
             ],
@@ -30,17 +44,23 @@ describe('RecordsController', () => {
             .useValue({ canActivate: () => true })
             .compile();
         controller = module.get(records_controller_1.RecordsController);
-        service = module.get(records_service_1.RecordsService);
+        createClinicalRecordUseCase = module.get(create_clinical_record_use_case_1.CreateClinicalRecordUseCase);
+        getPatientEvolutionUseCase = module.get(get_patient_evolution_use_case_1.GetPatientEvolutionUseCase);
+        getPatientStatsUseCase = module.get(get_patient_stats_use_case_1.GetPatientStatsUseCase);
     });
-    it('deve chamar o service com os dados corretos ao criar um registro', async () => {
+    it('deve chamar o use case com os dados corretos ao criar um registro', async () => {
         const dto = { weight: 85.5, skeletal_muscle_mass: 35 };
         await controller.createRecord(dto, mockUser);
-        expect(service.createRecord).toHaveBeenCalledWith(dto, mockUser);
+        expect(createClinicalRecordUseCase.execute).toHaveBeenCalledWith(dto, mockUser);
     });
     it('deve retornar o histórico de evolução do paciente', async () => {
         const result = await controller.getEvolution(mockUser);
-        expect(service.getEvolution).toHaveBeenCalledWith(mockUser);
+        expect(getPatientEvolutionUseCase.execute).toHaveBeenCalledWith(mockUser);
         expect(Array.isArray(result)).toBe(true);
+    });
+    it('deve retornar as estatísticas do paciente', async () => {
+        await controller.getStats(mockUser);
+        expect(getPatientStatsUseCase.execute).toHaveBeenCalledWith(mockUser);
     });
 });
 //# sourceMappingURL=records.controller.spec.js.map

@@ -1,72 +1,67 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TasksController } from '../../tasks/tasks.controller';
-import { TasksService } from '../../tasks/tasks.service';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
-import { UserContext } from '../../common/decorators/get-user.decorator';
+import { UserContext } from '../../shared/auth/user-context';
+import { CompleteTaskUseCase } from '../../tasks/application/use-cases/complete-task.use-case';
+import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/get-categorized-ranking.use-case';
+import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';
+import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
+import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
+import { TasksController } from '../../tasks/presentation/http/tasks.controller';
 
 describe('TasksController', () => {
-    let controller: TasksController;
-    let service: TasksService;
+  let controller: TasksController;
+  let getDailyTasksUseCase: GetDailyTasksUseCase;
+  let completeTaskUseCase: CompleteTaskUseCase;
+  let getRankingUseCase: GetRankingUseCase;
+  let getTasksTodayUseCase: GetTasksTodayUseCase;
 
-    // Mock do contexto do usuário (JWT extraído)
-    const mockUser: UserContext = {
-        userId: 'user-uuid-123',
-        tenantId: 'tenant-uuid-456',
-        role: 'patient',
-    };
+  const mockUser: UserContext = {
+    userId: 'user-uuid-123',
+    tenantId: 'tenant-uuid-456',
+    role: 'patient',
+  };
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            controllers: [TasksController],
-            providers: [
-                {
-                    provide: TasksService,
-                    useValue: {
-                        getDailyTasks: jest.fn().mockResolvedValue([]),
-                        completeTask: jest.fn().mockResolvedValue({ success: true }),
-                        getRanking: jest.fn().mockResolvedValue([]),
-                        getCategorizedRanking: jest.fn().mockResolvedValue([]), // ADICIONE ESTA LINHA
-                        getTasksToday: jest.fn().mockResolvedValue([]),
-                    },
-                },
-            ],
-        })
-            // Sobrescrevemos o Guard para não precisar de um token real nos testes
-            .overrideGuard(SupabaseGuard)
-            .useValue({ canActivate: () => true })
-            .compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [TasksController],
+      providers: [
+        { provide: GetDailyTasksUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
+        { provide: CompleteTaskUseCase, useValue: { execute: jest.fn().mockResolvedValue({ success: true }) } },
+        { provide: GetRankingUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
+        { provide: GetCategorizedRankingUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
+        { provide: GetTasksTodayUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
+      ],
+    })
+      .overrideGuard(SupabaseGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
-        controller = module.get<TasksController>(TasksController);
-        service = module.get<TasksService>(TasksService);
-    });
+    controller = module.get<TasksController>(TasksController);
+    getDailyTasksUseCase = module.get<GetDailyTasksUseCase>(GetDailyTasksUseCase);
+    completeTaskUseCase = module.get<CompleteTaskUseCase>(CompleteTaskUseCase);
+    getRankingUseCase = module.get<GetRankingUseCase>(GetRankingUseCase);
+    getTasksTodayUseCase = module.get<GetTasksTodayUseCase>(GetTasksTodayUseCase);
+  });
 
-    describe('getDailyTasks', () => {
-        it('deve chamar o service passando o contexto do usuário logado', async () => {
-            await controller.getDailyTasks(mockUser);
-            expect(service.getDailyTasks).toHaveBeenCalledWith(mockUser);
-        });
-    });
+  it('deve chamar o use case de tarefas diárias com o contexto do usuário', async () => {
+    await controller.getDailyTasks(mockUser);
+    expect(getDailyTasksUseCase.execute).toHaveBeenCalledWith(mockUser);
+  });
 
-    describe('completeTask', () => {
-        it('deve extrair o ID da URL e o contexto do usuário corretamente', async () => {
-            const taskId = 'task-123';
-            await controller.completeTask(taskId, mockUser);
+  it('deve extrair o ID da URL e o contexto do usuário corretamente', async () => {
+    const taskId = 'task-123';
+    await controller.completeTask(taskId, mockUser);
 
-            expect(service.completeTask).toHaveBeenCalledWith(taskId, mockUser);
-        });
-    });
+    expect(completeTaskUseCase.execute).toHaveBeenCalledWith(taskId, mockUser);
+  });
 
-    describe('getRanking', () => {
-        it('deve chamar a busca de ranking para o tenant do usuário', async () => {
-            await controller.getRanking(mockUser);
-            expect(service.getRanking).toHaveBeenCalledWith(mockUser);
-        });
-    });
+  it('deve chamar a busca de ranking para o tenant do usuário', async () => {
+    await controller.getRanking(mockUser);
+    expect(getRankingUseCase.execute).toHaveBeenCalledWith(mockUser);
+  });
 
-    describe('getTasksToday', () => {
-        it('deve retornar apenas as tarefas agendadas para hoje', async () => {
-            await controller.getTasksToday(mockUser);
-            expect(service.getTasksToday).toHaveBeenCalledWith(mockUser);
-        });
-    });
+  it('deve retornar apenas as tarefas agendadas para hoje', async () => {
+    await controller.getTasksToday(mockUser);
+    expect(getTasksTodayUseCase.execute).toHaveBeenCalledWith(mockUser);
+  });
 });

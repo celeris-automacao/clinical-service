@@ -3,154 +3,211 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // O ID da clínica que você usou no teste do Insomnia
-  const tenantId = 'c56a4180-65aa-42ec-a945-5fd21dec0538';
-  const patientId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-
-  console.log('👤 Criando o Paciente/Herói...');
-  await prisma.patient.upsert({
-    where: { id: patientId },
-    update: { name: 'Guerreiro de Saúde' },
+  console.log('Criando plano base...');
+  const plan = await (prisma as any).plan.upsert({
+    where: { code: 'starter' },
+    update: {},
     create: {
-      id: patientId,
-      tenantId: tenantId,
-      name: 'Guerreiro de Saúde',
+      id: '30000000-0000-0000-0000-000000000001',
+      name: 'Starter',
+      code: 'starter',
+      description: 'Plano inicial para operacao da clinica',
+      maxStaff: 10,
+      maxPatients: 200,
+      monthlyPrice: 299,
+      isActive: true,
     },
   });
 
-  // ... restante do seu código de seed (Boss, Tasks, etc) ...
-  console.log('✅ Seed finalizado com sucesso!');
+  console.log('Criando a clinica (Tenant)...');
+  const tenant = await (prisma as any).tenant.upsert({
+    where: { id: 'c56a4180-65aa-42ec-a945-5fd21dec0538' },
+    update: {},
+    create: {
+      id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
+      name: 'Clinica HealthQuest Central',
+      legalName: 'Clinica HealthQuest Central LTDA',
+      cnpj: '12345678000199',
+      responsibleName: 'Helena Costa',
+      responsibleEmail: 'owner@clinica.com',
+      responsiblePhone: '11999999999',
+      status: 'active',
+      activatedAt: new Date(),
+      planId: plan.id,
+      address: {
+        create: {
+          zipCode: '01311000',
+          street: 'Avenida Paulista',
+          number: '1000',
+          neighborhood: 'Bela Vista',
+          city: 'Sao Paulo',
+          state: 'SP',
+          country: 'BR',
+        },
+      },
+    },
+  });
 
-  console.log('⚔️  Gerando o Boss da Semana...');
+  console.log('Criando o paciente...');
+  const patient = await prisma.patient.upsert({
+    where: { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
+    update: {},
+    create: {
+      id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+      name: 'Guerreiro de Saude',
+      tenantId: tenant.id,
+      email: 'paciente@clinica.com',
+      phone: '11911111111',
+      document: '11122233344',
+      address: {
+        create: {
+          zipCode: '01415001',
+          street: 'Rua da Consolacao',
+          number: '200',
+          neighborhood: 'Consolacao',
+          city: 'Sao Paulo',
+          state: 'SP',
+          country: 'BR',
+        },
+      },
+    },
+  });
 
+  console.log('Gerando o boss inicial...');
   const boss = await prisma.bossBattle.upsert({
-    where: { id: '00000000-0000-0000-0000-000000000001' }, // ID fixo para evitar duplicidade no seed
+    where: { id: '00000000-0000-0000-0000-000000000001' },
     update: {
-      currentHp: 1, // <--- ADICIONE ISSO AQUI PARA FORÇAR A ATUALIZAÇÃO
+      currentHp: 10,
       isActive: true,
     },
     create: {
       id: '00000000-0000-0000-0000-000000000001',
-      tenantId: tenantId,
+      tenantId: tenant.id,
       name: 'Sedentarismo Voraz',
-      maxHp: 100000,     // 100.000 de vida inicial
-      currentHp: 10, // Vida atual cheia
+      maxHp: 100000,
+      currentHp: 10,
       isActive: true,
     },
   });
 
-  console.log(`✅ Boss ${boss.name} pronto para a batalha! HP: ${boss.currentHp}`);
+  console.log(`Boss ${boss.name} pronto! HP: ${boss.currentHp}`);
 
-  await prisma.dailyTask.createMany({
+  console.log('Criando templates de tarefa...');
+  const waterTemplate = await prisma.taskTemplate.upsert({
+    where: { id: '10000000-0000-0000-0000-000000000001' },
+    update: {},
+    create: {
+      id: '10000000-0000-0000-0000-000000000001',
+      tenantId: tenant.id,
+      title: 'Beber 2L de Agua',
+      description: 'Meta diaria de hidratacao',
+      taskType: 'water',
+      xpReward: 200,
+      createdByUserId: '11111111-1111-1111-1111-111111111111',
+    },
+  });
+
+  const workoutTemplate = await prisma.taskTemplate.upsert({
+    where: { id: '10000000-0000-0000-0000-000000000002' },
+    update: {},
+    create: {
+      id: '10000000-0000-0000-0000-000000000002',
+      tenantId: tenant.id,
+      title: '30min de Caminhada',
+      description: 'Atividade aerobica leve',
+      taskType: 'workout',
+      xpReward: 250,
+      createdByUserId: '11111111-1111-1111-1111-111111111111',
+    },
+  });
+
+  const dietTemplate = await prisma.taskTemplate.upsert({
+    where: { id: '10000000-0000-0000-0000-000000000003' },
+    update: {},
+    create: {
+      id: '10000000-0000-0000-0000-000000000003',
+      tenantId: tenant.id,
+      title: 'Registrar Refeicao Saudavel',
+      description: 'Enviar uma refeicao dentro do plano alimentar',
+      taskType: 'diet',
+      xpReward: 200,
+      createdByUserId: '11111111-1111-1111-1111-111111111111',
+    },
+  });
+
+  console.log('Atribuindo tarefas ao paciente...');
+  await prisma.taskAssignment.createMany({
     data: [
       {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // ID do Paciente é obrigatório [cite: 229]
-        title: 'Beber 2L de Água',
-        xpReward: 200, // Nome correto conforme o schema [cite: 233]
-        taskType: 'diet' // Opcional, mas recomendado pelo SQL [cite: 232]
+        id: '20000000-0000-0000-0000-000000000001',
+        tenantId: tenant.id,
+        templateId: waterTemplate.id,
+        patientId: patient.id,
+        dueDate: today,
+        status: 'pending',
+        assignedByUserId: '11111111-1111-1111-1111-111111111111',
       },
       {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // ID do Paciente é obrigatório [cite: 229]
-        title: '30min de Caminhada',
-        xpReward: 200, // Nome correto conforme o schema [cite: 233]
-        taskType: 'diet' // Opcional, mas recomendado pelo SQL [cite: 232]
+        id: '20000000-0000-0000-0000-000000000002',
+        tenantId: tenant.id,
+        templateId: workoutTemplate.id,
+        patientId: patient.id,
+        dueDate: today,
+        status: 'pending',
+        assignedByUserId: '11111111-1111-1111-1111-111111111111',
       },
       {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // ID do Paciente é obrigatório [cite: 229]
-        title: 'Registrar Refeição Saudável',
-        xpReward: 200, // Nome correto conforme o schema [cite: 233]
-        taskType: 'diet' // Opcional, mas recomendado pelo SQL [cite: 232]
-      },
-      {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        title: 'Meditação ou Respiração',
-        description: 'Realizar 5 min de respiração guiada',
-        xpReward: 150, // Nome correto [cite: 233]
-        taskType: 'education'
+        id: '20000000-0000-0000-0000-000000000003',
+        tenantId: tenant.id,
+        templateId: dietTemplate.id,
+        patientId: patient.id,
+        dueDate: today,
+        status: 'pending',
+        assignedByUserId: '11111111-1111-1111-1111-111111111111',
       },
     ],
     skipDuplicates: true,
   });
-  console.log('✅ Tarefas diárias iniciais criadas.');
+
+  console.log('Criando recompensas...');
   await prisma.reward.createMany({
     data: [
       {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        title: 'Medalha de Recruta',
-        requiredDamage: 1000,
-        badgeIcon: 'shield'
+        id: '00000000-0000-0000-0000-000000000002',
+        tenantId: tenant.id,
+        title: 'Medalha de Teste Unitario',
+        description: 'Parabens por validar o sistema de loot!',
+        requiredDamage: 1,
+        badgeIcon: 'test-tube',
       },
       {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
+        tenantId: tenant.id,
         title: 'Cupom 15% Suplementos',
         requiredDamage: 5000,
-        badgeIcon: 'ticket'
+        badgeIcon: 'ticket',
       },
     ],
     skipDuplicates: true,
   });
 
-  console.log('✅ Recompensas iniciais criadas.');
-
-  await prisma.reward.upsert({
-    where: { id: '00000000-0000-0000-0000-000000000002' }, // ID Fixo para facilitar o teste
-    update: {},
-    create: {
-      id: '00000000-0000-0000-0000-000000000002',
-      tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-      title: 'Medalha de Teste Unitário',
-      description: 'Parabéns por validar o sistema de Loot!',
-      requiredDamage: 1, // Dano mínimo para liberar
-      badgeIcon: 'test-tube',
-    },
-  });
-
-  await prisma.dailyTask.createMany({
-    data: [
-      {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        title: 'Beber 2L de Água',
-        xpReward: 200,
-        taskType: 'water',
-        dueDate: today, // Garante que apareça no "today"
-      },
-      {
-        tenantId: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
-        patientId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        title: '30min de Caminhada',
-        xpReward: 250,
-        taskType: 'workout',
-        dueDate: today,
-      },
-      // ... adicione para as outras tarefas
-    ],
-    skipDuplicates: true,
-  });
-
-  console.log('📊 Inicializando estatísticas do herói...');
+  console.log('Inicializando estatisticas do paciente...');
   await prisma.playerStats.upsert({
-    where: { patientId: patientId },
+    where: { patientId: patient.id },
     update: {},
     create: {
-      patientId: patientId,
-      tenantId: tenantId,
+      patientId: patient.id,
+      tenantId: tenant.id,
       currentXp: 0,
       currentLevel: 1,
       totalDamageDealt: 0,
-      currentGold: 0
+      currentGold: 0,
     },
   });
 
-
+  console.log('Seed finalizado com sucesso!');
 }
 
 main()
