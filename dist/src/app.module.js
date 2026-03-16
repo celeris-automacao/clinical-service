@@ -16,6 +16,7 @@ const auth_module_1 = require("./auth/auth.module");
 const social_module_1 = require("./social/social.module");
 const tenants_module_1 = require("./tenants/tenants.module");
 const patients_module_1 = require("./patients/patients.module");
+const plans_module_1 = require("./plans/plans.module");
 const shared_infrastructure_module_1 = require("./shared/infrastructure/shared-infrastructure.module");
 const staff_module_1 = require("./staff/staff.module");
 let AppModule = class AppModule {
@@ -33,6 +34,7 @@ exports.AppModule = AppModule = __decorate([
             social_module_1.SocialModule,
             tenants_module_1.TenantsModule,
             patients_module_1.PatientsModule,
+            plans_module_1.PlansModule,
             staff_module_1.StaffModule,
         ],
         controllers: [],

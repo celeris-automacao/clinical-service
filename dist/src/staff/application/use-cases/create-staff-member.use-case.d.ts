@@ -1,9 +1,11 @@
+import { TenantPlanPort } from '../../../shared/application/ports/tenant-plan.port';
 import { CreateStaffMemberDto } from '../../presentation/http/dto/create-staff-member.dto';
 import { StaffAuditLogPort } from '../ports/staff-audit-log.port';
 import { StaffRepositoryPort } from '../ports/staff-repository.port';
 export declare class CreateStaffMemberUseCase {
     private readonly repository;
     private readonly auditLogPort;
-    constructor(repository: StaffRepositoryPort, auditLogPort: StaffAuditLogPort);
+    private readonly tenantPlanPort;
+    constructor(repository: StaffRepositoryPort, auditLogPort: StaffAuditLogPort, tenantPlanPort: TenantPlanPort);
     execute(dto: CreateStaffMemberDto, tenantId: string, actorUserId?: string): Promise<any>;
 }

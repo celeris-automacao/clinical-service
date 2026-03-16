@@ -15,8 +15,8 @@ export declare class PrismaGameRepository implements GameRepositoryPort {
     }>;
     findActiveBoss(tenantId: string): Promise<{
         id: string;
-        name: string;
         tenantId: string;
+        name: string;
         maxHp: import("@prisma/client/runtime/library").Decimal;
         currentHp: import("@prisma/client/runtime/library").Decimal;
         isActive: boolean;

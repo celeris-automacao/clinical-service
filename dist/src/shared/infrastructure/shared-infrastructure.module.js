@@ -12,6 +12,7 @@ const event_emitter_1 = require("@nestjs/event-emitter");
 const prisma_module_1 = require("../../prisma/prisma.module");
 const shared_tokens_1 = require("../shared.tokens");
 const nest_application_event_bus_adapter_1 = require("./events/nest-application-event-bus.adapter");
+const prisma_tenant_plan_adapter_1 = require("./persistence/prisma-tenant-plan.adapter");
 const tenant_scoped_prisma_factory_1 = require("./persistence/tenant-scoped-prisma.factory");
 let SharedInfrastructureModule = class SharedInfrastructureModule {
 };
@@ -27,8 +28,12 @@ exports.SharedInfrastructureModule = SharedInfrastructureModule = __decorate([
                 provide: shared_tokens_1.APPLICATION_EVENT_BUS,
                 useExisting: nest_application_event_bus_adapter_1.NestApplicationEventBusAdapter,
             },
+            {
+                provide: shared_tokens_1.TENANT_PLAN_PORT,
+                useClass: prisma_tenant_plan_adapter_1.PrismaTenantPlanAdapter,
+            },
         ],
-        exports: [prisma_module_1.PrismaModule, shared_tokens_1.APPLICATION_EVENT_BUS, tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory],
+        exports: [prisma_module_1.PrismaModule, shared_tokens_1.APPLICATION_EVENT_BUS, shared_tokens_1.TENANT_PLAN_PORT, tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory],
     })
 ], SharedInfrastructureModule);
 //# sourceMappingURL=shared-infrastructure.module.js.map

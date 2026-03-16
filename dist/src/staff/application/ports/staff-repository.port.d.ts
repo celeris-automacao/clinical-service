@@ -58,4 +58,5 @@ export interface StaffRepositoryPort {
     revokeInvitation(id: string, actorUserId: string, tenantId: string): Promise<any>;
     cleanupExpiredInvitations(referenceDate: Date): Promise<number>;
     findAuditLogsByTenant(tenantId: string): Promise<any[]>;
+    countByTenant(tenantId: string): Promise<number>;
 }

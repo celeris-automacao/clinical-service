@@ -7,30 +7,16 @@ export declare class PrismaPatientsRepository implements PatientsRepositoryPort 
     constructor(tenantScopedPrismaFactory: TenantScopedPrismaFactory);
     createWithStats(data: CreatePatientDto, tenantId: string): Promise<{
         id: string;
-        name: string;
         tenantId: string;
+        name: string;
+        email: string | null;
+        phone: string | null;
+        document: string | null;
         gender: import(".prisma/client").$Enums.Gender | null;
         birthDate: Date | null;
     }>;
-    findBySupabaseId(id: string, tenantId: string): Promise<{
-        id: string;
-        name: string;
-        tenantId: string;
-        gender: import(".prisma/client").$Enums.Gender | null;
-        birthDate: Date | null;
-    }>;
-    findById(id: string, tenantId: string): Promise<{
-        id: string;
-        name: string;
-        tenantId: string;
-        gender: import(".prisma/client").$Enums.Gender | null;
-        birthDate: Date | null;
-    }>;
-    updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto): Promise<{
-        patientId: string;
-        initialGoals: string | null;
-        symptoms: string | null;
-        pathologies: string | null;
-        medicalNotes: string | null;
-    }>;
+    countByTenant(tenantId: string): Promise<any>;
+    findBySupabaseId(id: string, tenantId: string): Promise<any>;
+    findById(id: string, tenantId: string): Promise<any>;
+    updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto): Promise<any>;
 }

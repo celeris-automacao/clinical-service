@@ -10,8 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePatientDto = void 0;
+const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
 const client_1 = require("@prisma/client");
+const patient_address_dto_1 = require("./patient-address.dto");
 class CreatePatientDto {
 }
 exports.CreatePatientDto = CreatePatientDto;
@@ -26,6 +28,21 @@ __decorate([
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "name", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "email", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "phone", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreatePatientDto.prototype, "document", void 0);
+__decorate([
     (0, class_validator_1.IsEnum)(client_1.Gender),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
@@ -35,4 +52,10 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreatePatientDto.prototype, "birthDate", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => patient_address_dto_1.PatientAddressDto),
+    __metadata("design:type", patient_address_dto_1.PatientAddressDto)
+], CreatePatientDto.prototype, "address", void 0);
 //# sourceMappingURL=create-patient.dto.js.map

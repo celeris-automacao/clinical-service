@@ -39,6 +39,7 @@ export declare class PrismaStaffRepository implements StaffRepositoryPort {
     }): Promise<any>;
     changeStatus(id: string, tenantId: string, status: string): Promise<any>;
     countActiveByRole(tenantId: string, role: string): Promise<any>;
+    countByTenant(tenantId: string): Promise<any>;
     createInvitation(data: {
         tenantId: string;
         email: string;

@@ -1,0 +1,848 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-03-16T12:00:00.000Z",
+  "__export_source": "codex",
+  "resources": [
+    {
+      "_id": "wrk_clinical_service_e2e",
+      "_type": "workspace",
+      "name": "Clinical Service E2E",
+      "description": "Colecao base para validar o fluxo ponta a ponta do Clinical Service."
+    },
+    {
+      "_id": "env_clinical_service_e2e",
+      "_type": "environment",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3000/v1",
+        "token_owner": "",
+        "token_staff": "",
+        "token_patient": "",
+        "plan_id": "",
+        "tenant_id": "",
+        "owner_staff_id": "",
+        "staff_id": "",
+        "invitation_id": "",
+        "invitation_token": "",
+        "patient_id": "",
+        "template_water_id": "",
+        "template_workout_id": "",
+        "assignment_water_id": "",
+        "assignment_workout_id": "",
+        "reward_id": ""
+      }
+    },
+    {
+      "_id": "fld_plans",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "01 - Plans"
+    },
+    {
+      "_id": "req_create_plan",
+      "_type": "request",
+      "parentId": "fld_plans",
+      "name": "Create Plan",
+      "method": "POST",
+      "url": "{{ _.base_url }}/plans",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Professional\",\n  \"code\": \"professional\",\n  \"description\": \"Plano para clinicas em operacao\",\n  \"maxStaff\": 5,\n  \"maxPatients\": 20,\n  \"monthlyPrice\": 499,\n  \"isActive\": true\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_plans",
+      "_type": "request",
+      "parentId": "fld_plans",
+      "name": "List Plans",
+      "method": "GET",
+      "url": "{{ _.base_url }}/plans"
+    },
+    {
+      "_id": "req_get_plan",
+      "_type": "request",
+      "parentId": "fld_plans",
+      "name": "Get Plan By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/plans/{{ _.plan_id }}"
+    },
+    {
+      "_id": "fld_tenants",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "02 - Tenants"
+    },
+    {
+      "_id": "req_create_tenant",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Create Tenant",
+      "method": "POST",
+      "url": "{{ _.base_url }}/tenants",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Clinica Horizonte\",\n  \"legalName\": \"Clinica Horizonte LTDA\",\n  \"cnpj\": \"11222333000181\",\n  \"responsibleName\": \"Helena Costa\",\n  \"responsibleEmail\": \"owner@clinica.com\",\n  \"responsiblePhone\": \"11999999999\",\n  \"planId\": \"{{ _.plan_id }}\",\n  \"address\": {\n    \"zipCode\": \"01311000\",\n    \"street\": \"Avenida Paulista\",\n    \"number\": \"1000\",\n    \"neighborhood\": \"Bela Vista\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"country\": \"BR\"\n  }\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_tenants",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "List Tenants",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tenants"
+    },
+    {
+      "_id": "req_get_tenant",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Get Tenant By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tenants/{{ _.tenant_id }}"
+    },
+    {
+      "_id": "req_activate_tenant",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Activate Tenant",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/tenants/{{ _.tenant_id }}/status",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"active\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    },
+    {
+      "_id": "fld_staff",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "03 - Staff"
+    },
+    {
+      "_id": "req_create_staff_owner",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Create Owner Staff",
+      "method": "POST",
+      "url": "{{ _.base_url }}/staff",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userId\": \"11111111-1111-1111-1111-111111111111\",\n  \"name\": \"Dra Helena Costa\",\n  \"document\": \"12345678900\",\n  \"email\": \"owner@clinica.com\",\n  \"phone\": \"11999999999\",\n  \"professionalType\": \"doctor\",\n  \"specialty\": \"Clinica Geral\",\n  \"role\": \"owner\",\n  \"licenseNumber\": \"CRM12345\",\n  \"status\": \"active\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_staff_me_context",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Get My Staff Context",
+      "method": "GET",
+      "url": "{{ _.base_url }}/staff/me/context",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_staff_invitation",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Create Staff Invitation",
+      "method": "POST",
+      "url": "{{ _.base_url }}/staff/invitations",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"medico@clinica.com\",\n  \"name\": \"Dr Bruno Lima\",\n  \"document\": \"98765432100\",\n  \"professionalType\": \"doctor\",\n  \"specialty\": \"Endocrinologia\",\n  \"role\": \"doctor\",\n  \"licenseNumber\": \"CRM54321\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_pending_invitations",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "List Pending Invitations",
+      "method": "GET",
+      "url": "{{ _.base_url }}/staff/invitations/pending",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_accept_staff_invitation",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Accept Staff Invitation",
+      "method": "POST",
+      "url": "{{ _.base_url }}/staff/invitations/accept",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"token\": \"{{ _.invitation_token }}\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_staff }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_staff",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "List Staff",
+      "method": "GET",
+      "url": "{{ _.base_url }}/staff",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_update_staff",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Update Staff",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/staff/{{ _.staff_id }}",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"phone\": \"11888888888\",\n  \"specialty\": \"Metabologia\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_change_staff_status",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Change Staff Status",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/staff/{{ _.staff_id }}/status",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"active\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_staff_audit_logs",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "List Staff Audit Logs",
+      "method": "GET",
+      "url": "{{ _.base_url }}/staff/audit-logs",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_revoke_staff_invitation",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Revoke Staff Invitation",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/staff/invitations/{{ _.invitation_id }}/revoke",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_cleanup_staff_invitation",
+      "_type": "request",
+      "parentId": "fld_staff",
+      "name": "Cleanup Expired Invitations",
+      "method": "POST",
+      "url": "{{ _.base_url }}/staff/invitations/cleanup",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_patients",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "04 - Patients"
+    },
+    {
+      "_id": "req_create_patient",
+      "_type": "request",
+      "parentId": "fld_patients",
+      "name": "Create Patient",
+      "method": "POST",
+      "url": "{{ _.base_url }}/patients",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"supabaseId\": \"33333333-3333-3333-3333-333333333333\",\n  \"name\": \"Paciente Teste\",\n  \"email\": \"paciente@clinica.com\",\n  \"phone\": \"11911111111\",\n  \"document\": \"11122233344\",\n  \"gender\": \"MALE\",\n  \"birthDate\": \"1990-06-15\",\n  \"address\": {\n    \"zipCode\": \"01415001\",\n    \"street\": \"Rua da Consolacao\",\n    \"number\": \"200\",\n    \"neighborhood\": \"Consolacao\",\n    \"city\": \"Sao Paulo\",\n    \"state\": \"SP\",\n    \"country\": \"BR\"\n  }\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_patient",
+      "_type": "request",
+      "parentId": "fld_patients",
+      "name": "Get Patient By Id",
+      "method": "GET",
+      "url": "{{ _.base_url }}/patients/{{ _.patient_id }}",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_update_patient_profile",
+      "_type": "request",
+      "parentId": "fld_patients",
+      "name": "Update Patient Profile",
+      "method": "POST",
+      "url": "{{ _.base_url }}/patients/{{ _.patient_id }}/profile",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"initialGoals\": \"Perder peso e ganhar condicionamento\",\n  \"symptoms\": \"Cansaco e sono ruim\",\n  \"pathologies\": \"Nenhuma\",\n  \"medicalNotes\": \"Acompanhar composicao corporal\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_task_templates",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "05 - Task Templates"
+    },
+    {
+      "_id": "req_create_task_template_water",
+      "_type": "request",
+      "parentId": "fld_task_templates",
+      "name": "Create Water Template",
+      "method": "POST",
+      "url": "{{ _.base_url }}/task-templates",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Beber 2L de Agua\",\n  \"description\": \"Meta diaria de hidratacao\",\n  \"taskType\": \"water\",\n  \"xpReward\": 100\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_task_template_workout",
+      "_type": "request",
+      "parentId": "fld_task_templates",
+      "name": "Create Workout Template",
+      "method": "POST",
+      "url": "{{ _.base_url }}/task-templates",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Caminhada 30 minutos\",\n  \"description\": \"Atividade aerobica leve\",\n  \"taskType\": \"workout\",\n  \"xpReward\": 150\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_task_templates",
+      "_type": "request",
+      "parentId": "fld_task_templates",
+      "name": "List Task Templates",
+      "method": "GET",
+      "url": "{{ _.base_url }}/task-templates",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_task_assignments",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "06 - Task Assignments"
+    },
+    {
+      "_id": "req_assign_task_water",
+      "_type": "request",
+      "parentId": "fld_task_assignments",
+      "name": "Assign Water Template",
+      "method": "POST",
+      "url": "{{ _.base_url }}/task-assignments",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"templateId\": \"{{ _.template_water_id }}\",\n  \"patientId\": \"{{ _.patient_id }}\",\n  \"dueDate\": \"2026-03-16\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_assign_task_workout",
+      "_type": "request",
+      "parentId": "fld_task_assignments",
+      "name": "Assign Workout Template",
+      "method": "POST",
+      "url": "{{ _.base_url }}/task-assignments",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"templateId\": \"{{ _.template_workout_id }}\",\n  \"patientId\": \"{{ _.patient_id }}\",\n  \"dueDate\": \"2026-03-16\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_bulk_assign_task",
+      "_type": "request",
+      "parentId": "fld_task_assignments",
+      "name": "Bulk Assign Water Template",
+      "method": "POST",
+      "url": "{{ _.base_url }}/task-assignments/bulk",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"templateId\": \"{{ _.template_water_id }}\",\n  \"patientIds\": [\"{{ _.patient_id }}\"],\n  \"dueDate\": \"2026-03-17\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_tasks",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "07 - Patient Tasks"
+    },
+    {
+      "_id": "req_list_tasks",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "List My Tasks",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tasks",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_tasks_today",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "List Today Tasks",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tasks/today",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_complete_task_water",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "Complete Water Task",
+      "method": "POST",
+      "url": "{{ _.base_url }}/tasks/{{ _.assignment_water_id }}/complete",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_complete_task_workout",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "Complete Workout Task",
+      "method": "POST",
+      "url": "{{ _.base_url }}/tasks/{{ _.assignment_workout_id }}/complete",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_tasks_ranking",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "Get Tasks Ranking",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tasks/ranking",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_tasks_ranking_detailed",
+      "_type": "request",
+      "parentId": "fld_tasks",
+      "name": "Get Detailed Tasks Ranking",
+      "method": "GET",
+      "url": "{{ _.base_url }}/tasks/ranking/detailed",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_records",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "08 - Records"
+    },
+    {
+      "_id": "req_create_record_1",
+      "_type": "request",
+      "parentId": "fld_records",
+      "name": "Create Record 1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/records",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"weight\": 92.4,\n  \"skeletalMuscleMass\": 31.2,\n  \"bodyFatMass\": 27.5,\n  \"percentBodyFat\": 29.7,\n  \"visceralFatLevel\": 12,\n  \"basalMetabolicRate\": 1780\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_record_2",
+      "_type": "request",
+      "parentId": "fld_records",
+      "name": "Create Record 2",
+      "method": "POST",
+      "url": "{{ _.base_url }}/records",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"weight\": 90.8,\n  \"skeletalMuscleMass\": 32.0,\n  \"bodyFatMass\": 24.1,\n  \"percentBodyFat\": 26.5,\n  \"visceralFatLevel\": 10,\n  \"basalMetabolicRate\": 1815\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_record_evolution",
+      "_type": "request",
+      "parentId": "fld_records",
+      "name": "Get Records Evolution",
+      "method": "GET",
+      "url": "{{ _.base_url }}/records/me",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_record_stats",
+      "_type": "request",
+      "parentId": "fld_records",
+      "name": "Get Record Stats",
+      "method": "GET",
+      "url": "{{ _.base_url }}/records/stats",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_rewards",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "09 - Rewards"
+    },
+    {
+      "_id": "req_create_reward",
+      "_type": "request",
+      "parentId": "fld_rewards",
+      "name": "Create Reward",
+      "method": "POST",
+      "url": "{{ _.base_url }}/rewards",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Cupom 15% em Suplementos\",\n  \"description\": \"Beneficio para pacientes engajados\",\n  \"requiredDamage\": 100,\n  \"goldCost\": 50,\n  \"badgeIcon\": \"ticket\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_owner }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_list_rewards",
+      "_type": "request",
+      "parentId": "fld_rewards",
+      "name": "List Rewards",
+      "method": "GET",
+      "url": "{{ _.base_url }}/rewards",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_claim_reward",
+      "_type": "request",
+      "parentId": "fld_rewards",
+      "name": "Claim Reward",
+      "method": "POST",
+      "url": "{{ _.base_url }}/rewards/{{ _.reward_id }}/claim",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_dashboard",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "10 - Dashboard"
+    },
+    {
+      "_id": "req_dashboard_overview",
+      "_type": "request",
+      "parentId": "fld_dashboard",
+      "name": "Dashboard Overview",
+      "method": "GET",
+      "url": "{{ _.base_url }}/dashboard/overview",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_staff }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_dashboard_inactive_patients",
+      "_type": "request",
+      "parentId": "fld_dashboard",
+      "name": "Dashboard Inactive Patients",
+      "method": "GET",
+      "url": "{{ _.base_url }}/dashboard/inactive-patients",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_staff }}"
+        }
+      ]
+    },
+    {
+      "_id": "req_dashboard_recent_claims",
+      "_type": "request",
+      "parentId": "fld_dashboard",
+      "name": "Dashboard Recent Claims",
+      "method": "GET",
+      "url": "{{ _.base_url }}/dashboard/recent-claims",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_staff }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_game",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "11 - Game"
+    },
+    {
+      "_id": "req_player_stats",
+      "_type": "request",
+      "parentId": "fld_game",
+      "name": "Get Player Stats",
+      "method": "GET",
+      "url": "{{ _.base_url }}/player/stats",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    },
+    {
+      "_id": "fld_social",
+      "_type": "request_group",
+      "parentId": "wrk_clinical_service_e2e",
+      "name": "12 - Social"
+    },
+    {
+      "_id": "req_social_feed",
+      "_type": "request",
+      "parentId": "fld_social",
+      "name": "Get Social Feed",
+      "method": "GET",
+      "url": "{{ _.base_url }}/social/feed",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.token_patient }}"
+        }
+      ]
+    }
+  ]
+}

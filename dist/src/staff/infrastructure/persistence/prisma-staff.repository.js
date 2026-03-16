@@ -106,6 +106,12 @@ let PrismaStaffRepository = class PrismaStaffRepository {
             },
         });
     }
+    async countByTenant(tenantId) {
+        const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+        return prisma.staff.count({
+            where: { tenantId },
+        });
+    }
     async createInvitation(data) {
         const prisma = this.tenantScopedPrismaFactory.forTenantContext({
             userId: data.invitedByUserId,

@@ -10,7 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateTenantDto = void 0;
+const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
+const tenant_address_dto_1 = require("./tenant-address.dto");
 class CreateTenantDto {
 }
 exports.CreateTenantDto = CreateTenantDto;
@@ -20,4 +22,38 @@ __decorate([
     (0, class_validator_1.MinLength)(3),
     __metadata("design:type", String)
 ], CreateTenantDto.prototype, "name", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(3),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "legalName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "cnpj", void 0);
+__decorate([
+    (0, class_validator_1.IsUUID)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "planId", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "responsibleName", void 0);
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "responsibleEmail", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], CreateTenantDto.prototype, "responsiblePhone", void 0);
+__decorate([
+    (0, class_validator_1.ValidateNested)(),
+    (0, class_transformer_1.Type)(() => tenant_address_dto_1.TenantAddressDto),
+    __metadata("design:type", tenant_address_dto_1.TenantAddressDto)
+], CreateTenantDto.prototype, "address", void 0);
 //# sourceMappingURL=create-tenant.dto.js.map

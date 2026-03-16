@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const common_1 = require("@nestjs/common");
 const testing_1 = require("@nestjs/testing");
+const shared_tokens_1 = require("../../shared/shared.tokens");
 const accept_staff_invitation_use_case_1 = require("../../staff/application/use-cases/accept-staff-invitation.use-case");
 const change_staff_member_status_use_case_1 = require("../../staff/application/use-cases/change-staff-member-status.use-case");
 const cleanup_expired_staff_invitations_use_case_1 = require("../../staff/application/use-cases/cleanup-expired-staff-invitations.use-case");
@@ -19,6 +20,7 @@ const staff_tokens_1 = require("../../staff/staff.tokens");
 describe('Staff Use Cases', () => {
     let repository;
     let auditLogPort;
+    let tenantPlanPort;
     let createStaffMemberUseCase;
     let createStaffInvitationUseCase;
     let acceptStaffInvitationUseCase;
@@ -72,6 +74,7 @@ describe('Staff Use Cases', () => {
                         revokeInvitation: jest.fn(),
                         cleanupExpiredInvitations: jest.fn(),
                         findAuditLogsByTenant: jest.fn(),
+                        countByTenant: jest.fn(),
                     },
                 },
                 {
@@ -80,10 +83,17 @@ describe('Staff Use Cases', () => {
                         create: jest.fn().mockResolvedValue(undefined),
                     },
                 },
+                {
+                    provide: shared_tokens_1.TENANT_PLAN_PORT,
+                    useValue: {
+                        getTenantPlan: jest.fn(),
+                    },
+                },
             ],
         }).compile();
         repository = module.get(staff_tokens_1.STAFF_REPOSITORY);
         auditLogPort = module.get(staff_tokens_1.STAFF_AUDIT_LOG_PORT);
+        tenantPlanPort = module.get(shared_tokens_1.TENANT_PLAN_PORT);
         createStaffMemberUseCase = module.get(create_staff_member_use_case_1.CreateStaffMemberUseCase);
         createStaffInvitationUseCase = module.get(create_staff_invitation_use_case_1.CreateStaffInvitationUseCase);
         acceptStaffInvitationUseCase = module.get(accept_staff_invitation_use_case_1.AcceptStaffInvitationUseCase);
@@ -108,6 +118,8 @@ describe('Staff Use Cases', () => {
             role: 'doctor',
             licenseNumber: 'CRM-123',
         };
+        jest.spyOn(tenantPlanPort, 'getTenantPlan').mockResolvedValue({ id: 'plan-1', maxStaff: 2, maxPatients: 100 });
+        jest.spyOn(repository, 'countByTenant').mockResolvedValue(1);
         jest.spyOn(repository, 'findByUserId').mockResolvedValue(null);
         jest.spyOn(repository, 'findByDocument').mockResolvedValue(null);
         jest.spyOn(repository, 'findByLicenseNumber').mockResolvedValue(null);
@@ -124,6 +136,18 @@ describe('Staff Use Cases', () => {
             action: 'staff.created',
         }));
         expect(result).toEqual(expect.objectContaining({ id: 'staff-1', name: 'Dra. Ana' }));
+    });
+    it('deve bloquear criacao de staff quando o limite do plano for atingido', async () => {
+        jest.spyOn(tenantPlanPort, 'getTenantPlan').mockResolvedValue({ id: 'plan-1', maxStaff: 1, maxPatients: 100 });
+        jest.spyOn(repository, 'countByTenant').mockResolvedValue(1);
+        await expect(createStaffMemberUseCase.execute({
+            userId: '9cbf5f90-cb9d-4cb1-b9f2-761e9e57b9ab',
+            name: 'Dra. Ana',
+            document: '12345678900',
+            professionalType: 'doctor',
+            specialty: 'clinica geral',
+            role: 'doctor',
+        }, 'tenant-1', 'actor-1')).rejects.toThrow(new common_1.BadRequestException('Limite de profissionais do plano atingido.'));
     });
     it('deve criar convite de staff quando nao houver conflito por email, documento ou licenca', async () => {
         jest.spyOn(repository, 'findByEmail').mockResolvedValue(null);

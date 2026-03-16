@@ -14,12 +14,24 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePatientUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const shared_tokens_1 = require("../../../shared/shared.tokens");
 const patients_tokens_1 = require("../../patients.tokens");
 let CreatePatientUseCase = class CreatePatientUseCase {
-    constructor(repository) {
+    constructor(repository, tenantPlanPort) {
         this.repository = repository;
+        this.tenantPlanPort = tenantPlanPort;
     }
     async execute(createPatientDto, tenantId) {
+        const [plan, currentPatients] = await Promise.all([
+            this.tenantPlanPort.getTenantPlan(tenantId),
+            this.repository.countByTenant(tenantId),
+        ]);
+        if (!plan) {
+            throw new common_1.BadRequestException('Clinica sem plano ativo.');
+        }
+        if (currentPatients >= plan.maxPatients) {
+            throw new common_1.BadRequestException('Limite de pacientes do plano atingido.');
+        }
         return this.repository.createWithStats(createPatientDto, tenantId);
     }
 };
@@ -27,6 +39,7 @@ exports.CreatePatientUseCase = CreatePatientUseCase;
 exports.CreatePatientUseCase = CreatePatientUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(patients_tokens_1.PATIENTS_REPOSITORY)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, common_1.Inject)(shared_tokens_1.TENANT_PLAN_PORT)),
+    __metadata("design:paramtypes", [Object, Object])
 ], CreatePatientUseCase);
 //# sourceMappingURL=create-patient.use-case.js.map

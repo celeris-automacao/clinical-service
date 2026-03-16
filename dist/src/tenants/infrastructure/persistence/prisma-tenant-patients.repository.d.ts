@@ -5,21 +5,30 @@ export declare class PrismaTenantPatientsRepository {
     constructor(tenantScopedPrismaFactory: TenantScopedPrismaFactory);
     createWithStats(data: CreatePatientDto, tenantId: string): Promise<{
         id: string;
-        name: string;
         tenantId: string;
+        name: string;
+        email: string | null;
+        phone: string | null;
+        document: string | null;
         gender: import(".prisma/client").$Enums.Gender | null;
         birthDate: Date | null;
     }>;
     findBySupabaseId(id: string, tenantId?: string): Promise<{
         id: string;
-        name: string;
         tenantId: string;
+        name: string;
+        email: string | null;
+        phone: string | null;
+        document: string | null;
         gender: import(".prisma/client").$Enums.Gender | null;
         birthDate: Date | null;
     } | {
         id: string;
-        name: string;
         tenantId: string;
+        name: string;
+        email: string | null;
+        phone: string | null;
+        document: string | null;
         gender: import(".prisma/client").$Enums.Gender | null;
         birthDate: Date | null;
     }>;

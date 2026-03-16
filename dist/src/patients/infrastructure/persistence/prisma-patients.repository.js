@@ -23,8 +23,25 @@ let PrismaPatientsRepository = class PrismaPatientsRepository {
                     id: data.supabaseId,
                     name: data.name,
                     tenantId,
+                    email: data.email,
+                    phone: data.phone,
+                    document: data.document,
                     gender: data.gender,
                     birthDate: data.birthDate ? new Date(data.birthDate) : null,
+                    address: data.address
+                        ? {
+                            create: {
+                                zipCode: data.address.zipCode,
+                                street: data.address.street,
+                                number: data.address.number,
+                                complement: data.address.complement,
+                                neighborhood: data.address.neighborhood,
+                                city: data.address.city,
+                                state: data.address.state,
+                                country: data.address.country ?? 'BR',
+                            },
+                        }
+                        : undefined,
                 },
             });
             await tx.playerStats.create({
@@ -35,6 +52,12 @@ let PrismaPatientsRepository = class PrismaPatientsRepository {
                 },
             });
             return patient;
+        });
+    }
+    async countByTenant(tenantId) {
+        const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+        return prisma.patient.count({
+            where: { tenantId },
         });
     }
     async findBySupabaseId(id, tenantId) {

@@ -9,39 +9,43 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateTaskDto = void 0;
-const class_transformer_1 = require("class-transformer");
+exports.PatientAddressDto = void 0;
 const class_validator_1 = require("class-validator");
-const task_constants_1 = require("../../../domain/task.constants");
-class CreateTaskDto {
+class PatientAddressDto {
 }
-exports.CreateTaskDto = CreateTaskDto;
-__decorate([
-    (0, class_validator_1.IsUUID)(),
-    __metadata("design:type", String)
-], CreateTaskDto.prototype, "patientId", void 0);
+exports.PatientAddressDto = PatientAddressDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateTaskDto.prototype, "title", void 0);
+], PatientAddressDto.prototype, "zipCode", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PatientAddressDto.prototype, "street", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PatientAddressDto.prototype, "number", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateTaskDto.prototype, "description", void 0);
+], PatientAddressDto.prototype, "complement", void 0);
 __decorate([
-    (0, class_validator_1.IsIn)(task_constants_1.TASK_TYPES),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateTaskDto.prototype, "taskType", void 0);
+], PatientAddressDto.prototype, "neighborhood", void 0);
 __decorate([
-    (0, class_transformer_1.Type)(() => Number),
-    (0, class_validator_1.IsInt)(),
-    (0, class_validator_1.Min)(50),
-    (0, class_validator_1.Max)(500),
-    __metadata("design:type", Number)
-], CreateTaskDto.prototype, "xpReward", void 0);
-__decorate([
-    (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], CreateTaskDto.prototype, "dueDate", void 0);
-//# sourceMappingURL=create-task.dto.js.map
+], PatientAddressDto.prototype, "city", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PatientAddressDto.prototype, "state", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
+], PatientAddressDto.prototype, "country", void 0);
+//# sourceMappingURL=patient-address.dto.js.map

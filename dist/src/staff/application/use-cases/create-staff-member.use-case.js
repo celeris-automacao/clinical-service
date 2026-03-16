@@ -14,13 +14,25 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateStaffMemberUseCase = void 0;
 const common_1 = require("@nestjs/common");
+const shared_tokens_1 = require("../../../shared/shared.tokens");
 const staff_tokens_1 = require("../../staff.tokens");
 let CreateStaffMemberUseCase = class CreateStaffMemberUseCase {
-    constructor(repository, auditLogPort) {
+    constructor(repository, auditLogPort, tenantPlanPort) {
         this.repository = repository;
         this.auditLogPort = auditLogPort;
+        this.tenantPlanPort = tenantPlanPort;
     }
     async execute(dto, tenantId, actorUserId) {
+        const [plan, staffCount] = await Promise.all([
+            this.tenantPlanPort.getTenantPlan(tenantId),
+            this.repository.countByTenant(tenantId),
+        ]);
+        if (!plan) {
+            throw new common_1.BadRequestException('Clinica sem plano ativo.');
+        }
+        if (staffCount >= plan.maxStaff) {
+            throw new common_1.BadRequestException('Limite de profissionais do plano atingido.');
+        }
         const existingUser = await this.repository.findByUserId(dto.userId, tenantId);
         if (existingUser) {
             throw new common_1.BadRequestException('Ja existe um profissional com este usuario na clinica.');
@@ -60,6 +72,7 @@ exports.CreateStaffMemberUseCase = CreateStaffMemberUseCase = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(staff_tokens_1.STAFF_REPOSITORY)),
     __param(1, (0, common_1.Inject)(staff_tokens_1.STAFF_AUDIT_LOG_PORT)),
-    __metadata("design:paramtypes", [Object, Object])
+    __param(2, (0, common_1.Inject)(shared_tokens_1.TENANT_PLAN_PORT)),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], CreateStaffMemberUseCase);
 //# sourceMappingURL=create-staff-member.use-case.js.map

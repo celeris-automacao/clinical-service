@@ -10,6 +10,7 @@ describe('PrismaPatientsRepository', () => {
     const tenantPrisma = {
         patient: {
             findFirst: jest.fn(),
+            count: jest.fn(),
         },
         patientProfile: {
             upsert: jest.fn(),
@@ -23,6 +24,7 @@ describe('PrismaPatientsRepository', () => {
                     provide: tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory,
                     useValue: {
                         forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
+                        forTenant: jest.fn().mockReturnValue(tenantPrisma),
                         runInTenantTransaction: jest.fn(),
                     },
                 },
@@ -31,12 +33,23 @@ describe('PrismaPatientsRepository', () => {
         repository = module.get(prisma_patients_repository_1.PrismaPatientsRepository);
         tenantScopedPrismaFactory = module.get(tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory);
     });
-    it('deve criar paciente e playerStats iniciais dentro da transacao', async () => {
+    it('deve criar paciente, endereco e playerStats iniciais dentro da transacao', async () => {
         const dto = {
             supabaseId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
             name: 'Paciente Teste',
+            email: 'paciente@teste.com',
+            phone: '11911111111',
+            document: '11122233344',
             gender: client_1.Gender.MALE,
             birthDate: '1990-01-01',
+            address: {
+                zipCode: '01311000',
+                street: 'Av Paulista',
+                number: '1000',
+                neighborhood: 'Bela Vista',
+                city: 'Sao Paulo',
+                state: 'SP',
+            },
         };
         const tenantId = 'tenant-1';
         const createdPatient = { id: dto.supabaseId, name: dto.name, tenantId };
@@ -55,8 +68,23 @@ describe('PrismaPatientsRepository', () => {
                 id: dto.supabaseId,
                 name: dto.name,
                 tenantId,
+                email: dto.email,
+                phone: dto.phone,
+                document: dto.document,
                 gender: dto.gender,
                 birthDate: new Date(dto.birthDate),
+                address: {
+                    create: {
+                        zipCode: dto.address.zipCode,
+                        street: dto.address.street,
+                        number: dto.address.number,
+                        complement: undefined,
+                        neighborhood: dto.address.neighborhood,
+                        city: dto.address.city,
+                        state: dto.address.state,
+                        country: 'BR',
+                    },
+                },
             },
         });
         expect(tx.playerStats.create).toHaveBeenCalledWith({
@@ -67,6 +95,12 @@ describe('PrismaPatientsRepository', () => {
             },
         });
         expect(result).toEqual(createdPatient);
+    });
+    it('deve contar pacientes por tenant', async () => {
+        await repository.countByTenant('tenant-1');
+        expect(tenantPrisma.patient.count).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-1' },
+        });
     });
     it('deve buscar paciente por supabaseId dentro do tenant', async () => {
         await repository.findBySupabaseId('patient-1', 'tenant-1');
