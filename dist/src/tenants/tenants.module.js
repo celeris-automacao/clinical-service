@@ -8,9 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantsModule = void 0;
 const common_1 = require("@nestjs/common");
-const tenants_repository_1 = require("./repositories/tenants.repository");
-const tenants_service_1 = require("./tenants.service");
-const tenants_controller_1 = require("./tenants.controller");
+const create_tenant_use_case_1 = require("./application/use-cases/create-tenant.use-case");
+const get_tenant_by_id_use_case_1 = require("./application/use-cases/get-tenant-by-id.use-case");
+const get_tenants_use_case_1 = require("./application/use-cases/get-tenants.use-case");
+const tenants_controller_1 = require("./presentation/http/tenants.controller");
+const prisma_tenants_repository_1 = require("./infrastructure/persistence/prisma-tenants.repository");
+const tenants_tokens_1 = require("./tenants.tokens");
 let TenantsModule = class TenantsModule {
 };
 exports.TenantsModule = TenantsModule;
@@ -18,13 +21,14 @@ exports.TenantsModule = TenantsModule = __decorate([
     (0, common_1.Module)({
         controllers: [tenants_controller_1.TenantsController],
         providers: [
-            tenants_service_1.TenantsService,
+            create_tenant_use_case_1.CreateTenantUseCase,
+            get_tenants_use_case_1.GetTenantsUseCase,
+            get_tenant_by_id_use_case_1.GetTenantByIdUseCase,
             {
-                provide: 'ITenantsRepository',
-                useClass: tenants_repository_1.TenantsRepository,
+                provide: tenants_tokens_1.TENANTS_REPOSITORY,
+                useClass: prisma_tenants_repository_1.PrismaTenantsRepository,
             },
         ],
-        exports: [tenants_service_1.TenantsService],
     })
 ], TenantsModule);
 //# sourceMappingURL=tenants.module.js.map

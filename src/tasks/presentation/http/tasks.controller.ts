@@ -25,24 +25,21 @@ export class TasksController {
   }
 
   @Post(':id/complete')
-  completeTask(@Param('id') taskId: string, @GetUser() user: UserContext) {
-    return this.completeTaskUseCase.execute(taskId, user);
+  completeTask(@Param('id') taskAssignmentId: string, @GetUser() user: UserContext) {
+    return this.completeTaskUseCase.execute(taskAssignmentId, user);
   }
 
   @Get('ranking')
-  @UseGuards(SupabaseGuard)
   getRanking(@GetUser() user: UserContext) {
     return this.getRankingUseCase.execute(user);
   }
 
   @Get('ranking/detailed')
-  @UseGuards(SupabaseGuard)
   async getDetailedRanking(@GetUser() user: UserContext) {
     return this.getCategorizedRankingUseCase.execute(user.tenantId);
   }
 
   @Get('today')
-  @UseGuards(SupabaseGuard)
   getTasksToday(@GetUser() user: UserContext) {
     return this.getTasksTodayUseCase.execute(user);
   }

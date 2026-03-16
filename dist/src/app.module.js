@@ -8,32 +8,32 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_module_1 = require("./prisma/prisma.module");
 const records_module_1 = require("./records/records.module");
 const tasks_module_1 = require("./tasks/tasks.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
 const game_module_1 = require("./game/game.module");
-const event_emitter_1 = require("@nestjs/event-emitter");
 const auth_module_1 = require("./auth/auth.module");
 const social_module_1 = require("./social/social.module");
 const tenants_module_1 = require("./tenants/tenants.module");
 const patients_module_1 = require("./patients/patients.module");
+const shared_infrastructure_module_1 = require("./shared/infrastructure/shared-infrastructure.module");
+const staff_module_1 = require("./staff/staff.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            shared_infrastructure_module_1.SharedInfrastructureModule,
             auth_module_1.AuthModule,
-            event_emitter_1.EventEmitterModule.forRoot(),
-            prisma_module_1.PrismaModule,
             records_module_1.RecordsModule,
             tasks_module_1.TasksModule,
             dashboard_module_1.DashboardModule,
             game_module_1.GameModule,
             social_module_1.SocialModule,
             tenants_module_1.TenantsModule,
-            patients_module_1.PatientsModule
+            patients_module_1.PatientsModule,
+            staff_module_1.StaffModule,
         ],
         controllers: [],
         providers: [],

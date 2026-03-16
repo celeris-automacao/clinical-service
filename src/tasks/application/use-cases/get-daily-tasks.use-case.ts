@@ -11,17 +11,6 @@ export class GetDailyTasksUseCase {
   ) {}
 
   async execute(user: UserContext) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const [tasks, completions] = await Promise.all([
-      this.repository.findTasksByTenant(user.tenantId),
-      this.repository.findCompletionsByPatientToday(user.userId, today),
-    ]);
-
-    return tasks.map((task) => ({
-      ...task,
-      completed: completions.some((completion) => completion.taskId === task.id),
-    }));
+    return this.repository.findAssignmentsByPatient(user.userId, user.tenantId);
   }
 }

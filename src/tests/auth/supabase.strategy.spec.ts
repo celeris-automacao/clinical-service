@@ -12,7 +12,12 @@ describe('SupabaseStrategy', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SupabaseStrategy,
-        MapSupabaseUserUseCase,
+        {
+          provide: MapSupabaseUserUseCase,
+          useValue: {
+            execute: jest.fn(),
+          },
+        },
         {
           provide: AUTH_CONFIG_PORT,
           useValue: {
@@ -36,11 +41,16 @@ describe('SupabaseStrategy', () => {
       },
     };
 
-    const spy = jest.spyOn(mapSupabaseUserUseCase, 'execute');
+    (mapSupabaseUserUseCase.execute as jest.Mock).mockResolvedValue({
+      userId: 'user-uuid-123',
+      tenantId: 'clinica-xyz',
+      role: 'patient',
+      email: 'paciente@teste.com',
+    });
 
     const result = await strategy.validate(payload);
 
-    expect(spy).toHaveBeenCalledWith(payload);
+    expect(mapSupabaseUserUseCase.execute).toHaveBeenCalledWith(payload);
     expect(result).toEqual({
       userId: 'user-uuid-123',
       tenantId: 'clinica-xyz',

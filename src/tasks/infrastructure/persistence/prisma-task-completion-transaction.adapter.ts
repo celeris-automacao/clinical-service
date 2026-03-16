@@ -7,7 +7,7 @@ export class PrismaTaskCompletionTransactionAdapter implements TaskCompletionTra
   constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
   async execute(input: {
-    taskId: string;
+    assignmentId: string;
     patientId: string;
     tenantId: string;
     xpReward: number;
@@ -21,11 +21,11 @@ export class PrismaTaskCompletionTransactionAdapter implements TaskCompletionTra
     return this.tenantScopedPrismaFactory.runInTenantTransaction(
       { userId: input.patientId, tenantId: input.tenantId },
       async (tx) => {
-        await tx.taskCompletion.create({
+        await tx.taskAssignment.update({
+          where: { id: input.assignmentId },
           data: {
-            taskId: input.taskId,
-            patientId: input.patientId,
-            tenantId: input.tenantId,
+            status: 'completed',
+            completedAt: new Date(),
           },
         });
 

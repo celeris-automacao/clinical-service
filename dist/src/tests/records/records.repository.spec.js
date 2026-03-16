@@ -1,95 +1,83 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const records_repository_1 = require("../../records/repositories/records.repository");
-const prisma_service_1 = require("../../prisma/prisma.service");
-describe('RecordsRepository', () => {
+const prisma_records_repository_1 = require("../../records/infrastructure/persistence/prisma-records.repository");
+const tenant_scoped_prisma_factory_1 = require("../../shared/infrastructure/persistence/tenant-scoped-prisma.factory");
+describe('PrismaRecordsRepository', () => {
     let repository;
-    let prisma;
+    let tenantScopedPrismaFactory;
+    const tenantPrisma = {
+        clinicalRecord: {
+            create: jest.fn(),
+            findMany: jest.fn(),
+        },
+    };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             providers: [
-                records_repository_1.RecordsRepository,
+                prisma_records_repository_1.PrismaRecordsRepository,
                 {
-                    provide: prisma_service_1.PrismaService,
+                    provide: tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory,
                     useValue: {
-                        clinicalRecord: {
-                            create: jest.fn(),
-                            findMany: jest.fn(),
-                        },
+                        forTenant: jest.fn().mockReturnValue(tenantPrisma),
+                        forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
                     },
                 },
             ],
         }).compile();
-        repository = module.get(records_repository_1.RecordsRepository);
-        prisma = module.get(prisma_service_1.PrismaService);
+        repository = module.get(prisma_records_repository_1.PrismaRecordsRepository);
+        tenantScopedPrismaFactory = module.get(tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory);
     });
-    describe('create', () => {
-        it('deve persistir um novo registro clínico com os campos mapeados corretamente', async () => {
-            const dto = { weight: 80.5, skeletal_muscle_mass: 35, body_fat_mass: 20 };
-            const userId = 'user-123';
-            const tenantId = 'tenant-456';
-            await repository.create(dto, userId, tenantId);
-            expect(prisma.clinicalRecord.create).toHaveBeenCalledWith({
-                data: {
-                    weight: dto.weight,
-                    skeletalMuscleMass: dto.skeletal_muscle_mass,
-                    bodyFatMass: dto.body_fat_mass,
-                    patientId: userId,
-                    tenantId: tenantId,
-                },
-            });
+    it('deve persistir um novo registro clinico com os campos mapeados corretamente', async () => {
+        const dto = { weight: 80.5, skeletalMuscleMass: 35, bodyFatMass: 20 };
+        await repository.create(dto, 'user-123', 'tenant-456');
+        expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+            userId: 'user-123',
+            tenantId: 'tenant-456',
         });
-    });
-    describe('findAllByPatient', () => {
-        it('deve buscar o histórico completo ordenado por data ASCENDENTE para o gráfico', async () => {
-            const userId = 'user-123';
-            const tenantId = 'tenant-456';
-            await repository.findAllByPatient(userId, tenantId);
-            expect(prisma.clinicalRecord.findMany).toHaveBeenCalledWith({
-                where: { patientId: userId, tenantId },
-                orderBy: { recordedAt: 'asc' },
-            });
+        expect(tenantPrisma.clinicalRecord.create).toHaveBeenCalledWith({
+            data: {
+                weight: dto.weight,
+                skeletalMuscleMass: dto.skeletalMuscleMass,
+                bodyFatMass: dto.bodyFatMass,
+                patientId: 'user-123',
+                tenantId: 'tenant-456',
+            },
         });
     });
-    describe('findLastTwo', () => {
-        it('deve buscar apenas os 2 registros mais recentes para cálculo de dano', async () => {
-            const userId = 'user-123';
-            await repository.findLastTwo(userId);
-            expect(prisma.clinicalRecord.findMany).toHaveBeenCalledWith({
-                where: { patientId: userId },
-                orderBy: { recordedAt: 'desc' },
-                take: 2,
-            });
+    it('deve buscar o historico completo por paciente e tenant', async () => {
+        await repository.findAllByPatient('user-123', 'tenant-456');
+        expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-456', 'user-123');
+        expect(tenantPrisma.clinicalRecord.findMany).toHaveBeenCalledWith({
+            where: { patientId: 'user-123', tenantId: 'tenant-456' },
+            orderBy: { recordedAt: 'asc' },
         });
     });
-    describe('getClinicalDamageByTenant', () => {
-        it('deve calcular o dano acumulado de todos os pacientes da clínica com base na perda de peso', async () => {
-            const tenantId = 'tenant-123';
-            const mockRecords = [
-                { patientId: 'p1', weight: 100, recordedAt: new Date('2023-01-01') },
-                { patientId: 'p1', weight: 95, recordedAt: new Date('2023-01-02') },
-                { patientId: 'p2', weight: 80, recordedAt: new Date('2023-01-01') },
-                { patientId: 'p2', weight: 82, recordedAt: new Date('2023-01-02') },
-                { patientId: 'p2', weight: 79, recordedAt: new Date('2023-01-03') },
-            ];
-            jest.spyOn(prisma.clinicalRecord, 'findMany').mockResolvedValue(mockRecords);
-            const result = await repository.getClinicalDamageByTenant(tenantId);
-            expect(prisma.clinicalRecord.findMany).toHaveBeenCalledWith({
-                where: { tenantId },
-                select: { patientId: true, weight: true, recordedAt: true },
-                orderBy: { recordedAt: 'asc' },
-            });
-            expect(result).toBeInstanceOf(Map);
-            expect(result.size).toBe(2);
-            expect(result.get('p1')).toBe(38500);
-            expect(result.get('p2')).toBe(23100);
+    it('deve buscar os 2 registros mais recentes por paciente e tenant', async () => {
+        await repository.findLastTwo('user-123', 'tenant-456');
+        expect(tenantPrisma.clinicalRecord.findMany).toHaveBeenCalledWith({
+            where: { patientId: 'user-123', tenantId: 'tenant-456' },
+            orderBy: { recordedAt: 'desc' },
+            take: 2,
         });
-        it('deve retornar um Map vazio se a clínica não possuir registros', async () => {
-            jest.spyOn(prisma.clinicalRecord, 'findMany').mockResolvedValue([]);
-            const result = await repository.getClinicalDamageByTenant('tenant-vazio');
-            expect(result.size).toBe(0);
+    });
+    it('deve calcular o dano acumulado de todos os pacientes da clinica', async () => {
+        jest.spyOn(tenantPrisma.clinicalRecord, 'findMany').mockResolvedValue([
+            { patientId: 'p1', weight: 100, recordedAt: new Date('2023-01-01') },
+            { patientId: 'p1', weight: 95, recordedAt: new Date('2023-01-02') },
+            { patientId: 'p2', weight: 80, recordedAt: new Date('2023-01-01') },
+            { patientId: 'p2', weight: 82, recordedAt: new Date('2023-01-02') },
+            { patientId: 'p2', weight: 79, recordedAt: new Date('2023-01-03') },
+        ]);
+        const result = await repository.getClinicalDamageByTenant('tenant-123');
+        expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-123');
+        expect(tenantPrisma.clinicalRecord.findMany).toHaveBeenCalledWith({
+            where: { tenantId: 'tenant-123' },
+            select: { patientId: true, weight: true, recordedAt: true },
+            orderBy: { recordedAt: 'asc' },
         });
+        expect(result.get('p1')).toBe(38500);
+        expect(result.get('p2')).toBe(23100);
     });
 });
 //# sourceMappingURL=records.repository.spec.js.map

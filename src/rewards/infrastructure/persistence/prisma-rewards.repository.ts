@@ -8,10 +8,30 @@ import { RewardsRepositoryPort } from '../../application/ports/rewards-repositor
 export class PrismaRewardsRepository implements RewardsRepositoryPort {
   constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
+  async create(data: {
+    tenantId: string;
+    title: string;
+    description?: string;
+    requiredDamage: number;
+    goldCost: number;
+    badgeIcon?: string;
+    isActive: boolean;
+  }): Promise<Reward> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(data.tenantId);
+    return prisma.reward.create({ data });
+  }
+
   async findAllActiveByTenant(tenantId: string): Promise<Reward[]> {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
     return prisma.reward.findMany({
       where: byTenant(tenantId, { isActive: true }),
+    });
+  }
+
+  async findByTitle(title: string, tenantId: string): Promise<Reward | null> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.reward.findFirst({
+      where: byTenant(tenantId, { title }),
     });
   }
 

@@ -1,6 +1,6 @@
 export interface TaskCompletionTransactionPort {
   execute(input: {
-    taskId: string;
+    assignmentId: string;
     patientId: string;
     tenantId: string;
     xpReward: number;

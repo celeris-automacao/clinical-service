@@ -21,8 +21,8 @@ export class GetCategorizedRankingUseCase {
 
     return patients
       .map((patient) => {
-        const missionDamage = patient.completions.reduce(
-          (acc, completion) => acc + (completion.task?.xpReward || 0),
+        const missionDamage = patient.taskAssignments.reduce(
+          (acc, assignment) => acc + (assignment.template?.xpReward || 0),
           0,
         );
         const clinicalDamage = clinicalDamageMap.get(patient.id) || 0;

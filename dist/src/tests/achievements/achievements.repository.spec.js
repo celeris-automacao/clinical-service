@@ -1,39 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const testing_1 = require("@nestjs/testing");
-const achievements_repository_1 = require("../../achievements/repositories/achievements.repository");
-const prisma_service_1 = require("../../prisma/prisma.service");
-describe('AchievementsRepository', () => {
+const prisma_achievements_repository_1 = require("../../achievements/infrastructure/persistence/prisma-achievements.repository");
+const tenant_scoped_prisma_factory_1 = require("../../shared/infrastructure/persistence/tenant-scoped-prisma.factory");
+describe('PrismaAchievementsRepository', () => {
     let repository;
-    let prisma;
+    let tenantScopedPrismaFactory;
+    const rootPrisma = {
+        rewardClaim: { findFirst: jest.fn() },
+    };
+    const tenantPrisma = {
+        reward: { upsert: jest.fn() },
+        rewardClaim: { create: jest.fn() },
+    };
     beforeEach(async () => {
         const module = await testing_1.Test.createTestingModule({
             providers: [
-                achievements_repository_1.AchievementsRepository,
+                prisma_achievements_repository_1.PrismaAchievementsRepository,
                 {
-                    provide: prisma_service_1.PrismaService,
+                    provide: tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory,
                     useValue: {
-                        reward: { upsert: jest.fn() },
-                        rewardClaim: { findFirst: jest.fn(), create: jest.fn() },
+                        forRoot: jest.fn().mockReturnValue(rootPrisma),
+                        forTenant: jest.fn().mockReturnValue(tenantPrisma),
+                        forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
                     },
                 },
             ],
         }).compile();
-        repository = module.get(achievements_repository_1.AchievementsRepository);
-        prisma = module.get(prisma_service_1.PrismaService);
+        repository = module.get(prisma_achievements_repository_1.PrismaAchievementsRepository);
+        tenantScopedPrismaFactory = module.get(tenant_scoped_prisma_factory_1.TenantScopedPrismaFactory);
     });
-    it('getOrCreateBadge deve usar upsert com a chave composta (title_tenantId)', async () => {
+    it('getOrCreateBadge deve usar upsert com a chave composta', async () => {
         await repository.getOrCreateBadge('t1', 'Badge Teste', 'icon-1');
-        expect(prisma.reward.upsert).toHaveBeenCalledWith({
+        expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('t1');
+        expect(tenantPrisma.reward.upsert).toHaveBeenCalledWith({
             where: { title_tenantId: { title: 'Badge Teste', tenantId: 't1' } },
             update: {},
-            create: expect.objectContaining({ title: 'Badge Teste', tenantId: 't1' })
+            create: expect.objectContaining({ title: 'Badge Teste', tenantId: 't1' }),
         });
     });
     it('createClaim deve salvar o registro de ganho da medalha', async () => {
         await repository.createClaim('p1', 't1', 'r1');
-        expect(prisma.rewardClaim.create).toHaveBeenCalledWith({
-            data: { rewardId: 'r1', patientId: 'p1', tenantId: 't1' }
+        expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+            userId: 'p1',
+            tenantId: 't1',
+        });
+        expect(tenantPrisma.rewardClaim.create).toHaveBeenCalledWith({
+            data: { rewardId: 'r1', patientId: 'p1', tenantId: 't1' },
         });
     });
 });

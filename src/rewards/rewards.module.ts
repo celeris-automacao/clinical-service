@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { RecordsModule } from '../records/records.module';
 import { ClaimRewardUseCase } from './application/use-cases/claim-reward.use-case';
+import { CreateRewardUseCase } from './application/use-cases/create-reward.use-case';
 import { GetAvailableRewardsUseCase } from './application/use-cases/get-available-rewards.use-case';
 import { RecordsRewardsStatsAdapter } from './infrastructure/adapters/records-rewards-stats.adapter';
 import { RewardsEventsAdapter } from './infrastructure/adapters/rewards-events.adapter';
@@ -17,6 +18,7 @@ import {
 @Module({
   imports: [RecordsModule],
   providers: [
+    CreateRewardUseCase,
     GetAvailableRewardsUseCase,
     ClaimRewardUseCase,
     {

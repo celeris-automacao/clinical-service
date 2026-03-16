@@ -9,6 +9,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
+const staff_module_1 = require("../staff/staff.module");
+const map_supabase_user_use_case_1 = require("./application/use-cases/map-supabase-user.use-case");
+const auth_tokens_1 = require("./auth.tokens");
+const env_auth_config_adapter_1 = require("./infrastructure/adapters/env-auth-config.adapter");
 const supabase_strategy_1 = require("./strategies/supabase.strategy");
 let AuthModule = class AuthModule {
 };
@@ -16,9 +20,15 @@ exports.AuthModule = AuthModule;
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Global)(),
     (0, common_1.Module)({
-        imports: [passport_1.PassportModule.register({ defaultStrategy: 'supabase' })],
-        providers: [supabase_strategy_1.SupabaseStrategy],
-        exports: [passport_1.PassportModule, supabase_strategy_1.SupabaseStrategy],
+        imports: [passport_1.PassportModule.register({ defaultStrategy: 'supabase' }), staff_module_1.StaffModule],
+        providers: [
+            map_supabase_user_use_case_1.MapSupabaseUserUseCase,
+            {
+                provide: auth_tokens_1.AUTH_CONFIG_PORT,
+                useClass: env_auth_config_adapter_1.EnvAuthConfigAdapter,
+            },
+            supabase_strategy_1.SupabaseStrategy,
+        ],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

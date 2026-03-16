@@ -28,8 +28,7 @@ describe('CompleteTaskUseCase', () => {
         {
           provide: TASKS_REPOSITORY,
           useValue: {
-            findSpecificCompletionToday: jest.fn(),
-            findById: jest.fn(),
+            findAssignmentById: jest.fn(),
           },
         },
         {
@@ -61,22 +60,34 @@ describe('CompleteTaskUseCase', () => {
     handleBossVictoryUseCase = module.get<HandleBossVictoryUseCase>(HandleBossVictoryUseCase);
   });
 
-  it('deve lancar erro se a tarefa ja foi completada hoje', async () => {
-    jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue({ id: 'comp1' } as any);
+  it('deve lancar erro se a atribuicao nao existir para o paciente', async () => {
+    jest.spyOn(repository, 'findAssignmentById').mockResolvedValue(null);
 
-    await expect(useCase.execute('task1', mockUser as any)).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute('assignment-1', mockUser as any)).rejects.toThrow(
+      new BadRequestException('Missao nao encontrada.'),
+    );
   });
 
-  it('deve lancar erro se a missao nao existir', async () => {
-    jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
-    jest.spyOn(repository, 'findById').mockResolvedValue(null);
+  it('deve lancar erro se a atribuicao ja estiver concluida', async () => {
+    jest.spyOn(repository, 'findAssignmentById').mockResolvedValue({
+      id: 'assignment-1',
+      patientId: 'u1',
+      status: 'completed',
+      template: { xpReward: 50 },
+    } as any);
 
-    await expect(useCase.execute('task-x', mockUser as any)).rejects.toThrow(BadRequestException);
+    await expect(useCase.execute('assignment-1', mockUser as any)).rejects.toThrow(
+      new BadRequestException('Voce ja completou esta missao.'),
+    );
   });
 
   it('deve processar a conclusao com sucesso e dar dano no boss', async () => {
-    jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
-    jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'task1', xpReward: 50 } as any);
+    jest.spyOn(repository, 'findAssignmentById').mockResolvedValue({
+      id: 'assignment-1',
+      patientId: 'u1',
+      status: 'pending',
+      template: { xpReward: 50 },
+    } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
       newXp: 100,
       newLevel: 1,
@@ -84,7 +95,7 @@ describe('CompleteTaskUseCase', () => {
       bossDamage: 50,
     });
 
-    const result = await useCase.execute('task1', mockUser as any);
+    const result = await useCase.execute('assignment-1', mockUser as any);
 
     expect(result.success).toBe(true);
     expect(result.xp_earned).toBe(50);
@@ -92,8 +103,12 @@ describe('CompleteTaskUseCase', () => {
   });
 
   it('deve subir de nivel e disparar conquistas quando o XP atinge o limite', async () => {
-    jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
-    jest.spyOn(repository, 'findById').mockResolvedValue({ id: 't1', xpReward: 1000 } as any);
+    jest.spyOn(repository, 'findAssignmentById').mockResolvedValue({
+      id: 'assignment-1',
+      patientId: 'u1',
+      status: 'pending',
+      template: { xpReward: 1000 },
+    } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
       newXp: 1050,
       newLevel: 2,
@@ -101,7 +116,7 @@ describe('CompleteTaskUseCase', () => {
       bossDamage: 1000,
     });
 
-    const result = await useCase.execute('t1', mockUser as any);
+    const result = await useCase.execute('assignment-1', mockUser as any);
 
     expect(result.level_up).toBe(true);
     expect(tasksAchievementsPort.checkLevelAchievements).toHaveBeenCalledWith({
@@ -112,8 +127,12 @@ describe('CompleteTaskUseCase', () => {
   });
 
   it('deve disparar o use case de vitoria quando a transacao indicar boss derrotado', async () => {
-    jest.spyOn(repository, 'findSpecificCompletionToday').mockResolvedValue(null);
-    jest.spyOn(repository, 'findById').mockResolvedValue({ id: 'task-id', xpReward: 100 } as any);
+    jest.spyOn(repository, 'findAssignmentById').mockResolvedValue({
+      id: 'assignment-1',
+      patientId: 'u1',
+      status: 'pending',
+      template: { xpReward: 100 },
+    } as any);
     jest.spyOn(transactionPort, 'execute').mockResolvedValue({
       newXp: 100,
       newLevel: 1,
@@ -122,7 +141,7 @@ describe('CompleteTaskUseCase', () => {
       defeatedBossId: 'boss-1',
     });
 
-    await useCase.execute('task-id', mockUser as any);
+    await useCase.execute('assignment-1', mockUser as any);
 
     expect(handleBossVictoryUseCase.execute).toHaveBeenCalledWith(
       'boss-1',

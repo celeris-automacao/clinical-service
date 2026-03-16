@@ -6,14 +6,14 @@ describe('PrismaTasksRepository', () => {
   let repository: PrismaTasksRepository;
   let tenantScopedPrismaFactory: TenantScopedPrismaFactory;
 
-  const rootPrisma = {
-    taskCompletion: {
-      findMany: jest.fn(),
-      findFirst: jest.fn(),
-    },
-  };
   const tenantPrisma = {
-    dailyTask: {
+    taskTemplate: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+    },
+    taskAssignment: {
+      create: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
     },
@@ -22,6 +22,7 @@ describe('PrismaTasksRepository', () => {
     },
     patient: {
       findMany: jest.fn(),
+      findFirst: jest.fn(),
     },
   };
 
@@ -32,8 +33,8 @@ describe('PrismaTasksRepository', () => {
         {
           provide: TenantScopedPrismaFactory,
           useValue: {
-            forRoot: jest.fn().mockReturnValue(rootPrisma),
             forTenant: jest.fn().mockReturnValue(tenantPrisma),
+            forTenantContext: jest.fn().mockReturnValue(tenantPrisma),
           },
         },
       ],
@@ -43,66 +44,77 @@ describe('PrismaTasksRepository', () => {
     tenantScopedPrismaFactory = module.get<TenantScopedPrismaFactory>(TenantScopedPrismaFactory);
   });
 
-  it('deve buscar tarefas ativas filtrando pelo tenantId', async () => {
-    await repository.findTasksByTenant('tenant-123');
+  it('deve criar template dentro do tenant', async () => {
+    await repository.createTemplate({
+      tenantId: 'tenant-1',
+      title: 'Beber agua',
+      taskType: 'water',
+      xpReward: 100,
+      createdByUserId: 'staff-1',
+    });
 
-    expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-123');
-    expect(tenantPrisma.dailyTask.findMany).toHaveBeenCalledWith({
-      where: { isCompleted: true, tenantId: 'tenant-123' },
+    expect(tenantPrisma.taskTemplate.create).toHaveBeenCalled();
+  });
+
+  it('deve listar templates do tenant', async () => {
+    await repository.listTemplatesByTenant('tenant-1');
+
+    expect(tenantPrisma.taskTemplate.findMany).toHaveBeenCalledWith({
+      where: { tenantId: 'tenant-1' },
+      orderBy: [{ isActive: 'desc' }, { title: 'asc' }],
     });
   });
 
-  it('deve buscar conclusoes do paciente a partir do inicio do dia', async () => {
-    const startOfDay = new Date('2026-03-03T00:00:00Z');
+  it('deve criar atribuicao com include do template', async () => {
+    await repository.createAssignment({
+      templateId: 'template-1',
+      patientId: 'patient-1',
+      tenantId: 'tenant-1',
+      dueDate: new Date('2026-03-20'),
+      assignedByUserId: 'staff-1',
+    });
 
-    await repository.findCompletionsByPatientToday('user-1', startOfDay);
+    expect(tenantPrisma.taskAssignment.create).toHaveBeenCalled();
+  });
 
-    expect(rootPrisma.taskCompletion.findMany).toHaveBeenCalledWith({
-      where: {
-        patientId: 'user-1',
-        completedAt: { gte: startOfDay },
-      },
+  it('deve buscar atribuicoes do paciente no tenant', async () => {
+    await repository.findAssignmentsByPatient('patient-1', 'tenant-1');
+
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'patient-1',
+      tenantId: 'tenant-1',
+    });
+    expect(tenantPrisma.taskAssignment.findMany).toHaveBeenCalled();
+  });
+
+  it('deve buscar uma atribuicao pelo id dentro do tenant', async () => {
+    await repository.findAssignmentById('assignment-1', 'tenant-1');
+
+    expect(tenantPrisma.taskAssignment.findFirst).toHaveBeenCalledWith({
+      where: { id: 'assignment-1', tenantId: 'tenant-1' },
+      include: { template: true },
     });
   });
 
-  it('deve verificar se uma tarefa especifica foi concluida no intervalo', async () => {
-    const start = new Date('2026-03-03T00:00:00Z');
-    const end = new Date('2026-03-03T23:59:59Z');
+  it('deve validar se o paciente existe dentro do tenant', async () => {
+    await repository.findPatientById('patient-1', 'tenant-1');
 
-    await repository.findSpecificCompletionToday('task-1', 'user-1', start, end);
-
-    expect(rootPrisma.taskCompletion.findFirst).toHaveBeenCalledWith({
-      where: {
-        taskId: 'task-1',
-        patientId: 'user-1',
-        completedAt: { gte: start, lte: end },
-      },
+    expect(tenantPrisma.patient.findFirst).toHaveBeenCalledWith({
+      where: { id: 'patient-1', tenantId: 'tenant-1' },
+      select: { id: true },
     });
   });
 
-  it('deve buscar uma tarefa pelo id dentro do tenant', async () => {
-    await repository.findById('task-1', 'tenant-1');
-
-    expect(tenantPrisma.dailyTask.findFirst).toHaveBeenCalledWith({
-      where: { id: 'task-1', tenantId: 'tenant-1' },
-    });
-  });
-
-  it('deve buscar tarefas pendentes de hoje filtrando por tenant', async () => {
+  it('deve buscar atribuicoes pendentes de hoje filtrando por tenant', async () => {
     const today = new Date('2026-03-03');
 
     await repository.findPendingTasksToday('user-1', 'tenant-1', today);
 
-    expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-1', 'user-1');
-    expect(tenantPrisma.dailyTask.findMany).toHaveBeenCalledWith({
-      where: {
-        patientId: 'user-1',
-        tenantId: 'tenant-1',
-        isCompleted: false,
-        dueDate: today,
-      },
-      orderBy: { createdAt: 'asc' },
+    expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
+      userId: 'user-1',
+      tenantId: 'tenant-1',
     });
+    expect(tenantPrisma.taskAssignment.findMany).toHaveBeenCalled();
   });
 
   it('deve buscar o ranking filtrando por tenant', async () => {

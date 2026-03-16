@@ -30,33 +30,26 @@ export class CompleteTaskUseCase {
     private readonly handleBossVictoryUseCase: HandleBossVictoryUseCase,
   ) {}
 
-  async execute(taskId: string, user: UserContext) {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+  async execute(taskAssignmentId: string, user: UserContext) {
+    const assignment = await this.repository.findAssignmentById(taskAssignmentId, user.tenantId);
 
-    const alreadyCompleted = await this.repository.findSpecificCompletionToday(
-      taskId,
-      user.userId,
-      startOfDay,
-      endOfDay,
-    );
-
-    if (alreadyCompleted) {
-      throw new BadRequestException('Voce ja completou esta missao hoje!');
-    }
-
-    const task = await this.repository.findById(taskId, user.tenantId);
-    if (!task) {
+    if (!assignment || assignment.patientId !== user.userId) {
       throw new BadRequestException('Missao nao encontrada.');
     }
 
+    if (assignment.status === 'completed') {
+      throw new BadRequestException('Voce ja completou esta missao.');
+    }
+
+    if (assignment.status !== 'pending') {
+      throw new BadRequestException('A missao nao esta disponivel para conclusao.');
+    }
+
     const result = await this.taskCompletionTransactionPort.execute({
-      taskId,
+      assignmentId: taskAssignmentId,
       patientId: user.userId,
       tenantId: user.tenantId,
-      xpReward: task.xpReward,
+      xpReward: assignment.template.xpReward,
     });
 
     if (result.defeatedBossId) {
@@ -73,16 +66,16 @@ export class CompleteTaskUseCase {
 
     this.eventBus.publish(
       createApplicationEvent(APPLICATION_EVENTS.taskCompleted, {
-        taskId,
+        taskId: taskAssignmentId,
         userId: user.userId,
         tenantId: user.tenantId,
-        xp: task.xpReward,
+        xp: assignment.template.xpReward,
       }),
     );
 
     return {
       success: true,
-      xp_earned: task.xpReward,
+      xp_earned: assignment.template.xpReward,
       current_xp: result.newXp,
       current_level: result.newLevel,
       level_up: result.leveledUp,

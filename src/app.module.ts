@@ -9,6 +9,7 @@ import { SocialModule } from './social/social.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { PatientsModule } from './patients/patients.module';
 import { SharedInfrastructureModule } from './shared/infrastructure/shared-infrastructure.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { SharedInfrastructureModule } from './shared/infrastructure/shared-infra
     SocialModule,
     TenantsModule,
     PatientsModule,
+    StaffModule,
   ],
   controllers: [],
   providers: [],
