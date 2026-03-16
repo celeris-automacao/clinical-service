@@ -1,4 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { TenantPlanPort } from '../../../shared/application/ports/tenant-plan.port';
+import { TENANT_PLAN_PORT } from '../../../shared/shared.tokens';
 import { STAFF_AUDIT_LOG_PORT, STAFF_REPOSITORY } from '../../staff.tokens';
 import { CreateStaffMemberDto } from '../../presentation/http/dto/create-staff-member.dto';
 import { StaffAuditLogPort } from '../ports/staff-audit-log.port';
@@ -11,9 +13,24 @@ export class CreateStaffMemberUseCase {
     private readonly repository: StaffRepositoryPort,
     @Inject(STAFF_AUDIT_LOG_PORT)
     private readonly auditLogPort: StaffAuditLogPort,
+    @Inject(TENANT_PLAN_PORT)
+    private readonly tenantPlanPort: TenantPlanPort,
   ) {}
 
   async execute(dto: CreateStaffMemberDto, tenantId: string, actorUserId?: string) {
+    const [plan, staffCount] = await Promise.all([
+      this.tenantPlanPort.getTenantPlan(tenantId),
+      this.repository.countByTenant(tenantId),
+    ]);
+
+    if (!plan) {
+      throw new BadRequestException('Clinica sem plano ativo.');
+    }
+
+    if (staffCount >= plan.maxStaff) {
+      throw new BadRequestException('Limite de profissionais do plano atingido.');
+    }
+
     const existingUser = await this.repository.findByUserId(dto.userId, tenantId);
     if (existingUser) {
       throw new BadRequestException('Ja existe um profissional com este usuario na clinica.');

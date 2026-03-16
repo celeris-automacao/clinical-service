@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { SocialModule } from './social/social.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { PatientsModule } from './patients/patients.module';
+import { PlansModule } from './plans/plans.module';
 import { SharedInfrastructureModule } from './shared/infrastructure/shared-infrastructure.module';
 import { StaffModule } from './staff/staff.module';
 
@@ -22,6 +23,7 @@ import { StaffModule } from './staff/staff.module';
     SocialModule,
     TenantsModule,
     PatientsModule,
+    PlansModule,
     StaffModule,
   ],
   controllers: [],

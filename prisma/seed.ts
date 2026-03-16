@@ -6,13 +6,48 @@ async function main() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  console.log('Criando plano base...');
+  const plan = await (prisma as any).plan.upsert({
+    where: { code: 'starter' },
+    update: {},
+    create: {
+      id: '30000000-0000-0000-0000-000000000001',
+      name: 'Starter',
+      code: 'starter',
+      description: 'Plano inicial para operacao da clinica',
+      maxStaff: 10,
+      maxPatients: 200,
+      monthlyPrice: 299,
+      isActive: true,
+    },
+  });
+
   console.log('Criando a clinica (Tenant)...');
-  const tenant = await prisma.tenant.upsert({
+  const tenant = await (prisma as any).tenant.upsert({
     where: { id: 'c56a4180-65aa-42ec-a945-5fd21dec0538' },
     update: {},
     create: {
       id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
       name: 'Clinica HealthQuest Central',
+      legalName: 'Clinica HealthQuest Central LTDA',
+      cnpj: '12345678000199',
+      responsibleName: 'Helena Costa',
+      responsibleEmail: 'owner@clinica.com',
+      responsiblePhone: '11999999999',
+      status: 'active',
+      activatedAt: new Date(),
+      planId: plan.id,
+      address: {
+        create: {
+          zipCode: '01311000',
+          street: 'Avenida Paulista',
+          number: '1000',
+          neighborhood: 'Bela Vista',
+          city: 'Sao Paulo',
+          state: 'SP',
+          country: 'BR',
+        },
+      },
     },
   });
 
@@ -24,6 +59,20 @@ async function main() {
       id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
       name: 'Guerreiro de Saude',
       tenantId: tenant.id,
+      email: 'paciente@clinica.com',
+      phone: '11911111111',
+      document: '11122233344',
+      address: {
+        create: {
+          zipCode: '01415001',
+          street: 'Rua da Consolacao',
+          number: '200',
+          neighborhood: 'Consolacao',
+          city: 'Sao Paulo',
+          state: 'SP',
+          country: 'BR',
+        },
+      },
     },
   });
 

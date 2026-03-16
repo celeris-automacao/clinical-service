@@ -3,6 +3,7 @@ import { UpdatePatientProfileDto } from '../../presentation/http/dto/update-pati
 
 export interface PatientsRepositoryPort {
   createWithStats(data: CreatePatientDto, tenantId: string): Promise<any>;
+  countByTenant(tenantId: string): Promise<number>;
   findBySupabaseId(id: string, tenantId: string): Promise<any | null>;
   findById(id: string, tenantId: string): Promise<any | null>;
   updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto): Promise<any>;

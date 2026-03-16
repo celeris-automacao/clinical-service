@@ -17,8 +17,25 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
             id: data.supabaseId,
             name: data.name,
             tenantId,
+            email: data.email,
+            phone: data.phone,
+            document: data.document,
             gender: data.gender,
             birthDate: data.birthDate ? new Date(data.birthDate) : null,
+            address: data.address
+              ? {
+                  create: {
+                    zipCode: data.address.zipCode,
+                    street: data.address.street,
+                    number: data.address.number,
+                    complement: data.address.complement,
+                    neighborhood: data.address.neighborhood,
+                    city: data.address.city,
+                    state: data.address.state,
+                    country: data.address.country ?? 'BR',
+                  },
+                }
+              : undefined,
           },
         });
 
@@ -35,20 +52,27 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
     );
   }
 
+  async countByTenant(tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.count({
+      where: { tenantId },
+    });
+  }
+
   async findBySupabaseId(id: string, tenantId: string) {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId });
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId }) as any;
     return prisma.patient.findFirst({ where: { id, tenantId } });
   }
 
   async findById(id: string, tenantId: string) {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId });
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId }) as any;
     return prisma.patient.findFirst({ where: { id, tenantId } });
   }
 
   async updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto) {
     await this.findById(patientId, tenantId);
 
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: patientId, tenantId });
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: patientId, tenantId }) as any;
     return prisma.patientProfile.upsert({
       where: { patientId },
       update: data,

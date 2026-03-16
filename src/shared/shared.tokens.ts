@@ -1,1 +1,2 @@
 export const APPLICATION_EVENT_BUS = Symbol('APPLICATION_EVENT_BUS');
+export const TENANT_PLAN_PORT = Symbol('TENANT_PLAN_PORT');

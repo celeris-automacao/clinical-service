@@ -140,6 +140,13 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     });
   }
 
+  async countByTenant(tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.staff.count({
+      where: { tenantId },
+    });
+  }
+
   async createInvitation(data: {
     tenantId: string;
     email: string;
