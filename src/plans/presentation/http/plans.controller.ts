@@ -45,7 +45,6 @@ export class PlansController {
 
   // Rotas de Upgrade - Clinic Owner
   @Get('upgrade-request/pending')
-  @Roles('clinic_owner')
   getPendingRequest(@GetUser() user: UserContext) {
     return this.getPendingUpgradeRequestUseCase.execute(user.tenantId);
   }
