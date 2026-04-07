@@ -34,4 +34,60 @@ export class PrismaPlansRepository implements PlansRepositoryPort {
     const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
     return prisma.plan.findUnique({ where: { code } });
   }
+
+  async createUpgradeRequest(data: { tenantId: string; currentPlanId: string; targetPlanId: string }) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.planUpgradeRequest.create({
+      data: {
+        tenantId: data.tenantId,
+        currentPlanId: data.currentPlanId,
+        targetPlanId: data.targetPlanId,
+      },
+    });
+  }
+
+  async findPendingUpgradeRequestByTenantId(tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.planUpgradeRequest.findFirst({
+      where: {
+        tenantId,
+        status: 'pending',
+      },
+      include: {
+        targetPlan: true,
+      },
+    });
+  }
+
+  async findUpgradeRequests(status?: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.planUpgradeRequest.findMany({
+      where: status ? { status } : undefined,
+      include: {
+        tenant: true,
+        currentPlan: true,
+        targetPlan: true,
+      },
+      orderBy: { requestedAt: 'desc' },
+    });
+  }
+
+  async findUpgradeRequestById(id: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.planUpgradeRequest.findUnique({
+      where: { id },
+    });
+  }
+
+  async updateUpgradeRequestStatus(id: string, status: string, resolvedBy?: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.planUpgradeRequest.update({
+      where: { id },
+      data: {
+        status,
+        resolvedBy,
+        resolvedAt: new Date(),
+      },
+    });
+  }
 }

@@ -4,4 +4,13 @@ export interface PlansRepositoryPort {
     findAll(): Promise<any[]>;
     findById(id: string): Promise<any | null>;
     findByCode(code: string): Promise<any | null>;
+    createUpgradeRequest(data: {
+        tenantId: string;
+        currentPlanId: string;
+        targetPlanId: string;
+    }): Promise<any>;
+    findPendingUpgradeRequestByTenantId(tenantId: string): Promise<any | null>;
+    findUpgradeRequests(status?: string): Promise<any[]>;
+    findUpgradeRequestById(id: string): Promise<any | null>;
+    updateUpgradeRequestStatus(id: string, status: string, resolvedBy?: string): Promise<any>;
 }

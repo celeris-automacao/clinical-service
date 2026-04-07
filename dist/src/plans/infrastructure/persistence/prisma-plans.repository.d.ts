@@ -8,4 +8,13 @@ export declare class PrismaPlansRepository implements PlansRepositoryPort {
     findAll(): Promise<any>;
     findById(id: string): Promise<any>;
     findByCode(code: string): Promise<any>;
+    createUpgradeRequest(data: {
+        tenantId: string;
+        currentPlanId: string;
+        targetPlanId: string;
+    }): Promise<any>;
+    findPendingUpgradeRequestByTenantId(tenantId: string): Promise<any>;
+    findUpgradeRequests(status?: string): Promise<any>;
+    findUpgradeRequestById(id: string): Promise<any>;
+    updateUpgradeRequestStatus(id: string, status: string, resolvedBy?: string): Promise<any>;
 }

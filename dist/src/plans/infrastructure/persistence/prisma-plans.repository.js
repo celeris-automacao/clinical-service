@@ -40,6 +40,57 @@ let PrismaPlansRepository = class PrismaPlansRepository {
         const prisma = this.tenantScopedPrismaFactory.forRoot();
         return prisma.plan.findUnique({ where: { code } });
     }
+    async createUpgradeRequest(data) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.planUpgradeRequest.create({
+            data: {
+                tenantId: data.tenantId,
+                currentPlanId: data.currentPlanId,
+                targetPlanId: data.targetPlanId,
+            },
+        });
+    }
+    async findPendingUpgradeRequestByTenantId(tenantId) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.planUpgradeRequest.findFirst({
+            where: {
+                tenantId,
+                status: 'pending',
+            },
+            include: {
+                targetPlan: true,
+            },
+        });
+    }
+    async findUpgradeRequests(status) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.planUpgradeRequest.findMany({
+            where: status ? { status } : undefined,
+            include: {
+                tenant: true,
+                currentPlan: true,
+                targetPlan: true,
+            },
+            orderBy: { requestedAt: 'desc' },
+        });
+    }
+    async findUpgradeRequestById(id) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.planUpgradeRequest.findUnique({
+            where: { id },
+        });
+    }
+    async updateUpgradeRequestStatus(id, status, resolvedBy) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.planUpgradeRequest.update({
+            where: { id },
+            data: {
+                status,
+                resolvedBy,
+                resolvedAt: new Date(),
+            },
+        });
+    }
 };
 exports.PrismaPlansRepository = PrismaPlansRepository;
 exports.PrismaPlansRepository = PrismaPlansRepository = __decorate([

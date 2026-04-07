@@ -6,4 +6,5 @@ export interface TenantsRepositoryPort {
     findByCnpj(cnpj: string): Promise<any | null>;
     findActivePlanById(planId: string): Promise<any | null>;
     updateStatus(id: string, status: string): Promise<any>;
+    updatePlan(id: string, planId: string): Promise<any>;
 }

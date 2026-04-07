@@ -105,4 +105,12 @@ export class PrismaTenantsRepository implements TenantsRepositoryPort {
       },
     });
   }
+
+  async updatePlan(id: string, planId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.tenant.update({
+      where: { id },
+      data: { planId },
+    });
+  }
 }

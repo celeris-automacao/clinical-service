@@ -109,6 +109,13 @@ let PrismaTenantsRepository = class PrismaTenantsRepository {
             },
         });
     }
+    async updatePlan(id, planId) {
+        const prisma = this.tenantScopedPrismaFactory.forRoot();
+        return prisma.tenant.update({
+            where: { id },
+            data: { planId },
+        });
+    }
 };
 exports.PrismaTenantsRepository = PrismaTenantsRepository;
 exports.PrismaTenantsRepository = PrismaTenantsRepository = __decorate([

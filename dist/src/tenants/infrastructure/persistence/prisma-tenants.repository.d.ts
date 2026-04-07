@@ -10,4 +10,5 @@ export declare class PrismaTenantsRepository implements TenantsRepositoryPort {
     updateStatus(id: string, status: string): Promise<any>;
     findById(id: string): Promise<any>;
     findAll(): Promise<any>;
+    updatePlan(id: string, planId: string): Promise<any>;
 }

@@ -11,6 +11,10 @@ const common_1 = require("@nestjs/common");
 const create_plan_use_case_1 = require("./application/use-cases/create-plan.use-case");
 const get_plan_by_id_use_case_1 = require("./application/use-cases/get-plan-by-id.use-case");
 const get_plans_use_case_1 = require("./application/use-cases/get-plans.use-case");
+const request_plan_upgrade_use_case_1 = require("./application/use-cases/request-plan-upgrade.use-case");
+const resolve_upgrade_request_use_case_1 = require("./application/use-cases/resolve-upgrade-request.use-case");
+const get_pending_upgrade_request_use_case_1 = require("./application/use-cases/get-pending-upgrade-request.use-case");
+const get_upgrade_requests_use_case_1 = require("./application/use-cases/get-upgrade-requests.use-case");
 const prisma_plans_repository_1 = require("./infrastructure/persistence/prisma-plans.repository");
 const plans_controller_1 = require("./presentation/http/plans.controller");
 const plans_tokens_1 = require("./plans.tokens");
@@ -24,6 +28,10 @@ exports.PlansModule = PlansModule = __decorate([
             create_plan_use_case_1.CreatePlanUseCase,
             get_plans_use_case_1.GetPlansUseCase,
             get_plan_by_id_use_case_1.GetPlanByIdUseCase,
+            request_plan_upgrade_use_case_1.RequestPlanUpgradeUseCase,
+            resolve_upgrade_request_use_case_1.ResolveUpgradeRequestUseCase,
+            get_pending_upgrade_request_use_case_1.GetPendingUpgradeRequestUseCase,
+            get_upgrade_requests_use_case_1.GetUpgradeRequestsUseCase,
             {
                 provide: plans_tokens_1.PLANS_REPOSITORY,
                 useClass: prisma_plans_repository_1.PrismaPlansRepository,
