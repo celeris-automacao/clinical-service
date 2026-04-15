@@ -3,4 +3,10 @@ node_modules
 .env
 .agent*
 
+# Build artifacts
+dist/
+*.tsbuildinfo
+*.js.map
+
+# Prisma
 /generated/prisma

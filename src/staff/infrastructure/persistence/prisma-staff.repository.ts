@@ -36,6 +36,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
       status?: string;
       specialty?: string;
       professionalType?: string;
+      includePatients?: boolean;
     },
   ) {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
