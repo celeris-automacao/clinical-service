@@ -20,7 +20,7 @@ export class PatientsController {
 
   @Post()
   create(@Body() createPatientDto: CreatePatientDto, @GetUser() user: UserContext) {
-    return this.createPatientUseCase.execute(createPatientDto, user.tenantId);
+    return this.createPatientUseCase.execute(createPatientDto, user);
   }
 
   @Get(':id')

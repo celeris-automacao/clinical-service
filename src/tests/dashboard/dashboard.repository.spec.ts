@@ -41,7 +41,7 @@ describe('PrismaDashboardRepository', () => {
   it('deve contar jogadores ativos com tenant scope', async () => {
     const since = new Date('2026-01-01');
 
-    await repository.countActivePlayers('tenant-abc', since);
+    await repository.countActivePlayers({ tenantId: 'tenant-abc' }, since);
 
     expect(tenantScopedPrismaFactory.forTenant).toHaveBeenCalledWith('tenant-abc');
     expect(prisma.playerStats.count).toHaveBeenCalledWith({
@@ -53,7 +53,7 @@ describe('PrismaDashboardRepository', () => {
   });
 
   it('deve buscar achievements recentes com tenant scope', async () => {
-    await repository.findRecentAchievements('tenant-abc', 5);
+    await repository.findRecentAchievements({ tenantId: 'tenant-abc' }, 5);
 
     expect(prisma.socialPost.findMany).toHaveBeenCalledWith({
       where: {
@@ -69,7 +69,7 @@ describe('PrismaDashboardRepository', () => {
   });
 
   it('deve buscar top players com tenant scope', async () => {
-    await repository.findTopPlayers('tenant-abc', 3);
+    await repository.findTopPlayers({ tenantId: 'tenant-abc' }, 3);
 
     expect(prisma.playerStats.findMany).toHaveBeenCalledWith({
       where: { tenantId: 'tenant-abc' },
@@ -82,7 +82,7 @@ describe('PrismaDashboardRepository', () => {
   });
 
   it('deve buscar historico de task completions com tenant scope', async () => {
-    await repository.getTaskCompletionsHistory('tenant-abc');
+    await repository.getTaskCompletionsHistory({ tenantId: 'tenant-abc' });
 
     expect(prisma.taskCompletion.findMany).toHaveBeenCalledWith({
       where: { tenantId: 'tenant-abc' },
@@ -97,7 +97,7 @@ describe('PrismaDashboardRepository', () => {
   });
 
   it('deve buscar recent claims com tenant scope', async () => {
-    await repository.findRecentClaims('tenant-abc', 10);
+    await repository.findRecentClaims({ tenantId: 'tenant-abc' }, 10);
 
     expect(prisma.rewardClaim.findMany).toHaveBeenCalledWith({
       where: { tenantId: 'tenant-abc' },

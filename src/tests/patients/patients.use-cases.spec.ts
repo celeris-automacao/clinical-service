@@ -72,7 +72,13 @@ describe('Patients Use Cases', () => {
     jest.spyOn(repository, 'countByTenant').mockResolvedValue(1);
     jest.spyOn(repository, 'createWithStats').mockResolvedValue(createdPatient);
 
-    const result = await createPatientUseCase.execute(dto as any, 'tenant-1');
+    const mockUserContext = {
+      tenantId: 'tenant-1',
+      userId: 'user-1',
+      role: 'admin',
+    };
+
+    const result = await createPatientUseCase.execute(dto as any, mockUserContext as any);
 
     expect(repository.createWithStats).toHaveBeenCalledWith(dto, 'tenant-1');
     expect(result).toEqual(createdPatient);
@@ -88,7 +94,7 @@ describe('Patients Use Cases', () => {
           supabaseId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
           name: 'Paciente Teste',
         } as any,
-        'tenant-1',
+        { tenantId: 'tenant-1', userId: 'user-1', role: 'admin' } as any,
       ),
     ).rejects.toThrow(new BadRequestException('Limite de pacientes do plano atingido.'));
   });

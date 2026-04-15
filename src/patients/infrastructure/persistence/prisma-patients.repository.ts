@@ -36,6 +36,16 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
                   },
                 }
               : undefined,
+            staffLinks: data.assignedStaffId
+              ? {
+                  create: [
+                    {
+                      tenantId,
+                      staffId: data.assignedStaffId,
+                    },
+                  ],
+                }
+              : undefined,
           },
         });
 

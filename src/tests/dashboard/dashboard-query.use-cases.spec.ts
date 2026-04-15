@@ -10,7 +10,12 @@ describe('Dashboard Query Use Cases', () => {
   let getClinicOverviewUseCase: GetClinicOverviewUseCase;
   let getMissingPatientsUseCase: GetMissingPatientsUseCase;
   let getRecentClaimsUseCase: GetRecentClaimsUseCase;
-  const mockTenantId = 'tenant-123';
+  const mockUserContext = {
+    userId: 'user-1',
+    tenantId: 'tenant-123',
+    role: 'doctor',
+    staffId: 'staff-1',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -42,7 +47,7 @@ describe('Dashboard Query Use Cases', () => {
     (repository.findRecentAchievements as jest.Mock).mockResolvedValue([]);
     (repository.findTopPlayers as jest.Mock).mockResolvedValue([]);
 
-    const result = await getClinicOverviewUseCase.execute(mockTenantId);
+    const result = await getClinicOverviewUseCase.execute(mockUserContext as any);
 
     expect(result.activeToday).toBe(0);
     expect(result.recentAchievements).toHaveLength(0);
@@ -61,7 +66,7 @@ describe('Dashboard Query Use Cases', () => {
       { patientId: 'p1', completedAt: tenDaysAgo },
     ]);
 
-    const result = await getMissingPatientsUseCase.execute(mockTenantId, 3);
+    const result = await getMissingPatientsUseCase.execute(mockUserContext as any, 3);
 
     expect(result).toHaveLength(0);
   });
@@ -74,17 +79,17 @@ describe('Dashboard Query Use Cases', () => {
       { patientId: 'p2', completedAt: fiveDaysAgo },
     ]);
 
-    const resultAtivo = await getMissingPatientsUseCase.execute(mockTenantId, 7);
+    const resultAtivo = await getMissingPatientsUseCase.execute(mockUserContext as any, 7);
     expect(resultAtivo).toHaveLength(0);
 
-    const resultInativo = await getMissingPatientsUseCase.execute(mockTenantId, 3);
+    const resultInativo = await getMissingPatientsUseCase.execute(mockUserContext as any, 3);
     expect(resultInativo).toHaveLength(1);
   });
 
   it('deve retornar lista vazia se ninguém tiver completado tarefas na clínica', async () => {
     (repository.getTaskCompletionsHistory as jest.Mock).mockResolvedValue([]);
 
-    const result = await getMissingPatientsUseCase.execute(mockTenantId);
+    const result = await getMissingPatientsUseCase.execute(mockUserContext as any);
     expect(result).toEqual([]);
   });
 
@@ -92,9 +97,9 @@ describe('Dashboard Query Use Cases', () => {
     const claims = [{ id: 'claim-1' }];
     (repository.findRecentClaims as jest.Mock).mockResolvedValue(claims);
 
-    const result = await getRecentClaimsUseCase.execute(mockTenantId);
+    const result = await getRecentClaimsUseCase.execute(mockUserContext as any);
 
-    expect(repository.findRecentClaims).toHaveBeenCalledWith(mockTenantId, 10);
+    expect(repository.findRecentClaims).toHaveBeenCalledWith({ tenantId: mockUserContext.tenantId, staffId: mockUserContext.staffId }, 10);
     expect(result).toEqual(claims);
   });
 });

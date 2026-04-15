@@ -4,6 +4,8 @@ import { CreateClinicalRecordUseCase } from './application/use-cases/create-clin
 import { GetPatientEvolutionUseCase } from './application/use-cases/get-patient-evolution.use-case';
 import { GetPatientStatsUseCase } from './application/use-cases/get-patient-stats.use-case';
 import { HandleBossVictoryUseCase } from './application/use-cases/handle-boss-victory.use-case';
+import { GetPatientRecordsForDoctorUseCase } from './application/use-cases/get-patient-records-for-doctor.use-case';
+import { UpdateLastRecordUseCase } from './application/use-cases/update-last-record.use-case';
 import { ClinicalProgressCalculator } from './domain/services/clinical-progress-calculator';
 import { RecordsAchievementsAdapter } from './infrastructure/adapters/records-achievements.adapter';
 import { PrismaBossBattleAdapter } from './infrastructure/persistence/prisma-boss-battle.adapter';
@@ -25,6 +27,8 @@ import {
     HandleBossVictoryUseCase,
     GetPatientStatsUseCase,
     GetPatientEvolutionUseCase,
+    GetPatientRecordsForDoctorUseCase,
+    UpdateLastRecordUseCase,
     ClinicalProgressCalculator,
     {
       provide: RECORDS_REPOSITORY,

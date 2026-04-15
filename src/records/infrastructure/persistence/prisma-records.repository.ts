@@ -1,21 +1,23 @@
 import { ClinicalRecord } from '@prisma/client';
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { RecordsRepositoryPort } from '../../application/ports/records-repository.port';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
+import { UpdateRecordDto } from '../../presentation/http/dto/update-record.dto';
 
 @Injectable()
 export class PrismaRecordsRepository implements RecordsRepositoryPort {
   constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
-  async create(data: CreateRecordDto, userId: string, tenantId: string): Promise<ClinicalRecord> {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId, tenantId });
+  async create(data: CreateRecordDto, targetPatientId: string, recordedByUserId: string, tenantId: string): Promise<ClinicalRecord> {
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: recordedByUserId, tenantId });
     return prisma.clinicalRecord.create({
       data: {
         weight: data.weight,
         skeletalMuscleMass: data.skeletalMuscleMass,
         bodyFatMass: data.bodyFatMass,
-        patientId: userId,
+        patientId: targetPatientId,
+        recordedByUserId,
         tenantId,
       },
     });
@@ -67,5 +69,39 @@ export class PrismaRecordsRepository implements RecordsRepositoryPort {
     });
 
     return damageMap;
+  }
+
+  async updateLastRecord(
+    recordId: string,
+    patientId: string,
+    tenantId: string,
+    data: UpdateRecordDto,
+  ): Promise<ClinicalRecord> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+
+    // Buscar o registro mais recente deste paciente
+    const latestRecord = await prisma.clinicalRecord.findFirst({
+      where: { patientId, tenantId },
+      orderBy: { recordedAt: 'desc' },
+    });
+
+    if (!latestRecord) {
+      throw new NotFoundException('Nenhum registro encontrado para este paciente.');
+    }
+
+    if (latestRecord.id !== recordId) {
+      throw new ForbiddenException(
+        'Apenas o registro mais recente pode ser editado.',
+      );
+    }
+
+    return prisma.clinicalRecord.update({
+      where: { id: recordId },
+      data: {
+        weight: data.weight ?? latestRecord.weight,
+        skeletalMuscleMass: data.skeletalMuscleMass ?? latestRecord.skeletalMuscleMass,
+        bodyFatMass: data.bodyFatMass ?? latestRecord.bodyFatMass,
+      },
+    });
   }
 }

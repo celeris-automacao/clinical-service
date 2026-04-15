@@ -1,28 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
-import { DashboardRepositoryPort } from '../../application/ports/dashboard-repository.port';
+import { DashboardRepositoryPort, DashboardQueryParams } from '../../application/ports/dashboard-repository.port';
 
 @Injectable()
 export class PrismaDashboardRepository implements DashboardRepositoryPort {
   constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
 
-  async countActivePlayers(tenantId: string, since: Date): Promise<number> {
-    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+  async countActivePlayers(params: DashboardQueryParams, since: Date): Promise<number> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(params.tenantId);
+    
+    const where: any = {
+      tenantId: params.tenantId,
+      lastActivityAt: { gte: since },
+    };
+    if (params.staffId) {
+      where.patient = { staffLinks: { some: { staffId: params.staffId, status: 'active' } } };
+    }
+
     return prisma.playerStats.count({
-      where: {
-        tenantId,
-        lastActivityAt: { gte: since },
-      },
+      where,
     });
   }
 
-  async findRecentAchievements(tenantId: string, limit: number): Promise<any[]> {
-    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+  async findRecentAchievements(params: DashboardQueryParams, limit: number): Promise<any[]> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(params.tenantId);
+    
+    const where: any = {
+      tenantId: params.tenantId,
+      type: 'achievement',
+    };
+    if (params.staffId) {
+      where.patient = { staffLinks: { some: { staffId: params.staffId, status: 'active' } } };
+    }
+
     return prisma.socialPost.findMany({
-      where: {
-        tenantId,
-        type: 'achievement',
-      },
+      where,
       orderBy: { createdAt: 'desc' },
       take: limit,
       include: {
@@ -31,10 +43,16 @@ export class PrismaDashboardRepository implements DashboardRepositoryPort {
     });
   }
 
-  async findTopPlayers(tenantId: string, limit: number): Promise<any[]> {
-    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+  async findTopPlayers(params: DashboardQueryParams, limit: number): Promise<any[]> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(params.tenantId);
+    
+    const where: any = { tenantId: params.tenantId };
+    if (params.staffId) {
+      where.patient = { staffLinks: { some: { staffId: params.staffId, status: 'active' } } };
+    }
+
     return prisma.playerStats.findMany({
-      where: { tenantId },
+      where,
       orderBy: { totalDamageDealt: 'desc' },
       take: limit,
       include: {
@@ -43,10 +61,16 @@ export class PrismaDashboardRepository implements DashboardRepositoryPort {
     });
   }
 
-  async getTaskCompletionsHistory(tenantId: string): Promise<any[]> {
-    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+  async getTaskCompletionsHistory(params: DashboardQueryParams): Promise<any[]> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(params.tenantId);
+    
+    const where: any = { tenantId: params.tenantId };
+    if (params.staffId) {
+      where.patient = { staffLinks: { some: { staffId: params.staffId, status: 'active' } } };
+    }
+
     return prisma.taskCompletion.findMany({
-      where: { tenantId },
+      where,
       select: {
         patientId: true,
         completedAt: true,
@@ -57,10 +81,16 @@ export class PrismaDashboardRepository implements DashboardRepositoryPort {
     });
   }
 
-  async findRecentClaims(tenantId: string, limit: number): Promise<any[]> {
-    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+  async findRecentClaims(params: DashboardQueryParams, limit: number): Promise<any[]> {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(params.tenantId);
+    
+    const where: any = { tenantId: params.tenantId };
+    if (params.staffId) {
+      where.patient = { staffLinks: { some: { staffId: params.staffId, status: 'active' } } };
+    }
+
     return prisma.rewardClaim.findMany({
-      where: { tenantId },
+      where,
       include: { reward: true },
       orderBy: { claimedAt: 'desc' },
       take: limit,
