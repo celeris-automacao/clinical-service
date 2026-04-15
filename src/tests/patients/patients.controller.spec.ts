@@ -5,6 +5,8 @@ import { PatientsController } from '../../patients/presentation/http/patients.co
 import { CreatePatientUseCase } from '../../patients/application/use-cases/create-patient.use-case';
 import { GetPatientByIdUseCase } from '../../patients/application/use-cases/get-patient-by-id.use-case';
 import { UpdatePatientProfileUseCase } from '../../patients/application/use-cases/update-patient-profile.use-case';
+import { ListPatientsUseCase } from '../../patients/application/use-cases/list-patients.use-case';
+import { TransferPatientUseCase } from '../../patients/application/use-cases/transfer-patient.use-case';
 import { UserContext } from '../../shared/auth/user-context';
 
 describe('PatientsController', () => {
@@ -12,6 +14,8 @@ describe('PatientsController', () => {
   let createPatientUseCase: CreatePatientUseCase;
   let getPatientByIdUseCase: GetPatientByIdUseCase;
   let updatePatientProfileUseCase: UpdatePatientProfileUseCase;
+  let listPatientsUseCase: ListPatientsUseCase;
+  let transferPatientUseCase: TransferPatientUseCase;
 
   const user: UserContext = {
     userId: 'user-1',
@@ -41,6 +45,18 @@ describe('PatientsController', () => {
             execute: jest.fn().mockResolvedValue({ patientId: 'patient-1' }),
           },
         },
+        {
+          provide: ListPatientsUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue([{ id: 'patient-1' }]),
+          },
+        },
+        {
+          provide: TransferPatientUseCase,
+          useValue: {
+            execute: jest.fn().mockResolvedValue({ id: 'patient-1', responsibleStaffId: 'doctor-2' }),
+          },
+        },
       ],
     })
       .overrideGuard(SupabaseGuard)
@@ -51,6 +67,8 @@ describe('PatientsController', () => {
     createPatientUseCase = module.get<CreatePatientUseCase>(CreatePatientUseCase);
     getPatientByIdUseCase = module.get<GetPatientByIdUseCase>(GetPatientByIdUseCase);
     updatePatientProfileUseCase = module.get<UpdatePatientProfileUseCase>(UpdatePatientProfileUseCase);
+    listPatientsUseCase = module.get<ListPatientsUseCase>(ListPatientsUseCase);
+    transferPatientUseCase = module.get<TransferPatientUseCase>(TransferPatientUseCase);
   });
 
   it('deve repassar o dto e o tenant do usuario para o use case de criacao', async () => {

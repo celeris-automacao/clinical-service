@@ -6,5 +6,7 @@ export interface PatientsRepositoryPort {
   countByTenant(tenantId: string): Promise<number>;
   findBySupabaseId(id: string, tenantId: string): Promise<any | null>;
   findById(id: string, tenantId: string): Promise<any | null>;
+  findAll(tenantId: string, filters: { responsibleStaffId?: string }): Promise<any[]>;
+  update(id: string, tenantId: string, data: Partial<CreatePatientDto>): Promise<any>;
   updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto): Promise<any>;
 }

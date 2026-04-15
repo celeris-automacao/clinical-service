@@ -21,4 +21,7 @@ export class ListStaffMembersDto {
   @IsOptional()
   @IsIn(STAFF_PROFESSIONAL_TYPES)
   professionalType?: string;
+
+  @IsOptional()
+  includePatients?: boolean;
 }

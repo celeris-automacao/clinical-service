@@ -47,6 +47,19 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
         ...(filters.specialty ? { specialty: filters.specialty } : {}),
         ...(filters.professionalType ? { professionalType: filters.professionalType } : {}),
       },
+      include: {
+        ...(filters.includePatients
+          ? {
+              patients: {
+                include: {
+                  clinicalRecords: {
+                    orderBy: { recordedAt: 'desc' },
+                  },
+                },
+              },
+            }
+          : {}),
+      },
       orderBy: [{ role: 'asc' }, { name: 'asc' }],
     });
   }

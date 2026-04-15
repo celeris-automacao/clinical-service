@@ -33,6 +33,10 @@ export class CreatePatientDto {
   birthDate?: string;
 
   @IsOptional()
+  @IsUUID()
+  responsibleStaffId?: string;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => PatientAddressDto)
   address?: PatientAddressDto;

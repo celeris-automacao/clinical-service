@@ -48,6 +48,6 @@ import { STAFF_AUDIT_LOG_PORT, STAFF_REPOSITORY } from './staff.tokens';
       useClass: PrismaStaffAuditLogAdapter,
     },
   ],
-  exports: [GetStaffMemberByUserIdUseCase],
+  exports: [GetStaffMemberByUserIdUseCase, STAFF_REPOSITORY],
 })
 export class StaffModule {}

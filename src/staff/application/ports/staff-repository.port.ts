@@ -19,6 +19,7 @@ export interface StaffRepositoryPort {
       status?: string;
       specialty?: string;
       professionalType?: string;
+      includePatients?: boolean;
     },
   ): Promise<any[]>;
   findById(id: string, tenantId: string): Promise<any | null>;

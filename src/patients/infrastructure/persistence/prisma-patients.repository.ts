@@ -22,6 +22,7 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
             document: data.document,
             gender: data.gender,
             birthDate: data.birthDate ? new Date(data.birthDate) : null,
+            responsibleStaffId: data.responsibleStaffId,
             address: data.address
               ? {
                   create: {
@@ -67,6 +68,38 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
   async findById(id: string, tenantId: string) {
     const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId }) as any;
     return prisma.patient.findFirst({ where: { id, tenantId } });
+  }
+
+  async findAll(tenantId: string, filters: { responsibleStaffId?: string }) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.findMany({
+      where: {
+        tenantId,
+        responsibleStaffId: filters.responsibleStaffId,
+      },
+      include: {
+        clinicalRecords: {
+          orderBy: { recordedAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+  }
+
+  async update(id: string, tenantId: string, data: Partial<CreatePatientDto>) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.update({
+      where: { id, tenantId },
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        document: data.document,
+        gender: data.gender,
+        birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
+        responsibleStaffId: data.responsibleStaffId,
+      },
+    });
   }
 
   async updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto) {
