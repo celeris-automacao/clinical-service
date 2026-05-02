@@ -1,0 +1,42 @@
+﻿version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: healthquest_postgres_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local_password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  clinical-service:
+    build: .
+    container_name: healthgame_api_dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:local_password@postgres:5432/postgres?schema=clinical
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+    command: npm run start:dev
+
+volumes:
+  postgres_data:
