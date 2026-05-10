@@ -79,6 +79,28 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
     return prisma.patient.findFirst({ where: { id, tenantId } });
   }
 
+  async findAllByTenant(tenantId: string, search?: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.findMany({
+      where: {
+        tenantId,
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: 'insensitive' } },
+                { email: { contains: search, mode: 'insensitive' } },
+                { document: { contains: search, mode: 'insensitive' } },
+              ],
+            }
+          : {}),
+      },
+      orderBy: { name: 'asc' },
+      include: {
+        profile: true,
+      },
+    });
+  }
+
   async updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto) {
     await this.findById(patientId, tenantId);
 

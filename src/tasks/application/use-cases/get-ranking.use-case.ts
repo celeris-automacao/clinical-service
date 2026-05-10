@@ -15,7 +15,11 @@ export class GetRankingUseCase {
 
     return ranking.map((item, index) => ({
       position: index + 1,
-      name: item.patient?.name || 'Herói Anônimo',
+      userId: item.patientId || item.patient?.id || `ranking-${index + 1}`,
+      username: item.patient?.name || 'Heroi Anonimo',
+      totalXp: item.currentXp,
+      // Compatibilidade com consumidores antigos
+      name: item.patient?.name || 'Heroi Anonimo',
       level: item.currentLevel,
       xp: item.currentXp,
       damage: Number(item.totalDamageDealt),

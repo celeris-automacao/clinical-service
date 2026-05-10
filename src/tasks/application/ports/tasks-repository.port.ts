@@ -20,6 +20,7 @@ export interface TasksRepositoryPort {
   findAssignmentsByPatient(patientId: string, tenantId: string): Promise<any[]>;
   findAssignmentsByPatientOnDate(patientId: string, tenantId: string, dueDate: Date): Promise<any[]>;
   findAssignmentById(id: string, tenantId: string): Promise<any | null>;
+  findAssignmentByIdForTenant(id: string, tenantId: string): Promise<any | null>;
   findPatientById(patientId: string, tenantId: string): Promise<{ id: string } | null>;
   findActiveAssignment(input: {
     patientId: string;

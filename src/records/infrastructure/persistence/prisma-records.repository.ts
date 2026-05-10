@@ -2,7 +2,9 @@ import { ClinicalRecord } from '@prisma/client';
 import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
 import { RecordsRepositoryPort } from '../../application/ports/records-repository.port';
+import { CreateClinicalNoteDto } from '../../presentation/http/dto/create-clinical-note.dto';
 import { CreateRecordDto } from '../../presentation/http/dto/create-record.dto';
+import { UpdateClinicalNoteDto } from '../../presentation/http/dto/update-clinical-note.dto';
 import { UpdateRecordDto } from '../../presentation/http/dto/update-record.dto';
 
 @Injectable()
@@ -101,6 +103,55 @@ export class PrismaRecordsRepository implements RecordsRepositoryPort {
         weight: data.weight ?? latestRecord.weight,
         skeletalMuscleMass: data.skeletalMuscleMass ?? latestRecord.skeletalMuscleMass,
         bodyFatMass: data.bodyFatMass ?? latestRecord.bodyFatMass,
+      },
+    });
+  }
+
+  async createClinicalNote(data: CreateClinicalNoteDto, authorUserId: string, tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: authorUserId, tenantId });
+    return prisma.clinicalNote.create({
+      data: {
+        tenantId,
+        patientId: data.patientId,
+        authorUserId,
+        encounterType: data.encounterType,
+        subjective: data.subjective,
+        objective: data.objective,
+        assessment: data.assessment,
+        plan: data.plan,
+        riskLevel: data.riskLevel,
+        nextSteps: data.nextSteps,
+        consultationAt: new Date(data.consultationAt),
+      },
+    });
+  }
+
+  async listClinicalNotesByPatient(patientId: string, tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.clinicalNote.findMany({
+      where: { patientId, tenantId },
+      orderBy: { consultationAt: 'desc' },
+    });
+  }
+
+  async updateClinicalNote(noteId: string, tenantId: string, data: UpdateClinicalNoteDto) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    const existing = await prisma.clinicalNote.findFirst({
+      where: { id: noteId, tenantId },
+    });
+    if (!existing) {
+      throw new NotFoundException('Evolucao clinica nao encontrada.');
+    }
+    return prisma.clinicalNote.update({
+      where: { id: noteId },
+      data: {
+        encounterType: data.encounterType ?? existing.encounterType,
+        subjective: data.subjective ?? existing.subjective,
+        objective: data.objective ?? existing.objective,
+        assessment: data.assessment ?? existing.assessment,
+        plan: data.plan ?? existing.plan,
+        riskLevel: data.riskLevel ?? existing.riskLevel,
+        nextSteps: data.nextSteps ?? existing.nextSteps,
       },
     });
   }
