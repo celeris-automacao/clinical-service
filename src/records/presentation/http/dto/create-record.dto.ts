@@ -1,8 +1,12 @@
-// src/records/dto/create-record.dto.ts
-import { IsNumber, Min, Max, IsOptional } from 'class-validator';
+import { IsNumber, Min, Max, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRecordDto {
+  @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ description: 'ID do paciente (se inserido por um médico)' })
+  patientId?: string;
+
   @IsNumber()
   @Min(20)
   @Max(300)

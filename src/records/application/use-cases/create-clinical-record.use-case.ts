@@ -30,20 +30,22 @@ export class CreateClinicalRecordUseCase {
   ) {}
 
   async execute(dto: CreateRecordDto, user: UserContext) {
-    const newRecord = await this.repository.create(dto, user.userId, user.tenantId);
-    const damageDealt = await this.calculateAndApplyDamage(user.userId, user.tenantId);
+    // Se médico inseriu um patientId no body, usa esse; caso contrário usa o próprio usuário como paciente
+    const targetPatientId = dto.patientId ?? user.userId;
+    const newRecord = await this.repository.create(dto, targetPatientId, user.userId, user.tenantId);
+    const damageDealt = await this.calculateAndApplyDamage(targetPatientId, user.tenantId);
 
     await this.playerProgressionPort.upsertClinicalProgress({
-      patientId: user.userId,
+      patientId: targetPatientId,
       tenantId: user.tenantId,
       damageDealt,
     });
 
-    const history = await this.repository.findAllByPatient(user.userId, user.tenantId);
+    const history = await this.repository.findAllByPatient(targetPatientId, user.tenantId);
     const stats = this.clinicalProgressCalculator.calculateStats(history);
 
     await this.recordsAchievementsPort.checkLevelAchievements({
-      patientId: user.userId,
+      patientId: targetPatientId,
       tenantId: user.tenantId,
       newLevel: stats.currentLevel,
     });

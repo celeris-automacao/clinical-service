@@ -34,19 +34,21 @@ describe('PrismaRecordsRepository', () => {
   it('deve persistir um novo registro clinico com os campos mapeados corretamente', async () => {
     const dto = { weight: 80.5, skeletalMuscleMass: 35, bodyFatMass: 20 };
 
-    await repository.create(dto, 'user-123', 'tenant-456');
+    // Nova assinatura: create(dto, targetPatientId, recordedByUserId, tenantId)
+    await repository.create(dto as any, 'patient-123', 'user-doctor-456', 'tenant-789');
 
     expect(tenantScopedPrismaFactory.forTenantContext).toHaveBeenCalledWith({
-      userId: 'user-123',
-      tenantId: 'tenant-456',
+      userId: 'user-doctor-456',
+      tenantId: 'tenant-789',
     });
     expect(tenantPrisma.clinicalRecord.create).toHaveBeenCalledWith({
       data: {
         weight: dto.weight,
         skeletalMuscleMass: dto.skeletalMuscleMass,
         bodyFatMass: dto.bodyFatMass,
-        patientId: 'user-123',
-        tenantId: 'tenant-456',
+        patientId: 'patient-123',
+        recordedByUserId: 'user-doctor-456',
+        tenantId: 'tenant-789',
       },
     });
   });
