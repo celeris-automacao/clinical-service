@@ -1,0 +1,93 @@
+﻿Checklist de subida do projeto (Clinical Service)
+===============================================
+
+Objetivo
+--------
+Subir ambiente de desenvolvimento com PostgreSQL, aplicar migrations, executar seed e iniciar a API.
+
+Pré-requisitos
+--------------
+[ ] Docker Desktop instalado e rodando
+[ ] Node.js instalado (recomendado: Node 20 LTS)
+[ ] npm disponível no terminal
+[ ] Portas livres: 5432 (Postgres) e 3000 (API)
+[ ] Repositório clonado e pasta do projeto acessível
+
+Arquivos importantes
+--------------------
+[ ] .env com DATABASE_URL e SUPABASE_JWT_SECRET
+[ ] prisma/schema.prisma (fonte do modelo de dados)
+[ ] prisma/seed.ts (dados iniciais)
+[ ] docker-compose.yml (compose atual, apenas API)
+
+Passo a passo (execução local)
+------------------------------
+1) Entrar no projeto
+[ ] cd clinical-service
+
+2) Instalar dependências
+[ ] npm install
+
+3) Subir o banco PostgreSQL via Docker (caso não tenha serviço local)
+[ ] docker run --name healthquest-postgres -e POSTGRES_PASSWORD=local_password -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres -p 5432:5432 -d postgres:16
+
+4) Conferir DATABASE_URL no .env
+[ ] DATABASE_URL="postgresql://postgres:local_password@localhost:5432/postgres?schema=clinical"
+
+5) Aplicar migrations
+[ ] npx prisma migrate dev
+
+6) Gerar client Prisma
+[ ] npx prisma generate
+
+7) Executar seed
+[ ] npx prisma db seed
+
+8) Subir API
+[ ] npm run start:dev
+
+9) Validar ambiente
+[ ] API: http://localhost:3000/v1
+[ ] Swagger: http://localhost:3000/api
+[ ] (Opcional) npx prisma studio para inspecionar dados
+
+Fluxo alternativo (compose de teste)
+------------------------------------
+Se quiser usar compose com API + Postgres, utilize o arquivo docker-compose.test.yml criado na raiz:
+
+[ ] docker compose -f docker-compose.test.yml up --build -d
+
+Após subir:
+[ ] docker compose -f docker-compose.test.yml logs -f postgres
+[ ] docker compose -f docker-compose.test.yml logs -f clinical-service
+
+Depois rode (no host) para preparar banco:
+[ ] npx prisma migrate dev
+[ ] npx prisma generate
+[ ] npx prisma db seed
+
+Erros comuns e correções
+------------------------
+1) Erro Prisma P1001 (não conecta no banco)
+[ ] Verificar se container postgres está rodando
+[ ] Verificar porta 5432 e credenciais do DATABASE_URL
+
+2) Erro de schema/tabela não encontrada
+[ ] Rodar novamente: npx prisma migrate dev
+
+3) Falha de autenticação/JWT
+[ ] Conferir SUPABASE_JWT_SECRET no .env
+
+4) Porta em uso (3000 ou 5432)
+[ ] Alterar porta no compose ou liberar processo que está ocupando
+
+Comandos úteis de diagnóstico
+-----------------------------
+[ ] docker ps
+[ ] docker logs healthquest-postgres
+[ ] npx prisma migrate status
+[ ] npx prisma studio
+
+Observação importante
+---------------------
+O docker-compose.yml atual do projeto sobe apenas o serviço da API. O arquivo docker-compose.test.yml foi criado para comparação e para facilitar subida completa (API + Postgres) em ambiente local.

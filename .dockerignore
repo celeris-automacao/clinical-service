@@ -1,0 +1,12 @@
+node_modules
+dist
+npm-debug.log
+.git
+.env
+.agent
+.gitignore
+README.md
+architecture.md
+checklist.txt
+docs
+coverage

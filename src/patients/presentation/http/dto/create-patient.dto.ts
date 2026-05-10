@@ -36,4 +36,8 @@ export class CreatePatientDto {
   @ValidateNested()
   @Type(() => PatientAddressDto)
   address?: PatientAddressDto;
+
+  @IsOptional()
+  @IsUUID()
+  assignedStaffId?: string;
 }
