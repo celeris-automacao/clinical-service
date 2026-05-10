@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { UserContext } from '../../../shared/auth/user-context';
 import { DASHBOARD_REPOSITORY } from '../../dashboard.tokens';
-import { DashboardRepositoryPort } from '../ports/dashboard-repository.port';
+import { DashboardRepositoryPort, DashboardQueryParams } from '../ports/dashboard-repository.port';
 
 @Injectable()
 export class GetClinicOverviewUseCase {
@@ -9,14 +10,19 @@ export class GetClinicOverviewUseCase {
     private readonly repository: DashboardRepositoryPort,
   ) {}
 
-  async execute(tenantId: string) {
+  async execute(user: UserContext) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const params: DashboardQueryParams = { tenantId: user.tenantId };
+    if (user.role !== 'admin' && user.staffId) {
+      params.staffId = user.staffId;
+    }
+
     const [activeCount, achievements, ranking] = await Promise.all([
-      this.repository.countActivePlayers(tenantId, today),
-      this.repository.findRecentAchievements(tenantId, 5),
-      this.repository.findTopPlayers(tenantId, 3),
+      this.repository.countActivePlayers(params, today),
+      this.repository.findRecentAchievements(params, 5),
+      this.repository.findTopPlayers(params, 3),
     ]);
 
     return {

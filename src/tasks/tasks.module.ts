@@ -8,6 +8,7 @@ import { CreateTaskTemplateUseCase } from './application/use-cases/create-task-t
 import { GetCategorizedRankingUseCase } from './application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from './application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from './application/use-cases/get-ranking.use-case';
+import { GetTaskByIdUseCase } from './application/use-cases/get-task-by-id.use-case';
 import { GetTasksTodayUseCase } from './application/use-cases/get-tasks-today.use-case';
 import { ListTaskTemplatesUseCase } from './application/use-cases/list-task-templates.use-case';
 import { TasksAchievementsAdapter } from './infrastructure/adapters/tasks-achievements.adapter';
@@ -34,6 +35,7 @@ import {
     GetCategorizedRankingUseCase,
     GetDailyTasksUseCase,
     GetRankingUseCase,
+    GetTaskByIdUseCase,
     GetTasksTodayUseCase,
     {
       provide: TASKS_REPOSITORY,

@@ -20,19 +20,19 @@ export class DashboardController {
   @ApiOperation({ summary: 'Visão geral da clínica para o médico (Ranking e Atividade)' })
   async getOverview(@GetUser() user: UserContext) {
     this.checkDoctorRole(user);
-    return this.getClinicOverviewUseCase.execute(user.tenantId);
+    return this.getClinicOverviewUseCase.execute(user);
   }
 
   @Get('inactive-patients')
   async getInactive(@GetUser() user: UserContext) {
     this.checkDoctorRole(user);
-    return this.getMissingPatientsUseCase.execute(user.tenantId);
+    return this.getMissingPatientsUseCase.execute(user);
   }
 
   @Get('recent-claims')
   async getRecentClaims(@GetUser() user: UserContext) {
     this.checkDoctorRole(user);
-    return this.getRecentClaimsUseCase.execute(user.tenantId);
+    return this.getRecentClaimsUseCase.execute(user);
   }
 
   private checkDoctorRole(user: UserContext) {
