@@ -6,6 +6,7 @@ import { CompleteTaskUseCase } from '../../application/use-cases/complete-task.u
 import { GetCategorizedRankingUseCase } from '../../application/use-cases/get-categorized-ranking.use-case';
 import { GetDailyTasksUseCase } from '../../application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from '../../application/use-cases/get-ranking.use-case';
+import { GetTaskByIdUseCase } from '../../application/use-cases/get-task-by-id.use-case';
 import { GetTasksTodayUseCase } from '../../application/use-cases/get-tasks-today.use-case';
 
 @Controller('tasks')
@@ -17,6 +18,7 @@ export class TasksController {
     private readonly getRankingUseCase: GetRankingUseCase,
     private readonly getCategorizedRankingUseCase: GetCategorizedRankingUseCase,
     private readonly getTasksTodayUseCase: GetTasksTodayUseCase,
+    private readonly getTaskByIdUseCase: GetTaskByIdUseCase,
   ) {}
 
   @Get()
@@ -42,5 +44,10 @@ export class TasksController {
   @Get('today')
   getTasksToday(@GetUser() user: UserContext) {
     return this.getTasksTodayUseCase.execute(user);
+  }
+
+  @Get(':id')
+  getTaskById(@Param('id') taskAssignmentId: string, @GetUser() user: UserContext) {
+    return this.getTaskByIdUseCase.execute(taskAssignmentId, user);
   }
 }

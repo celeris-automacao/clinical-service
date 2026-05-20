@@ -86,6 +86,14 @@ export class PrismaTasksRepository implements TasksRepositoryPort {
     });
   }
 
+  async findAssignmentByIdForTenant(id: string, tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
+    return prisma.taskAssignment.findFirst({
+      where: byIdAndTenant(id, tenantId),
+      include: { template: true },
+    });
+  }
+
   async findPatientById(patientId: string, tenantId: string): Promise<{ id: string } | null> {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId);
     return prisma.patient.findFirst({
@@ -131,10 +139,11 @@ export class PrismaTasksRepository implements TasksRepositoryPort {
     return prisma.playerStats.findMany({
       where: byTenant(tenantId),
       select: {
+        patientId: true,
         currentLevel: true,
         currentXp: true,
         totalDamageDealt: true,
-        patient: { select: { name: true } },
+        patient: { select: { id: true, name: true } },
       },
       orderBy: [{ currentLevel: 'desc' }, { currentXp: 'desc' }, { totalDamageDealt: 'desc' }],
     });
