@@ -1,23 +1,40 @@
 // src/main.ts
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common'; // Adicione esta linha
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AddressInfo } from 'node:net';
 
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Segurança: Adiciona headers de segurança (Helmet)
+
+  // Security headers
   app.use(helmet());
 
-  // CORS: Habilita acesso entre origens
-  const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['*'];
+  // CORS with explicit allow-list
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+  const allowAnyOrigin = allowedOrigins.includes('*');
+
+  if (allowAnyOrigin) {
+    console.warn(
+      'ALLOWED_ORIGINS contains "*". For better security, remove wildcard when credentials=true.',
+    );
+  }
+
   app.enableCors({
     origin: (origin, callback) => {
-      // Se não houver origin (ex: mobile app nativo) ou se '*' estiver permitido
-      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+      // Allow requests without browser origin (mobile app, curl, Postman)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowAnyOrigin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -28,27 +45,44 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('v1');
-  
-  app.useGlobalPipes(new ValidationPipe({ 
-    whitelist: true, 
-    transform: true,
-    forbidNonWhitelisted: true, // Opcional: erro se enviarem campos que não existem no DTO
-  }));
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('HealthQuest API')
-    .setDescription('Documentação das rotas de Gamificação e Clínica')
+    .setDescription('HealthQuest API routes')
     .setVersion('1.0')
-    .addBearerAuth() // Habilita o campo de Token que você usa no Insomnia
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  
-  // 3. Setup do endpoint da documentação
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
-  console.log(`🚀 Clinical Service rodando em: http://localhost:3000`);
-  console.log(`📚 Documentação disponível em: http://localhost:3000/api`);
+  const port = Number(process.env.PORT || 3000);
+
+  try {
+    await app.listen(port);
+  } catch (error: any) {
+    if (error?.code === 'EADDRINUSE') {
+      console.error(
+        `Port ${port} is already in use. Stop the existing process or run with another port, for example: PORT=3001 npm run start:dev`,
+      );
+      process.exit(1);
+    }
+
+    throw error;
+  }
+
+  const address = app.getHttpServer().address() as AddressInfo;
+  const runningPort = address?.port ?? port;
+
+  console.log(`Clinical Service running at: http://localhost:${runningPort}`);
+  console.log(`Swagger docs available at: http://localhost:${runningPort}/api`);
 }
 bootstrap();
