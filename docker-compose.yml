@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: local_password
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,6 +20,7 @@ services:
       retries: 10
 
   clinical-service:
+    profiles: ["app"]
     build: .
     container_name: healthgame_api_dev
     restart: unless-stopped
@@ -27,7 +28,7 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3002:3000"
     volumes:
       - .:/app
       - /app/node_modules
@@ -35,7 +36,7 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://postgres:local_password@postgres:5432/postgres?schema=clinical
-      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET:?SUPABASE_JWT_SECRET is required}
     command: npm run start:dev
 
 volumes:
