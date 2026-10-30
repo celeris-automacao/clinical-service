@@ -4,6 +4,7 @@ import { CreatePatientUseCase } from './application/use-cases/create-patient.use
 import { GetPatientByIdUseCase } from './application/use-cases/get-patient-by-id.use-case';
 import { ListPatientsUseCase } from './application/use-cases/list-patients.use-case';
 import { UpdatePatientProfileUseCase } from './application/use-cases/update-patient-profile.use-case';
+import { UpdatePatientEmailUseCase } from './application/use-cases/update-patient-email.use-case';
 import { PatientsController } from './presentation/http/patients.controller';
 import { PrismaPatientsRepository } from './infrastructure/persistence/prisma-patients.repository';
 import { PATIENTS_REPOSITORY } from './patients.tokens';
@@ -16,6 +17,7 @@ import { PATIENTS_REPOSITORY } from './patients.tokens';
     GetPatientByIdUseCase,
     ListPatientsUseCase,
     UpdatePatientProfileUseCase,
+    UpdatePatientEmailUseCase,
     {
       provide: PATIENTS_REPOSITORY,
       useClass: PrismaPatientsRepository,

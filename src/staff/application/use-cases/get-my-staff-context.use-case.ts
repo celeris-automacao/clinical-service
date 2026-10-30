@@ -4,10 +4,15 @@ import { GetStaffMemberByUserIdUseCase } from './get-staff-member-by-user-id.use
 
 @Injectable()
 export class GetMyStaffContextUseCase {
-  constructor(private readonly getStaffMemberByUserIdUseCase: GetStaffMemberByUserIdUseCase) {}
+  constructor(
+    private readonly getStaffMemberByUserIdUseCase: GetStaffMemberByUserIdUseCase,
+  ) {}
 
   async execute(user: UserContext) {
-    const staffMember = await this.getStaffMemberByUserIdUseCase.execute(user.userId, user.tenantId);
+    const staffMember = await this.getStaffMemberByUserIdUseCase.execute(
+      user.userId,
+      user.tenantId,
+    );
 
     return {
       userId: user.userId,
@@ -23,6 +28,8 @@ export class GetMyStaffContextUseCase {
             specialty: staffMember.specialty,
             professionalType: staffMember.professionalType,
             licenseNumber: staffMember.licenseNumber,
+            privateConsultationPrice:
+              staffMember.privateConsultationPrice?.toString() ?? null,
           }
         : null,
     };

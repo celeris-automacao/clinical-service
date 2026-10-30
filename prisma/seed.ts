@@ -25,14 +25,14 @@ async function main() {
   console.log('Criando a clinica (Tenant)...');
   const tenant = await (prisma as any).tenant.upsert({
     where: { id: 'c56a4180-65aa-42ec-a945-5fd21dec0538' },
-    update: {},
+    update: { responsibleEmail: 'owner.staging@modulaclinic.com' },
     create: {
       id: 'c56a4180-65aa-42ec-a945-5fd21dec0538',
       name: 'Clinica HealthQuest Central',
       legalName: 'Clinica HealthQuest Central LTDA',
       cnpj: '12345678000199',
       responsibleName: 'Helena Costa',
-      responsibleEmail: 'owner@clinica.com',
+      responsibleEmail: 'owner.staging@modulaclinic.com',
       responsiblePhone: '11999999999',
       status: 'active',
       activatedAt: new Date(),
@@ -173,16 +173,16 @@ async function main() {
   });
 
   console.log('Criando recompensas...');
+  await prisma.reward.updateMany({
+    where: { id: '00000000-0000-0000-0000-000000000002' },
+    data: {
+      title: 'Conquista de Saúde',
+      description: 'Conquista por completar seu primeiro desafio.',
+      badgeIcon: 'heart-pulse',
+    },
+  });
   await prisma.reward.createMany({
     data: [
-      {
-        id: '00000000-0000-0000-0000-000000000002',
-        tenantId: tenant.id,
-        title: 'Medalha de Teste Unitario',
-        description: 'Parabens por validar o sistema de loot!',
-        requiredDamage: 1,
-        badgeIcon: 'test-tube',
-      },
       {
         tenantId: tenant.id,
         title: 'Cupom 15% Suplementos',

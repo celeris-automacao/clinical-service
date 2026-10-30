@@ -6,20 +6,27 @@ import { UpdatePatientProfileDto } from '../../presentation/http/dto/update-pati
 
 @Injectable()
 export class PrismaPatientsRepository implements PatientsRepositoryPort {
-  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
+  constructor(
+    private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory,
+  ) {}
 
-  async createWithStats(data: CreatePatientDto, tenantId: string) {
+  async createWithStats(
+    data: CreatePatientDto,
+    tenantId: string,
+    actorUserId?: string,
+  ) {
     return this.tenantScopedPrismaFactory.runInTenantTransaction(
-      { userId: data.supabaseId, tenantId },
+      { userId: actorUserId ?? data.supabaseId ?? tenantId, tenantId },
       async (tx) => {
         const patient = await tx.patient.create({
           data: {
-            id: data.supabaseId,
+            ...(data.supabaseId ? { id: data.supabaseId } : {}),
             name: data.name,
             tenantId,
             email: data.email,
             phone: data.phone,
             document: data.document,
+            normalizedDocument: data.document,
             gender: data.gender,
             birthDate: data.birthDate ? new Date(data.birthDate) : null,
             address: data.address
@@ -69,13 +76,31 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
     });
   }
 
+  async findByDocument(document: string, tenantId: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.findFirst({
+      where: {
+        tenantId,
+        normalizedDocument: {
+          equals: document,
+        },
+      },
+    });
+  }
+
   async findBySupabaseId(id: string, tenantId: string) {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId }) as any;
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId: id,
+      tenantId,
+    }) as any;
     return prisma.patient.findFirst({ where: { id, tenantId } });
   }
 
   async findById(id: string, tenantId: string) {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: id, tenantId }) as any;
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId: id,
+      tenantId,
+    }) as any;
     return prisma.patient.findFirst({ where: { id, tenantId } });
   }
 
@@ -101,10 +126,17 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
     });
   }
 
-  async updateProfile(patientId: string, tenantId: string, data: UpdatePatientProfileDto) {
+  async updateProfile(
+    patientId: string,
+    tenantId: string,
+    data: UpdatePatientProfileDto,
+  ) {
     await this.findById(patientId, tenantId);
 
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId: patientId, tenantId }) as any;
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId: patientId,
+      tenantId,
+    }) as any;
     return prisma.patientProfile.upsert({
       where: { patientId },
       update: data,
@@ -113,5 +145,25 @@ export class PrismaPatientsRepository implements PatientsRepositoryPort {
         ...data,
       },
     });
+  }
+
+  async findByEmail(email: string, tenantId: string, excludeId?: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    return prisma.patient.findFirst({
+      where: {
+        tenantId,
+        email: { equals: email, mode: 'insensitive' },
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+    });
+  }
+
+  async updateEmail(patientId: string, tenantId: string, email: string) {
+    const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
+    await prisma.patient.updateMany({
+      where: { id: patientId, tenantId },
+      data: { email },
+    });
+    return this.findById(patientId, tenantId);
   }
 }

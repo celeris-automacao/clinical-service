@@ -2,9 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SupabaseGuard } from '../../auth/guards/supabase.guard';
 import { UserContext } from '../../shared/auth/user-context';
 import { CreateClinicalRecordUseCase } from '../../records/application/use-cases/create-clinical-record.use-case';
+import { CreateClinicalNoteUseCase } from '../../records/application/use-cases/create-clinical-note.use-case';
 import { GetPatientEvolutionUseCase } from '../../records/application/use-cases/get-patient-evolution.use-case';
+import { GetPatientClinicalNotesUseCase } from '../../records/application/use-cases/get-patient-clinical-notes.use-case';
 import { GetPatientRecordsForDoctorUseCase } from '../../records/application/use-cases/get-patient-records-for-doctor.use-case';
 import { GetPatientStatsUseCase } from '../../records/application/use-cases/get-patient-stats.use-case';
+import { UpdateClinicalNoteUseCase } from '../../records/application/use-cases/update-clinical-note.use-case';
 import { UpdateLastRecordUseCase } from '../../records/application/use-cases/update-last-record.use-case';
 import { RecordsController } from '../../records/presentation/http/records.controller';
 
@@ -32,6 +35,14 @@ describe('RecordsController', () => {
           },
         },
         {
+          provide: CreateClinicalNoteUseCase,
+          useValue: { execute: jest.fn().mockResolvedValue({ id: 'note-1' }) },
+        },
+        {
+          provide: GetPatientClinicalNotesUseCase,
+          useValue: { execute: jest.fn().mockResolvedValue([]) },
+        },
+        {
           provide: GetPatientEvolutionUseCase,
           useValue: {
             execute: jest.fn().mockResolvedValue([]),
@@ -54,6 +65,10 @@ describe('RecordsController', () => {
           useValue: {
             execute: jest.fn().mockResolvedValue({}),
           },
+        },
+        {
+          provide: UpdateClinicalNoteUseCase,
+          useValue: { execute: jest.fn().mockResolvedValue({ id: 'note-1' }) },
         },
       ],
     })

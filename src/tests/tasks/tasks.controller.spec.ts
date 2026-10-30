@@ -6,6 +6,7 @@ import { GetCategorizedRankingUseCase } from '../../tasks/application/use-cases/
 import { GetDailyTasksUseCase } from '../../tasks/application/use-cases/get-daily-tasks.use-case';
 import { GetRankingUseCase } from '../../tasks/application/use-cases/get-ranking.use-case';
 import { GetTasksTodayUseCase } from '../../tasks/application/use-cases/get-tasks-today.use-case';
+import { GetTaskByIdUseCase } from '../../tasks/application/use-cases/get-task-by-id.use-case';
 import { TasksController } from '../../tasks/presentation/http/tasks.controller';
 
 describe('TasksController', () => {
@@ -30,6 +31,7 @@ describe('TasksController', () => {
         { provide: GetRankingUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
         { provide: GetCategorizedRankingUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
         { provide: GetTasksTodayUseCase, useValue: { execute: jest.fn().mockResolvedValue([]) } },
+        { provide: GetTaskByIdUseCase, useValue: { execute: jest.fn().mockResolvedValue({ id: 'task-123' }) } },
       ],
     })
       .overrideGuard(SupabaseGuard)

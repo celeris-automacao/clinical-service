@@ -1,11 +1,26 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SupabaseGuard } from '../../../auth/guards/supabase.guard';
+import { GetUser } from '../../../common/decorators/get-user.decorator';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { RolesGuard } from '../../../common/guards/roles.guard';
+import { UserContext } from '../../../shared/auth/user-context';
 import { ChangeTenantStatusUseCase } from '../../application/use-cases/change-tenant-status.use-case';
 import { CreateTenantUseCase } from '../../application/use-cases/create-tenant.use-case';
 import { GetTenantByIdUseCase } from '../../application/use-cases/get-tenant-by-id.use-case';
 import { GetTenantsUseCase } from '../../application/use-cases/get-tenants.use-case';
+import { UpdateTenantContactEmailUseCase } from '../../application/use-cases/update-tenant-contact-email.use-case';
 import { ChangeTenantStatusDto } from './dto/change-tenant-status.dto';
 import { CreateTenantDto } from './dto/create-tenant.dto';
+import { UpdateTenantContactEmailDto } from './dto/update-tenant-contact-email.dto';
 
 @ApiTags('Tenants')
 @Controller('tenants')
@@ -15,6 +30,7 @@ export class TenantsController {
     private readonly getTenantsUseCase: GetTenantsUseCase,
     private readonly getTenantByIdUseCase: GetTenantByIdUseCase,
     private readonly changeTenantStatusUseCase: ChangeTenantStatusUseCase,
+    private readonly updateTenantContactEmailUseCase: UpdateTenantContactEmailUseCase,
   ) {}
 
   @Post()
@@ -40,5 +56,23 @@ export class TenantsController {
   @ApiOperation({ summary: 'Alterar status operacional da clinica' })
   changeStatus(@Param('id') id: string, @Body() dto: ChangeTenantStatusDto) {
     return this.changeTenantStatusUseCase.execute(id, dto.status);
+  }
+
+  @Patch(':id/contact-email')
+  @UseGuards(SupabaseGuard, RolesGuard)
+  @Roles('owner', 'admin')
+  @ApiOperation({
+    summary: 'Atualizar e-mail de contato da clinica do usuario',
+  })
+  updateContactEmail(
+    @Param('id') id: string,
+    @Body() dto: UpdateTenantContactEmailDto,
+    @GetUser() user: UserContext,
+  ) {
+    return this.updateTenantContactEmailUseCase.execute(
+      id,
+      dto.email.trim(),
+      user,
+    );
   }
 }

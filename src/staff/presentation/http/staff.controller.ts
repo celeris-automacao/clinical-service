@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { SupabaseGuard } from '../../../auth/guards/supabase.guard';
 import { GetUser } from '../../../common/decorators/get-user.decorator';
 import { Roles } from '../../../common/decorators/roles.decorator';
@@ -44,22 +53,49 @@ export class StaffController {
 
   @Post()
   create(@Body() dto: CreateStaffMemberDto, @GetUser() user: UserContext) {
-    return this.createStaffMemberUseCase.execute(dto, user.tenantId, user.userId);
+    return this.createStaffMemberUseCase.execute(
+      dto,
+      user.tenantId,
+      user.userId,
+    );
   }
 
   @Post('invitations')
   invite(@Body() dto: CreateStaffInvitationDto, @GetUser() user: UserContext) {
-    return this.createStaffInvitationUseCase.execute(dto, user.tenantId, user.userId);
+    return this.createStaffInvitationUseCase.execute(
+      dto,
+      user.tenantId,
+      user.userId,
+    );
   }
 
   @Post('invitations/accept')
-  @Roles('patient', 'owner', 'admin', 'doctor', 'specialist', 'staff')
-  acceptInvitation(@Body() dto: AcceptStaffInvitationDto, @GetUser() user: UserContext) {
+  @Roles(
+    'patient',
+    'owner',
+    'admin',
+    'doctor',
+    'specialist',
+    'staff',
+    'assistant',
+  )
+  acceptInvitation(
+    @Body() dto: AcceptStaffInvitationDto,
+    @GetUser() user: UserContext,
+  ) {
     return this.acceptStaffInvitationUseCase.execute(dto, user);
   }
 
   @Get('me/context')
-  @Roles('patient', 'owner', 'admin', 'doctor', 'specialist', 'staff')
+  @Roles(
+    'patient',
+    'owner',
+    'admin',
+    'doctor',
+    'specialist',
+    'staff',
+    'assistant',
+  )
   getMyContext(@GetUser() user: UserContext) {
     return this.getMyStaffContextUseCase.execute(user);
   }
@@ -90,7 +126,12 @@ export class StaffController {
     @Body() dto: UpdateStaffMemberDto,
     @GetUser() user: UserContext,
   ) {
-    return this.updateStaffMemberUseCase.execute(id, user.tenantId, dto, user.userId);
+    return this.updateStaffMemberUseCase.execute(
+      id,
+      user.tenantId,
+      dto,
+      user.userId,
+    );
   }
 
   @Patch(':id/status')
@@ -99,12 +140,21 @@ export class StaffController {
     @Body() dto: ChangeStaffMemberStatusDto,
     @GetUser() user: UserContext,
   ) {
-    return this.changeStaffMemberStatusUseCase.execute(id, user.tenantId, dto.status, user.userId);
+    return this.changeStaffMemberStatusUseCase.execute(
+      id,
+      user.tenantId,
+      dto.status,
+      user.userId,
+    );
   }
 
   @Patch('invitations/:id/revoke')
   revokeInvitation(@Param('id') id: string, @GetUser() user: UserContext) {
-    return this.revokeStaffInvitationUseCase.execute(id, user.tenantId, user.userId);
+    return this.revokeStaffInvitationUseCase.execute(
+      id,
+      user.tenantId,
+      user.userId,
+    );
   }
 
   @Post('invitations/cleanup')

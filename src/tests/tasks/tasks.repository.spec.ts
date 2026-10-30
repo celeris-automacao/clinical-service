@@ -126,7 +126,8 @@ describe('PrismaTasksRepository', () => {
         currentLevel: true,
         currentXp: true,
         totalDamageDealt: true,
-        patient: { select: { name: true } },
+        patientId: true,
+        patient: { select: { id: true, name: true } },
       },
       orderBy: [{ currentLevel: 'desc' }, { currentXp: 'desc' }, { totalDamageDealt: 'desc' }],
     });

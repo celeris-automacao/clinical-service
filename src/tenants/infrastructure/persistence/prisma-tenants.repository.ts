@@ -5,7 +5,9 @@ import { CreateTenantDto } from '../../presentation/http/dto/create-tenant.dto';
 
 @Injectable()
 export class PrismaTenantsRepository implements TenantsRepositoryPort {
-  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
+  constructor(
+    private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory,
+  ) {}
 
   async create(data: CreateTenantDto) {
     const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
@@ -79,6 +81,15 @@ export class PrismaTenantsRepository implements TenantsRepositoryPort {
         plan: true,
         address: true,
       },
+    });
+  }
+
+  async updateResponsibleEmail(id: string, email: string) {
+    const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
+    return prisma.tenant.update({
+      where: { id },
+      data: { responsibleEmail: email },
+      include: { plan: true, address: true },
     });
   }
 

@@ -1,28 +1,33 @@
-import { Type } from 'class-transformer';
-import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, Matches, ValidateNested } from 'class-validator';
 import { Gender } from '@prisma/client';
 import { PatientAddressDto } from './patient-address.dto';
+import { IsCpf, normalizeCpf } from '../../../../common/validation/cpf.validator';
 
 export class CreatePatientDto {
+  @IsOptional()
   @IsUUID()
-  @IsNotEmpty()
-  supabaseId: string;
+  supabaseId?: string;
 
   @IsString()
   @IsNotEmpty()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim() : value)
   name: string;
 
-  @IsOptional()
   @IsEmail()
-  email?: string;
+  @IsNotEmpty()
+  @Transform(({ value }) => typeof value === 'string' ? value.trim().toLowerCase() : value)
+  email: string;
 
-  @IsOptional()
   @IsString()
-  phone?: string;
+  @IsNotEmpty()
+  @Matches(/^\+?[0-9()\s.-]{10,20}$/)
+  phone: string;
 
-  @IsOptional()
   @IsString()
-  document?: string;
+  @Transform(({ value }) => typeof value === 'string' ? normalizeCpf(value) : value)
+  @IsCpf()
+  document: string;
 
   @IsEnum(Gender)
   @IsOptional()
@@ -30,6 +35,7 @@ export class CreatePatientDto {
 
   @IsDateString()
   @IsOptional()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
   birthDate?: string;
 
   @IsOptional()

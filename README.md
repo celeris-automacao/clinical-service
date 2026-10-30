@@ -35,6 +35,34 @@ npx prisma migrate dev
 npx prisma generate
 ```
 
+Em ambientes de deploy, aplique migrations pelo processo de release, usando
+`npm run db:migrate:deploy` em um único job coordenado por banco de dados. Não
+execute migrations simultaneamente por cada réplica da aplicação e não use
+`migrate dev` em produção. Migrations já aplicadas devem ser tratadas como
+imutáveis; mudanças posteriores devem ser registradas em uma nova pasta
+versionada em `prisma/migrations/`. Após a execução, confira o estado com
+`npx prisma migrate status`.
+
+### SMTP para convites de profissionais
+
+Configure estas variáveis no ambiente da API (use o gerenciador de secrets do
+ambiente em deploy; não versione credenciais):
+
+| Variável | Obrigatória | Observação |
+|---|---:|---|
+| `SMTP_HOST` | Sim | Host do relay SMTP |
+| `SMTP_PORT` | Não | Padrão `587`; para TLS implícito, use normalmente `465` |
+| `SMTP_SECURE` | Não | `true` ou `false`; sem valor, usa TLS implícito na porta 465 |
+| `SMTP_USER` / `SMTP_PASSWORD` | Em conjunto | Credenciais do relay; ambas podem ficar vazias em relays sem autenticação |
+| `SMTP_FROM` | Sim | Remetente autorizado pelo provedor |
+| `STAFF_INVITATION_APP_URL` | Sim | URL HTTPS base do Flutter Web (HTTP é aceito apenas em localhost) |
+
+O link leva o token no fragmento da URL, que não é enviado ao servidor web nem
+incluído no cabeçalho Referer. O usuário precisa entrar com o e-mail convidado
+em uma conta cujo contexto de clínica corresponda ao convite. Teste a conexão,
+sem enviar mensagem, com `npm run email:verify` após injetar a configuração.
+Convites não enviados são revogados e a API retorna erro, sem indicar sucesso.
+
 Rodar seed:
 
 ```bash
@@ -138,12 +166,16 @@ Funções principais:
 - criar plano
 - listar planos
 - buscar plano por id
+- solicitar mudança de plano (owner/admin)
+- consultar solicitação pendente da clínica (owner/admin)
 
 Regra de negócio:
 
 - `code` do plano é único
 - tenant só pode ser criado com plano existente e ativo
 - plano define limites operacionais da clínica
+- uma clínica pode ter no máximo uma solicitação de mudança pendente; a
+  solicitação é persistida para revisão comercial posterior
 
 ### `tenants`
 

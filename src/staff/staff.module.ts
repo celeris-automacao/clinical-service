@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { EmailModule } from '../email/email.module';
 import { ChangeStaffMemberStatusUseCase } from './application/use-cases/change-staff-member-status.use-case';
 import { AcceptStaffInvitationUseCase } from './application/use-cases/accept-staff-invitation.use-case';
 import { CleanupExpiredStaffInvitationsUseCase } from './application/use-cases/cleanup-expired-staff-invitations.use-case';
@@ -21,6 +22,7 @@ import { StaffController } from './presentation/http/staff.controller';
 import { STAFF_AUDIT_LOG_PORT, STAFF_REPOSITORY } from './staff.tokens';
 
 @Module({
+  imports: [EmailModule],
   controllers: [StaffController],
   providers: [
     Reflector,

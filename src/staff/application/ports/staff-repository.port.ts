@@ -9,6 +9,7 @@ export interface StaffRepositoryPort {
     professionalType: string;
     specialty: string;
     role: string;
+    roleLabel?: string;
     licenseNumber?: string;
     status: string;
   }): Promise<any>;
@@ -23,8 +24,16 @@ export interface StaffRepositoryPort {
   ): Promise<any[]>;
   findById(id: string, tenantId: string): Promise<any | null>;
   findByUserId(userId: string, tenantId: string): Promise<any | null>;
-  findByEmail(email: string, tenantId: string, excludeId?: string): Promise<any | null>;
-  findByDocument(document: string, tenantId: string, excludeId?: string): Promise<any | null>;
+  findByEmail(
+    email: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<any | null>;
+  findByDocument(
+    document: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<any | null>;
   findByLicenseNumber(
     licenseNumber: string,
     tenantId: string,
@@ -42,6 +51,7 @@ export interface StaffRepositoryPort {
       specialty?: string;
       role?: string;
       licenseNumber?: string | null;
+      privateConsultationPrice?: number | null;
     },
   ): Promise<any>;
   changeStatus(id: string, tenantId: string, status: string): Promise<any>;
@@ -53,14 +63,21 @@ export interface StaffRepositoryPort {
     professionalType: string;
     specialty: string;
     role: string;
+    roleLabel?: string;
     licenseNumber?: string;
     invitedByUserId: string;
     token: string;
     status: string;
     expiresAt: Date;
   }): Promise<any>;
-  findPendingInvitationByEmail(email: string, tenantId: string): Promise<any | null>;
-  findPendingInvitationByDocument(document: string, tenantId: string): Promise<any | null>;
+  findPendingInvitationByEmail(
+    email: string,
+    tenantId: string,
+  ): Promise<any | null>;
+  findPendingInvitationByDocument(
+    document: string,
+    tenantId: string,
+  ): Promise<any | null>;
   findPendingInvitationByLicenseNumber(
     licenseNumber: string,
     tenantId: string,
@@ -68,8 +85,16 @@ export interface StaffRepositoryPort {
   findPendingInvitationsByTenant(tenantId: string): Promise<any[]>;
   findInvitationById(id: string, tenantId: string): Promise<any | null>;
   findInvitationByToken(token: string): Promise<any | null>;
-  acceptInvitation(token: string, actorUserId: string, tenantId: string): Promise<any>;
-  revokeInvitation(id: string, actorUserId: string, tenantId: string): Promise<any>;
+  acceptInvitation(
+    token: string,
+    actorUserId: string,
+    tenantId: string,
+  ): Promise<any>;
+  revokeInvitation(
+    id: string,
+    actorUserId: string,
+    tenantId: string,
+  ): Promise<any>;
   cleanupExpiredInvitations(referenceDate: Date): Promise<number>;
   findAuditLogsByTenant(tenantId: string): Promise<any[]>;
   countByTenant(tenantId: string): Promise<number>;

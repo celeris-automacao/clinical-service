@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { STAFF_AUDIT_LOG_PORT, STAFF_REPOSITORY } from '../../staff.tokens';
 import { UpdateStaffMemberDto } from '../../presentation/http/dto/update-staff-member.dto';
 import { StaffAuditLogPort } from '../ports/staff-audit-log.port';
@@ -13,23 +18,53 @@ export class UpdateStaffMemberUseCase {
     private readonly auditLogPort: StaffAuditLogPort,
   ) {}
 
-  async execute(id: string, tenantId: string, dto: UpdateStaffMemberDto, actorUserId?: string) {
+  async execute(
+    id: string,
+    tenantId: string,
+    dto: UpdateStaffMemberDto,
+    actorUserId?: string,
+  ) {
     const existingStaff = await this.repository.findById(id, tenantId);
     if (!existingStaff) {
       throw new NotFoundException('Profissional nao encontrado na clinica.');
     }
 
     if (dto.document) {
-      const existingDocument = await this.repository.findByDocument(dto.document, tenantId, id);
+      const existingDocument = await this.repository.findByDocument(
+        dto.document,
+        tenantId,
+        id,
+      );
       if (existingDocument) {
-        throw new BadRequestException('Ja existe um profissional com este documento na clinica.');
+        throw new BadRequestException(
+          'Ja existe um profissional com este documento na clinica.',
+        );
+      }
+    }
+
+    if (dto.email) {
+      const existingEmail = await this.repository.findByEmail(
+        dto.email.trim(),
+        tenantId,
+        id,
+      );
+      if (existingEmail) {
+        throw new BadRequestException(
+          'Ja existe um profissional com este e-mail na clinica.',
+        );
       }
     }
 
     if (dto.licenseNumber) {
-      const existingLicense = await this.repository.findByLicenseNumber(dto.licenseNumber, tenantId, id);
+      const existingLicense = await this.repository.findByLicenseNumber(
+        dto.licenseNumber,
+        tenantId,
+        id,
+      );
       if (existingLicense) {
-        throw new BadRequestException('Ja existe um profissional com este registro na clinica.');
+        throw new BadRequestException(
+          'Ja existe um profissional com este registro na clinica.',
+        );
       }
     }
 

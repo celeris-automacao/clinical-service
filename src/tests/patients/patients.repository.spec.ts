@@ -11,6 +11,7 @@ describe('PrismaPatientsRepository', () => {
     patient: {
       findFirst: jest.fn(),
       count: jest.fn(),
+      create: jest.fn(),
     },
     patientProfile: {
       upsert: jest.fn(),
@@ -79,6 +80,7 @@ describe('PrismaPatientsRepository', () => {
         email: dto.email,
         phone: dto.phone,
         document: dto.document,
+        normalizedDocument: dto.document,
         gender: dto.gender,
         birthDate: new Date(dto.birthDate),
         address: {
@@ -103,6 +105,58 @@ describe('PrismaPatientsRepository', () => {
       },
     });
     expect(result).toEqual(createdPatient);
+  });
+
+  it('deve deixar o banco gerar o id quando o contato nao possui login', async () => {
+    const createdPatient = { id: 'generated-patient-id', tenantId: 'tenant-1' };
+    const tx = {
+      patient: {
+        create: jest.fn().mockResolvedValue(createdPatient),
+      },
+      playerStats: {
+        create: jest.fn().mockResolvedValue({}),
+      },
+    };
+    (tenantScopedPrismaFactory.runInTenantTransaction as jest.Mock)
+      .mockImplementation(async (_context: any, callback: any) => callback(tx));
+
+    await repository.createWithStats(
+      {
+        name: 'Paciente Teste',
+        email: 'paciente@teste.com',
+        phone: '11911111111',
+        document: '52998224725',
+        normalizedDocument: '52998224725',
+      } as any,
+      'tenant-1',
+      'owner-1',
+    );
+
+    expect(tenantScopedPrismaFactory.runInTenantTransaction).toHaveBeenCalledWith(
+      { userId: 'owner-1', tenantId: 'tenant-1' },
+      expect.any(Function),
+    );
+    expect(tx.patient.create).toHaveBeenCalledWith({
+      data: {
+        name: 'Paciente Teste',
+        tenantId: 'tenant-1',
+        email: 'paciente@teste.com',
+        phone: '11911111111',
+        document: '52998224725',
+        normalizedDocument: '52998224725',
+        gender: undefined,
+        birthDate: null,
+        address: undefined,
+        staffLinks: undefined,
+      },
+    });
+    expect(tx.playerStats.create).toHaveBeenCalledWith({
+      data: {
+        patientId: createdPatient.id,
+        tenantId: 'tenant-1',
+        currentLevel: 1,
+      },
+    });
   });
 
   it('deve contar pacientes por tenant', async () => {
@@ -130,6 +184,20 @@ describe('PrismaPatientsRepository', () => {
 
     expect(tenantPrisma.patient.findFirst).toHaveBeenCalledWith({
       where: { id: 'patient-2', tenantId: 'tenant-1' },
+    });
+  });
+
+  it('deve buscar CPF normalizado sem diferenciar caixa no tenant', async () => {
+    tenantPrisma.patient.findFirst.mockResolvedValue({ id: 'patient-1' });
+
+    await expect(
+      repository.findByDocument('52998224725', 'tenant-1'),
+    ).resolves.toEqual({ id: 'patient-1' });
+    expect(tenantPrisma.patient.findFirst).toHaveBeenCalledWith({
+      where: {
+        tenantId: 'tenant-1',
+        normalizedDocument: { equals: '52998224725' },
+      },
     });
   });
 

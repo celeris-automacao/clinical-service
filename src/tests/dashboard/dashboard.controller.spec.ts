@@ -46,7 +46,7 @@ describe('DashboardController', () => {
 
   it('deve permitir acesso ao overview para usuários com role doctor', async () => {
     await expect(controller.getOverview(mockDoctor)).resolves.not.toThrow();
-    expect(getClinicOverviewUseCase.execute).toHaveBeenCalledWith(mockDoctor.tenantId);
+    expect(getClinicOverviewUseCase.execute).toHaveBeenCalledWith(mockDoctor);
   });
 
   it('deve lançar ForbiddenException se um patient tentar acessar o overview', async () => {
@@ -55,7 +55,7 @@ describe('DashboardController', () => {
 
   it('deve permitir acesso a pacientes inativos apenas para médicos/admins', async () => {
     await expect(controller.getInactive(mockDoctor)).resolves.not.toThrow();
-    expect(getMissingPatientsUseCase.execute).toHaveBeenCalledWith(mockDoctor.tenantId);
+    expect(getMissingPatientsUseCase.execute).toHaveBeenCalledWith(mockDoctor);
   });
 
   it('deve bloquear acesso a resgates recentes para pacientes', async () => {
@@ -64,6 +64,6 @@ describe('DashboardController', () => {
 
   it('deve buscar os resgates recentes pelo tenantId do médico logado', async () => {
     await controller.getRecentClaims(mockDoctor);
-    expect(getRecentClaimsUseCase.execute).toHaveBeenCalledWith(mockDoctor.tenantId);
+    expect(getRecentClaimsUseCase.execute).toHaveBeenCalledWith(mockDoctor);
   });
 });

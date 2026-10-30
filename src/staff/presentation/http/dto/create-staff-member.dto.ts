@@ -1,9 +1,18 @@
-import { IsEmail, IsIn, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Transform } from "class-transformer";
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from "class-validator";
 import {
   STAFF_PROFESSIONAL_TYPES,
   STAFF_ROLES,
   STAFF_STATUSES,
-} from '../../../domain/staff.constants';
+} from "../../../domain/staff.constants";
 
 export class CreateStaffMemberDto {
   @IsUUID()
@@ -31,6 +40,13 @@ export class CreateStaffMemberDto {
 
   @IsIn(STAFF_ROLES)
   role: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(60)
+  roleLabel?: string;
 
   @IsOptional()
   @IsString()

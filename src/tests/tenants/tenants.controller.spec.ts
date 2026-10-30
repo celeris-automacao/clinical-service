@@ -3,6 +3,7 @@ import { ChangeTenantStatusUseCase } from '../../tenants/application/use-cases/c
 import { CreateTenantUseCase } from '../../tenants/application/use-cases/create-tenant.use-case';
 import { GetTenantByIdUseCase } from '../../tenants/application/use-cases/get-tenant-by-id.use-case';
 import { GetTenantsUseCase } from '../../tenants/application/use-cases/get-tenants.use-case';
+import { UpdateTenantContactEmailUseCase } from '../../tenants/application/use-cases/update-tenant-contact-email.use-case';
 import { CreateTenantDto } from '../../tenants/presentation/http/dto/create-tenant.dto';
 import { TenantsController } from '../../tenants/presentation/http/tenants.controller';
 
@@ -40,6 +41,10 @@ describe('TenantsController', () => {
           useValue: {
             execute: jest.fn().mockResolvedValue({ id: 'tenant-1', status: 'inactive' }),
           },
+        },
+        {
+          provide: UpdateTenantContactEmailUseCase,
+          useValue: { execute: jest.fn().mockResolvedValue({ id: 'tenant-1' }) },
         },
       ],
     }).compile();

@@ -14,37 +14,38 @@ datasource db {
 // ==========================================
 
 model Tenant {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  legalName String   @map("legal_name")
-  cnpj      String   @unique
-  status    String   @default("active")
-  responsibleName  String  @map("responsible_name")
-  responsibleEmail String  @map("responsible_email")
-  responsiblePhone String? @map("responsible_phone")
-  planId    String   @map("plan_id") @db.Uuid
-  activatedAt DateTime? @map("activated_at")
-  deactivatedAt DateTime? @map("deactivated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id               String    @id @default(uuid()) @db.Uuid
+  name             String
+  legalName        String    @map("legal_name")
+  cnpj             String    @unique
+  status           String    @default("active")
+  responsibleName  String    @map("responsible_name")
+  responsibleEmail String    @map("responsible_email")
+  responsiblePhone String?   @map("responsible_phone")
+  planId           String    @map("plan_id") @db.Uuid
+  activatedAt      DateTime? @map("activated_at")
+  deactivatedAt    DateTime? @map("deactivated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
   // Relações Reais 
-  patients        Patient[]
-  bossBattles     BossBattle[]
-  dailyTasks      DailyTask[]
-  taskTemplates   TaskTemplate[]
-  taskAssignments TaskAssignment[]
-  records         ClinicalRecord[]
-  clinicalNotes   ClinicalNote[]
-  rewards         Reward[]
-  playerStats     PlayerStats[]
-  taskCompletions TaskCompletion[]
-  rewardClaims    RewardClaim[]
-  socialPosts     SocialPost[]
-  staff           Staff[]
-  plan            Plan @relation(fields: [planId], references: [id])
-  address         TenantAddress?
-  patientStaffLinks PatientStaffLink[]
+  patients            Patient[]
+  bossBattles         BossBattle[]
+  dailyTasks          DailyTask[]
+  taskTemplates       TaskTemplate[]
+  taskAssignments     TaskAssignment[]
+  records             ClinicalRecord[]
+  clinicalNotes       ClinicalNote[]
+  rewards             Reward[]
+  playerStats         PlayerStats[]
+  taskCompletions     TaskCompletion[]
+  rewardClaims        RewardClaim[]
+  socialPosts         SocialPost[]
+  staff               Staff[]
+  plan                Plan                 @relation(fields: [planId], references: [id])
+  address             TenantAddress?
+  patientStaffLinks   PatientStaffLink[]
+  planUpgradeRequests PlanUpgradeRequest[]
 
   @@map("tenants")
   @@schema("access")
@@ -62,22 +63,42 @@ model Plan {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  tenants Tenant[]
+  tenants             Tenant[]
+  upgradeRequestsFrom PlanUpgradeRequest[] @relation("PlanUpgradeCurrent")
+  upgradeRequestsTo   PlanUpgradeRequest[] @relation("PlanUpgradeTarget")
 
   @@map("plans")
   @@schema("access")
 }
 
+model PlanUpgradeRequest {
+  id                String   @id @default(uuid()) @db.Uuid
+  tenantId          String   @map("tenant_id") @db.Uuid
+  currentPlanId     String   @map("current_plan_id") @db.Uuid
+  targetPlanId      String   @map("target_plan_id") @db.Uuid
+  requestedByUserId String   @map("requested_by_user_id") @db.Uuid
+  status            String   @default("pending")
+  requestedAt       DateTime @default(now()) @map("requested_at")
+
+  tenant      Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  currentPlan Plan   @relation("PlanUpgradeCurrent", fields: [currentPlanId], references: [id], onDelete: Restrict)
+  targetPlan  Plan   @relation("PlanUpgradeTarget", fields: [targetPlanId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status, requestedAt])
+  @@map("plan_upgrade_requests")
+  @@schema("access")
+}
+
 model TenantAddress {
-  tenantId      String  @id @map("tenant_id") @db.Uuid
-  zipCode       String  @map("zip_code")
-  street        String
-  number        String
-  complement    String?
-  neighborhood  String
-  city          String
-  state         String
-  country       String  @default("BR")
+  tenantId     String  @id @map("tenant_id") @db.Uuid
+  zipCode      String  @map("zip_code")
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  country      String  @default("BR")
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
@@ -149,7 +170,7 @@ model TaskTemplate {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  tenant      Tenant            @relation(fields: [tenantId], references: [id])
+  tenant      Tenant           @relation(fields: [tenantId], references: [id])
   assignments TaskAssignment[]
 
   @@unique([tenantId, title, taskType])
@@ -178,14 +199,15 @@ model TaskAssignment {
 }
 
 model Patient {
-  id        String    @id @default(uuid()) @db.Uuid
-  tenantId  String    @map("tenant_id") @db.Uuid
-  name      String
-  email     String?   @map("email")
-  phone     String?   @map("phone")
-  document  String?   @map("document")
-  gender    Gender?
-  birthDate DateTime? @map("birth_date") @db.Date
+  id                 String    @id @default(uuid()) @db.Uuid
+  tenantId           String    @map("tenant_id") @db.Uuid
+  name               String
+  email              String?   @map("email")
+  phone              String?   @map("phone")
+  document           String?   @map("document")
+  normalizedDocument String?   @map("normalized_document")
+  gender             Gender?
+  birthDate          DateTime? @map("birth_date") @db.Date
 
   // Relações Clínicas
   tenant          Tenant           @relation(fields: [tenantId], references: [id])
@@ -204,8 +226,9 @@ model Patient {
   socialPosts SocialPost[] // Corrigindo erro na linha 230 [cite: 16]
 
   // Relações de Equipe
-  staffLinks      PatientStaffLink[]
+  staffLinks PatientStaffLink[]
 
+  @@unique([tenantId, normalizedDocument])
   @@map("patients")
   @@schema("clinical")
 }
@@ -235,15 +258,15 @@ model ClinicalNote {
 }
 
 model PatientAddress {
-  patientId      String  @id @map("patient_id") @db.Uuid
-  zipCode        String  @map("zip_code")
-  street         String
-  number         String
-  complement     String?
-  neighborhood   String
-  city           String
-  state          String
-  country        String  @default("BR")
+  patientId    String  @id @map("patient_id") @db.Uuid
+  zipCode      String  @map("zip_code")
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  country      String  @default("BR")
 
   patient Patient @relation(fields: [patientId], references: [id])
 
@@ -265,22 +288,24 @@ model PatientProfile {
 }
 
 model Staff {
-  id               String   @id @default(uuid()) @db.Uuid
-  tenantId         String   @map("tenant_id") @db.Uuid
-  userId           String   @map("user_id") @db.Uuid
-  name             String
-  document         String
-  email            String?
-  phone            String?
-  professionalType String   @default("doctor") @map("professional_type")
-  specialty        String
-  role             String   @default("doctor")
-  licenseNumber    String?  @map("license_number")
-  status           String   @default("active")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id                       String   @id @default(uuid()) @db.Uuid
+  tenantId                 String   @map("tenant_id") @db.Uuid
+  userId                   String   @map("user_id") @db.Uuid
+  name                     String
+  document                 String
+  email                    String?
+  phone                    String?
+  professionalType         String   @default("doctor") @map("professional_type")
+  specialty                String
+  role                     String   @default("doctor")
+  roleLabel                String?  @map("role_label")
+  licenseNumber            String?  @map("license_number")
+  privateConsultationPrice Decimal? @map("private_consultation_price") @db.Decimal(10, 2)
+  status                   String   @default("active")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
 
-  tenant Tenant @relation(fields: [tenantId], references: [id])
+  tenant       Tenant             @relation(fields: [tenantId], references: [id])
   patientLinks PatientStaffLink[]
 
   @@unique([tenantId, userId])
@@ -316,6 +341,7 @@ model StaffInvitation {
   professionalType String   @map("professional_type")
   specialty        String
   role             String
+  roleLabel        String?  @map("role_label")
   licenseNumber    String?  @map("license_number")
   invitedByUserId  String   @map("invited_by_user_id") @db.Uuid
   token            String   @unique
@@ -329,13 +355,13 @@ model StaffInvitation {
 }
 
 model StaffAuditLog {
-  id           String   @id @default(uuid()) @db.Uuid
-  tenantId     String   @map("tenant_id") @db.Uuid
-  actorUserId  String   @map("actor_user_id") @db.Uuid
-  targetStaffId String? @map("target_staff_id") @db.Uuid
-  action       String
-  metadata     String?  @db.Text
-  createdAt    DateTime @default(now()) @map("created_at")
+  id            String   @id @default(uuid()) @db.Uuid
+  tenantId      String   @map("tenant_id") @db.Uuid
+  actorUserId   String   @map("actor_user_id") @db.Uuid
+  targetStaffId String?  @map("target_staff_id") @db.Uuid
+  action        String
+  metadata      String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
 
   @@map("staff_audit_logs")
   @@schema("clinical")

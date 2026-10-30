@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { TenantScopedPrismaFactory } from '../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory';
-import { StaffRepositoryPort } from '../../application/ports/staff-repository.port';
+import { Injectable } from "@nestjs/common";
+import { TenantScopedPrismaFactory } from "../../../shared/infrastructure/persistence/tenant-scoped-prisma.factory";
+import { StaffRepositoryPort } from "../../application/ports/staff-repository.port";
 
 @Injectable()
 export class PrismaStaffRepository implements StaffRepositoryPort {
-  constructor(private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory) {}
+  constructor(
+    private readonly tenantScopedPrismaFactory: TenantScopedPrismaFactory,
+  ) {}
 
   async create(data: {
     tenantId: string;
@@ -16,6 +18,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     professionalType: string;
     specialty: string;
     role: string;
+    roleLabel?: string;
     licenseNumber?: string;
     status: string;
   }) {
@@ -45,9 +48,11 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
         ...(filters.role ? { role: filters.role } : {}),
         ...(filters.status ? { status: filters.status } : {}),
         ...(filters.specialty ? { specialty: filters.specialty } : {}),
-        ...(filters.professionalType ? { professionalType: filters.professionalType } : {}),
+        ...(filters.professionalType
+          ? { professionalType: filters.professionalType }
+          : {}),
       },
-      orderBy: [{ role: 'asc' }, { name: 'asc' }],
+      orderBy: [{ role: "asc" }, { name: "asc" }],
     });
   }
 
@@ -59,7 +64,10 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
   }
 
   async findByUserId(userId: string, tenantId: string) {
-    const prisma = this.tenantScopedPrismaFactory.forTenantContext({ userId, tenantId }) as any;
+    const prisma = this.tenantScopedPrismaFactory.forTenantContext({
+      userId,
+      tenantId,
+    }) as any;
     return prisma.staff.findFirst({
       where: { userId, tenantId },
     });
@@ -69,7 +77,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
     return prisma.staff.findFirst({
       where: {
-        email,
+        email: { equals: email, mode: "insensitive" },
         tenantId,
         ...(excludeId ? { id: { not: excludeId } } : {}),
       },
@@ -87,7 +95,11 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     });
   }
 
-  async findByLicenseNumber(licenseNumber: string, tenantId: string, excludeId?: string) {
+  async findByLicenseNumber(
+    licenseNumber: string,
+    tenantId: string,
+    excludeId?: string,
+  ) {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
     return prisma.staff.findFirst({
       where: {
@@ -110,6 +122,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
       specialty?: string;
       role?: string;
       licenseNumber?: string | null;
+      privateConsultationPrice?: number | null;
     },
   ) {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
@@ -135,7 +148,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
       where: {
         tenantId,
         role,
-        status: 'active',
+        status: "active",
       },
     });
   }
@@ -155,6 +168,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     professionalType: string;
     specialty: string;
     role: string;
+    roleLabel?: string;
     licenseNumber?: string;
     invitedByUserId: string;
     token: string;
@@ -176,7 +190,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
       where: {
         email,
         tenantId,
-        status: 'pending',
+        status: "pending",
       },
     });
   }
@@ -187,18 +201,21 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
       where: {
         document,
         tenantId,
-        status: 'pending',
+        status: "pending",
       },
     });
   }
 
-  async findPendingInvitationByLicenseNumber(licenseNumber: string, tenantId: string) {
+  async findPendingInvitationByLicenseNumber(
+    licenseNumber: string,
+    tenantId: string,
+  ) {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
     return prisma.staffInvitation.findFirst({
       where: {
         licenseNumber,
         tenantId,
-        status: 'pending',
+        status: "pending",
       },
     });
   }
@@ -208,9 +225,9 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     return prisma.staffInvitation.findMany({
       where: {
         tenantId,
-        status: 'pending',
+        status: "pending",
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -235,7 +252,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     }) as any;
     return prisma.staffInvitation.updateMany({
       where: { token, tenantId },
-      data: { status: 'accepted' },
+      data: { status: "accepted" },
     });
   }
 
@@ -246,7 +263,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     }) as any;
     await prisma.staffInvitation.updateMany({
       where: { id, tenantId },
-      data: { status: 'revoked' },
+      data: { status: "revoked" },
     });
     return this.findInvitationById(id, tenantId);
   }
@@ -255,11 +272,11 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     const prisma = this.tenantScopedPrismaFactory.forRoot() as any;
     const result = await prisma.staffInvitation.updateMany({
       where: {
-        status: 'pending',
+        status: "pending",
         expiresAt: { lt: referenceDate },
       },
       data: {
-        status: 'expired',
+        status: "expired",
       },
     });
     return result.count ?? 0;
@@ -269,7 +286,7 @@ export class PrismaStaffRepository implements StaffRepositoryPort {
     const prisma = this.tenantScopedPrismaFactory.forTenant(tenantId) as any;
     return prisma.staffAuditLog.findMany({
       where: { tenantId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 }

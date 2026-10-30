@@ -23,6 +23,16 @@ describe('Tasks Query Use Cases', () => {
   let getCategorizedRankingUseCase: GetCategorizedRankingUseCase;
   let getTasksTodayUseCase: GetTasksTodayUseCase;
 
+  const futureDueDate = () => {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-');
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -130,7 +140,7 @@ describe('Tasks Query Use Cases', () => {
       {
         templateId: 'template-1',
         patientId: 'patient-1',
-        dueDate: '2026-03-20',
+        dueDate: futureDueDate(),
       } as any,
       't1',
       'staff-1',
@@ -181,7 +191,7 @@ describe('Tasks Query Use Cases', () => {
         {
           templateId: 'template-1',
           patientId: 'patient-1',
-          dueDate: '2026-03-20',
+          dueDate: futureDueDate(),
         } as any,
         't1',
         'staff-1',

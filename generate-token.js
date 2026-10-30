@@ -11,6 +11,13 @@ if (!secret) {
   process.exit(1);
 }
 
+const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/+$/, '');
+
+if (!supabaseUrl) {
+  console.error('ERRO: SUPABASE_URL nao encontrada no arquivo .env');
+  process.exit(1);
+}
+
 const seededTenantId = 'c56a4180-65aa-42ec-a945-5fd21dec0538';
 const seededProfiles = {
   owner: {
@@ -18,27 +25,17 @@ const seededProfiles = {
     email: 'owner@clinica.com',
     role: 'owner',
   },
-  staff: {
-    sub: '22222222-2222-4222-8222-222222222222',
-    email: 'medico@clinica.com',
-    role: 'doctor',
-  },
-  patient: {
-    sub: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-    email: 'paciente@clinica.com',
-    role: 'patient',
-  },
 };
 
 function parseArgs(argv) {
   const args = argv.slice(2);
   const options = {};
-  let profile = 'patient';
+  let profile = 'owner';
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
 
-    if (!arg.startsWith('--') && profile === 'patient') {
+    if (!arg.startsWith('--') && profile === 'owner') {
       profile = arg.toLowerCase();
       continue;
     }
@@ -67,7 +64,9 @@ function buildPayload(profileName, options) {
 
   if (!selectedProfile) {
     console.error(`Perfil invalido: ${profileName}`);
-    console.error(`Perfis disponiveis: ${Object.keys(seededProfiles).join(', ')}`);
+    console.error(
+      `Perfis disponiveis: ${Object.keys(seededProfiles).join(', ')}`,
+    );
     process.exit(1);
   }
 
@@ -85,7 +84,7 @@ function buildPayload(profileName, options) {
     },
     aud: 'authenticated',
     role: 'authenticated',
-    iss: 'local-dev',
+    iss: `${supabaseUrl}/auth/v1`,
   };
 }
 
@@ -106,11 +105,6 @@ console.log('\nPayload usado:');
 console.log(JSON.stringify(payload, null, 2));
 console.log('\nUso:');
 console.log('node generate-token.js owner');
-console.log('node generate-token.js staff');
-console.log('node generate-token.js patient');
 console.log(
   'node generate-token.js owner --tenant c56a4180-65aa-42ec-a945-5fd21dec0538 --expiresIn 8h',
-);
-console.log(
-  'node generate-token.js patient --tenant <tenant_id> --sub <patient_supabase_id> --email paciente@clinica.com',
 );

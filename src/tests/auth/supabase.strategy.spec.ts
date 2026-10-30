@@ -22,6 +22,7 @@ describe('SupabaseStrategy', () => {
           provide: AUTH_CONFIG_PORT,
           useValue: {
             getSupabaseJwtSecret: jest.fn().mockReturnValue('test-secret'),
+            getSupabaseUrl: jest.fn().mockReturnValue(''),
           } satisfies AuthConfigPort,
         },
       ],
