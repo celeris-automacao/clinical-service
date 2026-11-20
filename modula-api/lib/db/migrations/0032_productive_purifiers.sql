@@ -1,0 +1,3 @@
+ALTER TABLE "appointments" ADD COLUMN "price_type" "payment_type";--> statement-breakpoint
+ALTER TABLE "appointments" ADD COLUMN "doctor_insurance_id" integer;--> statement-breakpoint
+ALTER TABLE "appointments" ADD CONSTRAINT "appointments_doctor_insurance_id_doctor_insurances_id_fk" FOREIGN KEY ("doctor_insurance_id") REFERENCES "public"."doctor_insurances"("id") ON DELETE set null ON UPDATE no action;

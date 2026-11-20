@@ -1,0 +1,1 @@
+CREATE INDEX "request_access_attempts_email_attempted_at_idx" ON "request_access_attempts" USING btree ("email","attempted_at");

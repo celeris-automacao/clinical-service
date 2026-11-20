@@ -1,0 +1,4 @@
+ALTER TABLE "conversations" ADD COLUMN "participant_a_user_id" integer;--> statement-breakpoint
+ALTER TABLE "conversations" ADD COLUMN "participant_b_user_id" integer;--> statement-breakpoint
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_participant_a_user_id_users_id_fk" FOREIGN KEY ("participant_a_user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_participant_b_user_id_users_id_fk" FOREIGN KEY ("participant_b_user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;

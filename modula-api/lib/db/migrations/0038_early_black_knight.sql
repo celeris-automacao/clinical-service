@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "mute_community_notifications" boolean DEFAULT false NOT NULL;

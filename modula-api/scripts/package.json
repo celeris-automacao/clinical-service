@@ -1,0 +1,30 @@
+{
+  "name": "@workspace/scripts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "hello": "tsx ./src/hello.ts",
+    "seed": "tsx ./src/seed.ts",
+    "seed:birthdays-and-agenda": "tsx ./src/seed-birthdays-and-agenda.ts",
+    "seed:finance": "tsx ./src/seed-finance.ts",
+    "seed:demo": "tsx ./src/seed-demo.ts",
+    "check-reset-tokens": "tsx ./src/check-reset-tokens.ts",
+    "cleanup:reset-tokens": "tsx ./src/cleanup-reset-tokens.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:e2e": "playwright test --config playwright.config.ts"
+  },
+  "dependencies": {
+    "@workspace/db": "workspace:*",
+    "bcryptjs": "catalog:",
+    "drizzle-orm": "catalog:",
+    "pg": "catalog:"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/bcryptjs": "catalog:",
+    "@types/node": "catalog:",
+    "@types/pg": "catalog:",
+    "tsx": "catalog:"
+  }
+}

@@ -1,0 +1,2 @@
+ALTER TABLE "patients" ADD COLUMN "daily_water_goal_ml" integer DEFAULT 2000 NOT NULL;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "daily_exercise_calorie_goal" integer DEFAULT 300 NOT NULL;

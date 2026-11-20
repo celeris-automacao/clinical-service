@@ -1,0 +1,19 @@
+ALTER TABLE "patients" ADD COLUMN "cpf" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "rg" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_street" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_number" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_complement" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_neighborhood" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_city" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_state" text;--> statement-breakpoint
+ALTER TABLE "patients" ADD COLUMN "address_zip" text;--> statement-breakpoint
+ALTER TABLE "doctors" ADD COLUMN "phone" text;--> statement-breakpoint
+ALTER TABLE "doctors" ADD COLUMN "cpf" text;--> statement-breakpoint
+ALTER TABLE "doctors" ADD COLUMN "rg" text;--> statement-breakpoint
+ALTER TABLE "doctors" ADD COLUMN "birth_date" text;--> statement-breakpoint
+ALTER TABLE "doctors" ADD COLUMN "salary" numeric(10, 2);--> statement-breakpoint
+ALTER TABLE "secretaries" ADD COLUMN "phone" text;--> statement-breakpoint
+ALTER TABLE "secretaries" ADD COLUMN "cpf" text;--> statement-breakpoint
+ALTER TABLE "secretaries" ADD COLUMN "rg" text;--> statement-breakpoint
+ALTER TABLE "secretaries" ADD COLUMN "birth_date" text;--> statement-breakpoint
+ALTER TABLE "secretaries" ADD COLUMN "salary" numeric(10, 2);

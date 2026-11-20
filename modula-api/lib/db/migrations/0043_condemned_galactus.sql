@@ -1,0 +1,2 @@
+ALTER TABLE "patients" ADD COLUMN "clinic_id" integer;--> statement-breakpoint
+CREATE UNIQUE INDEX "patients_clinic_cpf_unique" ON "patients" USING btree ("clinic_id","cpf") WHERE "patients"."cpf" IS NOT NULL AND "patients"."clinic_id" IS NOT NULL;

@@ -1,0 +1,30 @@
+  "id": "f3a9b2c1-8e4d-4f7a-9b3e-2c1d5e6f8a0b",
+        "ip": {
+          "name": "ip",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        },
+        "request_access_attempts_ip_attempted_at_idx": {
+          "name": "request_access_attempts_ip_attempted_at_idx",
+          "columns": [
+            {
+              "expression": "ip",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "attempted_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+          "notNull": false,
+          "default": null

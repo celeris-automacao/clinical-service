@@ -1,0 +1,2 @@
+ALTER TABLE "request_access_attempts" ADD COLUMN "ip" text;--> statement-breakpoint
+CREATE INDEX "request_access_attempts_ip_attempted_at_idx" ON "request_access_attempts" USING btree ("ip","attempted_at");

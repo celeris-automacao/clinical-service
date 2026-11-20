@@ -1,0 +1,1 @@
+ALTER TABLE "clinic_settings" ADD COLUMN "branding_version" integer DEFAULT 1 NOT NULL;

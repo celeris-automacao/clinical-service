@@ -1,0 +1,510 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1782873881486,
+      "tag": "0000_spooky_goblin_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782873900000,
+      "tag": "0001_add_nutrition_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782873900001,
+      "tag": "0002_add_password_reset_tokens",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782873900002,
+      "tag": "0003_add_birthday_notification_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782873900003,
+      "tag": "0004_add_clinics",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782873900004,
+      "tag": "0005_add_multitenant",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782874000000,
+      "tag": "0006_fix_patient_doctors_fk",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782874020000,
+      "tag": "0007_add_super_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1782874020001,
+      "tag": "0008_allow_multi_clinic_owners",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783039108557,
+      "tag": "0009_vengeful_shaman",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783040000000,
+      "tag": "0010_add_calorie_macros_checkin_nullable",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783040135337,
+      "tag": "0011_past_mulholland_black",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783046344845,
+      "tag": "0012_stale_squadron_sinister",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1783046345000,
+      "tag": "0013_add_chat_conversations_messages",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1783274558815,
+      "tag": "0014_abnormal_starhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1783274998167,
+      "tag": "0015_curly_hairball",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1783275100067,
+      "tag": "0016_small_mephistopheles",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1783291486700,
+      "tag": "0017_tearful_boomerang",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783293995794,
+      "tag": "0018_furry_wolverine",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783297099039,
+      "tag": "0019_white_epoch",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1783301772076,
+      "tag": "0020_worthless_thunderbolts",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1783328435531,
+      "tag": "0021_rich_tiger_shark",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1783330388258,
+      "tag": "0022_dusty_stone_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1783330433678,
+      "tag": "0023_last_sheva_callister",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1783330433679,
+      "tag": "0024_purple_runaways",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1783331171035,
+      "tag": "0025_cold_the_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1783343953419,
+      "tag": "0026_fine_deadpool",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1783373932979,
+      "tag": "0027_tricky_stellaris",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1783373973207,
+      "tag": "0028_closed_ravenous",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1783376262529,
+      "tag": "0029_common_arachne",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1783376280000,
+      "tag": "0030_outstanding_rage",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1783376300000,
+      "tag": "0031_black_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1783378644771,
+      "tag": "0032_productive_purifiers",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1783378714798,
+      "tag": "0033_lonely_big_bertha",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1783381380924,
+      "tag": "0034_young_lord_hawal",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1783383688899,
+      "tag": "0035_next_stephen_strange",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1783384001828,
+      "tag": "0036_uneven_wildside",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1783384406945,
+      "tag": "0037_breezy_baron_strucker",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1783387187394,
+      "tag": "0038_early_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1783387609116,
+      "tag": "0039_thankful_mauler",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1783411389783,
+      "tag": "0040_tricky_mephistopheles",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1783413958350,
+      "tag": "0041_calm_wonder_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1783413958351,
+      "tag": "0042_married_bullseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1783421114977,
+      "tag": "0043_condemned_galactus",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1783422151698,
+      "tag": "0044_common_christian_walker",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1783422151699,
+      "tag": "0045_friendly_frightful_four",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1783464559350,
+      "tag": "0046_gray_wiccan",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1783464559351,
+      "tag": "0047_brave_the_captain",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1783465013942,
+      "tag": "0048_clean_kronos",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1783465144873,
+      "tag": "0049_organic_king_cobra",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1783465437899,
+      "tag": "0050_yummy_rick_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1783466259829,
+      "tag": "0051_strong_silverclaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1783466888006,
+      "tag": "0052_serious_spitfire",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1783467608245,
+      "tag": "0053_milky_brood",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1783468056966,
+      "tag": "0054_faithful_landau",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1783469849566,
+      "tag": "0055_plain_stick",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1783469874553,
+      "tag": "0056_peaceful_mentor",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1783470486276,
+      "tag": "0057_living_starfox",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1783471077727,
+      "tag": "0058_cold_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1783471077728,
+      "tag": "0059_active_enrollment_unique_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1783471077729,
+      "tag": "0060_doctor_specialty_free_text",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1783471077730,
+      "tag": "0061_message_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1793325841205,
+      "tag": "0062_community_file_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1793327650000,
+      "tag": "0063_appointment_email_confirmation",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1793399400000,
+      "tag": "0064_commercial_leads",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1793560000000,
+      "tag": "0065_community_comment_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1793560000001,
+      "tag": "0066_appointment_free_text_insurance",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1793560000002,
+      "tag": "0067_professional_lunch_breaks",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1793560000003,
+      "tag": "0068_care_package_slot_doctors",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1793560000004,
+      "tag": "0069_care_package_promotion_images",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1793560000005,
+      "tag": "0070_care_package_promotion_uploads",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1793650000000,
+      "tag": "0071_care_package_original_price",
+      "breakpoints": true
+    }
+  ]
+}

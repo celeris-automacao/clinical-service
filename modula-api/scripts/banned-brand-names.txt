@@ -1,0 +1,19 @@
+# Banned brand-name strings — one per line.
+# Lines starting with # are ignored. Blank lines are ignored.
+#
+# ─── HOW TO RETIRE A BRAND NAME ──────────────────────────────────────────────
+# When the product is renamed or a brand string is replaced:
+#   1. Add the OLD name to this file BEFORE updating any source files.
+#   2. Run the brand-name check to confirm it catches the old strings:
+#          bash scripts/check-brand-name.sh
+#   3. Replace all old-name occurrences in source until the check passes.
+#   4. Keep the entry here permanently — it guards against future regressions.
+#
+# Exclusion rules (e.g. legitimate code identifiers like "ClinictareLogo")
+# live in check-brand-name.sh, not here.
+# ─────────────────────────────────────────────────────────────────────────────
+
+ClinicTare
+OmniClinic
+CriaClinic
+Clínica in Box

@@ -1,0 +1,1 @@
+ALTER TABLE "patients" ADD COLUMN "last_seen_goals_at" timestamp;

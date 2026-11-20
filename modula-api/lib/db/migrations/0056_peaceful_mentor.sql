@@ -1,0 +1,1 @@
+ALTER TABLE "audit_failures" ADD COLUMN IF NOT EXISTS "owner_notified_at" timestamp;
